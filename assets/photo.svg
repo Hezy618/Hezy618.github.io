@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges">
+  <!-- 占位像素头像：把你的照片命名为 me.jpg 放进 assets/，
+       再把 data.js 里 photo 改成 "assets/me.jpg" 即可 -->
+  <rect width="16" height="16" fill="#14152a"/>
+  <rect x="4" y="3" width="8" height="2" fill="#5a3d1e"/>
+  <rect x="3" y="4" width="10" height="2" fill="#5a3d1e"/>
+  <rect x="3" y="5" width="10" height="5" fill="#f2c48d"/>
+  <rect x="4" y="7" width="2" height="2" fill="#1a1b31"/>
+  <rect x="10" y="7" width="2" height="2" fill="#1a1b31"/>
+  <rect x="6" y="10" width="4" height="1" fill="#c96f4a"/>
+  <rect x="5" y="11" width="6" height="1" fill="#f2c48d"/>
+  <rect x="4" y="12" width="8" height="3" fill="#3ef26d"/>
+  <rect x="3" y="13" width="10" height="3" fill="#3ef26d"/>
+  <rect x="4" y="14" width="2" height="2" fill="#2ab84f"/>
+  <rect x="10" y="14" width="2" height="2" fill="#2ab84f"/>
+</svg>

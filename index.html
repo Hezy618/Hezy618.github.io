@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zhongyu He — Homepage</title>
+  <meta name="description" content="Personal homepage of Zhongyu He" />
+
+  <!-- 像素字体：标题 Press Start 2P / 正文 VT323 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'><rect width='8' height='8' fill='%2307070f'/><rect x='3' y='1' width='2' height='2' fill='%23f3e9c8'/><rect x='1' y='3' width='6' height='2' fill='%23f3e9c8'/><rect x='3' y='5' width='2' height='2' fill='%23f3e9c8'/></svg>" />
+</head>
+<body>
+
+  <!-- 夜空背景：星星 / 流星（JS）· 月亮 / 云 / 群山（CSS+JS） -->
+  <div id="starfield" aria-hidden="true"></div>
+  <div class="moon-wrap" aria-hidden="true"><div id="moon"></div></div>
+  <div class="cloud cloud-1" aria-hidden="true"></div>
+  <div class="cloud cloud-2" aria-hidden="true"></div>
+  <div class="mountains mountains-back" aria-hidden="true"></div>
+  <div class="mountains mountains-front" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+
+  <!-- 鼠标星尘轨迹容器 -->
+  <div id="stardust" aria-hidden="true"></div>
+
+  <!-- ===== 顶部导航 ===== -->
+  <nav class="navbar">
+    <span class="nav-logo">✦ <span id="nav-name">ZH</span></span>
+    <div class="nav-links">
+      <a href="#about">ABOUT</a>
+      <a href="#experience">EXP</a>
+      <a href="#publications">PAPERS</a>
+      <a href="#hobbies">FUN</a>
+    </div>
+  </nav>
+
+  <main class="container">
+
+    <!-- ===== HERO：塔罗牌 + 角色信息 ===== -->
+    <header class="hero" id="about">
+
+      <!-- 塔罗牌：悬停 3D 倾斜 + 流光，点击翻面 -->
+      <div class="tarot-scene" id="tarotScene" title="Click to flip">
+        <div class="tarot-tilt" id="tarotTilt">
+          <div class="tarot-card" id="tarotCard">
+            <!-- 正面 -->
+            <div class="tarot-face tarot-front">
+              <div class="tarot-border-inner">
+                <div class="tarot-top">
+                  <span class="tarot-star">✦</span>
+                  <span class="tarot-numeral" id="tarot-numeral">XXII</span>
+                  <span class="tarot-star">✦</span>
+                </div>
+                <div class="tarot-photo-ring">
+                  <div class="tarot-photo-frame">
+                    <img id="profile-photo" src="assets/photo.svg" alt="profile photo" />
+                    <div class="tarot-glare" id="tarotGlare"></div>
+                  </div>
+                </div>
+                <div class="tarot-caption" id="tarot-caption">THE SCHOLAR</div>
+                <div class="tarot-deco">
+                  <span>☾</span><span class="diamond"></span><span>✦</span><span class="diamond"></span><span>☽</span>
+                </div>
+              </div>
+            </div>
+            <!-- 背面 -->
+            <div class="tarot-face tarot-back">
+              <div class="tarot-border-inner">
+                <div class="tarot-back-sigil">☾</div>
+                <p class="tarot-back-quote" id="tarot-back-quote"></p>
+                <div class="tarot-deco"><span>✦</span><span class="diamond"></span><span>✦</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tarot-shadow"></div>
+        <!-- 打盹的像素猫（趴在牌框上沿，JS 生成） -->
+        <div class="cat cat-sleep" id="catSleep" aria-hidden="true"></div>
+      </div>
+
+      <!-- 角色信息 -->
+      <div class="hero-info">
+        <p class="hero-hello">✦ WELCOME, TRAVELER ✦</p>
+        <h1 id="profile-name" class="pixel-title">Zhongyu He</h1>
+        <p class="tagline"><span id="typewriter"></span><span class="cursor">_</span></p>
+        <ul class="stat-list" id="stat-list"><!-- JS 渲染 --></ul>
+        <div class="chip-row" id="chip-row"><!-- JS 渲染：研究方向 --></div>
+        <div class="link-row" id="link-row"><!-- JS 渲染 --></div>
+      </div>
+    </header>
+
+    <!-- ===== About Me ===== -->
+    <section class="panel reveal">
+      <h2 class="section-title"><span class="glyph">✦</span> ABOUT ME <span class="rule"></span></h2>
+      <div id="bio"><!-- JS 渲染 --></div>
+    </section>
+
+    <!-- ===== Experience 个人经历（工作 + 教育） ===== -->
+    <section class="panel reveal" id="experience">
+      <h2 class="section-title"><span class="glyph">✦</span> EXPERIENCE <span class="rule"></span></h2>
+      <h3 class="sub-title">▸ WORK</h3>
+      <div id="exp-list"><!-- JS 渲染 --></div>
+      <h3 class="sub-title">▸ EDUCATION</h3>
+      <ul class="edu-list" id="edu-list"><!-- JS 渲染 --></ul>
+    </section>
+
+    <!-- ===== Publications ===== -->
+    <section class="panel reveal" id="publications">
+      <h2 class="section-title"><span class="glyph">✦</span> PUBLICATIONS <span class="rule"></span></h2>
+      <div id="pub-list"><!-- JS 渲染 --></div>
+      <!-- 巡逻的像素猫（沿板块上沿来回走动，JS 生成） -->
+      <div class="cat cat-patrol" id="catPatrol" aria-hidden="true"></div>
+    </section>
+
+    <!-- ===== Awards ===== -->
+    <section class="panel reveal" id="awards">
+      <h2 class="section-title"><span class="glyph">✦</span> HONORS <span class="rule"></span></h2>
+      <ul class="award-list" id="award-list"><!-- JS 渲染 --></ul>
+    </section>
+
+    <!-- ===== Hobbies ===== -->
+    <section class="panel reveal" id="hobbies">
+      <h2 class="section-title"><span class="glyph">✦</span> SIDE QUESTS <span class="rule"></span></h2>
+      <div class="hobby-grid" id="hobby-grid"><!-- JS 渲染 --></div>
+      <!-- 坐姿像素猫（蹲在板块上沿，偶尔眨眼，JS 生成） -->
+      <div class="cat cat-sit" id="catSit" aria-hidden="true"></div>
+    </section>
+
+    <footer class="footer">
+      <p class="footer-divider">✦ · ✦</p>
+      <p id="footer-text"></p>
+    </footer>
+
+  </main>
+
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
