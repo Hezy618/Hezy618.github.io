@@ -32,11 +32,11 @@
 
 **学术主页特化功能**
 
-- 🏷️ **评级徽章自动配色**：`CCF-A` / `CCF-B` / `CAS Q1 Top`（中科院分区）等，按文字自动匹配颜色
+- 🏷️ **评级徽章自动配色**：`CCF-A`（高亮发光）/ `CCF-B` / `CAS Q1 Top`（中科院分区）等，按文字自动匹配颜色
 - 🔗 **徽章可点击**：CCF 徽章直达 CCF 官方目录、CORE 直达 ICORE 查询页、TH-CPL 直达清华官方 PDF（跳转表可自行增删）
 - 🔑 **论文关键词**：作者名单下方一行小 chips，悬停高亮
 - ✍️ 你的名字在作者列表中**自动加粗**；名字后加 `*` 自动标注共同一作并生成 "* Equal contribution" 脚注
-- 📌 `Accepted`（绿）/ `Under Review`（紫）状态徽章自动区分
+- 📌 `Accepted`（绿，呼吸灯）/ `Under Review`（紫）状态徽章自动区分，在审论文可挂 `meta` 审稿均分
 
 **彩蛋与细节**
 
@@ -77,7 +77,8 @@
   venue: "期刊/会议名",
   year: 2026,
   status: "Accepted",                      // 或 "Under Review"
-  level: "CCF-A",                          // 主评级徽章，颜色自动匹配
+  meta: 3.5,                               // 可选：在审会议论文的审稿均分（仅填写后显示）
+  level: "CCF-A",                          // 主评级徽章，颜色自动匹配（CCF-A 高亮发光）
   extraLevels: ["CORE A*", "TH-CPL A"],    // 补充评级（金色空心徽章），可省略
   keywords: ["LLM Agents", "Reinforcement Learning"],  // 关键词 chips（作者下方），留空 [] 不显示
   links: { PDF: "https://doi.org/..." },   // 论文链接，键名随意增删

@@ -460,7 +460,7 @@ body {
   padding: 6px 9px;
   color: var(--bg0);
 }
-.badge.ccf-a   { background: #e85a5a; box-shadow: 0 3px 0 #7e2f2f; }
+.badge.ccf-a   { background: #e85a5a; box-shadow: 0 3px 0 #7e2f2f, 0 0 16px rgba(232,90,90,.55); font-size: 9px; padding: 7px 10px; }
 .badge.ccf-b   { background: #e8c46a; box-shadow: 0 3px 0 #8a6d2f; }
 .badge.ccf-c   { background: #6ec6d8; box-shadow: 0 3px 0 #2f6f7e; }
 .badge.cas     { background: #d98fb8; box-shadow: 0 3px 0 #7e3f68; }
@@ -488,6 +488,12 @@ body {
   color: #b48fe8; border-color: #b48fe8;
 }
 .badge.status.review::before { display: none; }
+/* 审稿均分（Under Review 会议论文的 Meta score，紫色微光） */
+.badge.meta {
+  background: rgba(180, 143, 232, .12);
+  color: #cfb2f5; border: 1px solid #b48fe8;
+  box-shadow: 0 0 10px rgba(180, 143, 232, .35);
+}
 /* 补充评级标签：金色空心，如 CORE A* / TH-CPL A */
 .badge.alt { background: transparent; box-shadow: none; color: var(--gold); border: 1px solid var(--gold); }
 /* 可点击的评级徽章 */

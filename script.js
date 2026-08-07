@@ -133,6 +133,8 @@
       if (/review/i.test(pub.status)) st.classList.add("review");
       badges.appendChild(st);
     }
+    if (pub.meta != null && pub.meta !== "")
+      badges.appendChild(el("span", "badge meta", `Meta ${esc(String(pub.meta))}`));
     if (pub.level) badges.appendChild(badgeEl(pub.level, badgeClass(pub.level)));
     (pub.extraLevels || []).forEach((lv) =>
       badges.appendChild(badgeEl(lv, "alt")));
