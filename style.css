@@ -508,20 +508,6 @@ a.badge:hover { transform: translateY(-2px); filter: brightness(1.15); }
 }
 .pub-keywords .kw:hover { color: var(--cyan); border-color: rgba(143, 216, 232, .5); }
 
-/* 论文 framework 缩略图（钉在徽章行最右侧，点击看大图/PDF） */
-.pub-thumb {
-  margin-left: auto;
-  flex: none;
-  width: 132px;
-  background: #fff;
-  border: 2px solid var(--line-soft);
-  padding: 3px;
-  cursor: zoom-in;
-  transition: border-color .15s, transform .15s;
-}
-.pub-thumb:hover { border-color: var(--gold); transform: translateY(-2px); }
-.pub-thumb img { display: block; width: 100%; height: auto; }
-
 .pub-links { display: inline-flex; gap: 8px; }
 .pub-links a {
   font-family: var(--font-pixel);
