@@ -81,7 +81,7 @@ const SITE = {
       year: 2026,
       status: "Accepted",
       level: "CCF-A",
-      keywords: ["知识蒸馏", "Graph2Token", "超图", "化学语言模型"],
+      keywords: ["Knowledge Distillation", "Graph2Token", "Hypergraph", "Chemical Language Model"],
       links: { PDF: "https://doi.org/10.1093/bioinformatics/btag290" },
     },
     {
@@ -91,7 +91,7 @@ const SITE = {
       year: 2026,
       status: "Accepted",
       level: "CAS Q1 Top",
-      keywords: ["化学语言模型", "Attention"],
+      keywords: ["Chemical Language Model", "Attention"],
       links: { PDF: "https://doi.org/10.1109/JBHI.2026.3678303" },
     },
     {
@@ -101,7 +101,7 @@ const SITE = {
       year: 2026,
       status: "Accepted",
       level: "CAS Q2",
-      keywords: ["Graph2Token", "分子表示"],
+      keywords: ["Graph2Token", "Molecular Representation"],
       links: { PDF: "https://doi.org/10.1021/acs.jcim.6c01205" },
     },
     {
@@ -112,7 +112,7 @@ const SITE = {
       status: "Under Review",
       level: "CCF-B",
       extraLevels: ["CORE A*", "TH-CPL A"],   // EMNLP: CORE2023 起 A*，清华 TH-CPL A 类
-      keywords: ["LLM Agents", "Agentic RL", "SKILL", "自蒸馏"],
+      keywords: ["LLM Agents", "Agentic RL", "SKILL", "Self-Distillation"],
       links: { PDF: "https://arxiv.org/pdf/2606.02355" },
     },
     {
@@ -133,7 +133,7 @@ const SITE = {
       year: 2026,
       status: "Under Review",
       level: "CCF-A",
-      keywords: ["超图", "知识图谱"],
+      keywords: ["Hypergraph", "Knowledge Graph"],
       links: {},                                                        // TODO: 有公开链接后补上
     },
   ],
