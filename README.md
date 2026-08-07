@@ -4,8 +4,6 @@
 
 **在线预览 → https://hezy618.github.io**
 
-![页面预览](assets/preview.png)
-
 ---
 
 ## ✨ 页面里有哪些设计
