@@ -69,6 +69,7 @@ const SITE = {
    * badge 颜色会自动匹配；status 可填 "Accepted" / "Under Review" 等；
    * extraLevels 可填补充评级标签，如 ["CORE A*", "TH-CPL A"]（金色空心徽章）；
    * keywords 为关键词数组，显示在作者名单下方（留空 [] 则不显示）；
+   * meta 为审稿均分，仅 Under Review 的会议论文需要（如 meta: 3.5，留空则不显示）；
    * 作者名后加 * 表示共同一作（页面自动加 "* Equal contribution" 脚注）；
    * links 里的键可以随意增删（PDF / Code / arXiv / DOI / Project ...）；
    * 整段数组清空 [] 后该版块会自动隐藏
@@ -110,6 +111,7 @@ const SITE = {
       venue: "EMNLP",
       year: 2026,
       status: "Under Review",
+      meta: 3.5,                              // ARR 审稿均分
       level: "CCF-B",
       extraLevels: ["CORE A*", "TH-CPL A"],   // EMNLP: CORE2023 起 A*，清华 TH-CPL A 类
       keywords: ["LLM Agents", "Agentic RL", "SKILL", "Self-Distillation"],
@@ -121,6 +123,7 @@ const SITE = {
       venue: "EMNLP",
       year: 2026,
       status: "Under Review",
+      meta: 3,                                // ARR 审稿均分
       level: "CCF-B",
       extraLevels: ["CORE A*", "TH-CPL A"],   // EMNLP: CORE2023 起 A*，清华 TH-CPL A 类
       keywords: ["LLM Agents", "Agentic RL", "SKILL"],
@@ -128,7 +131,7 @@ const SITE = {
     },
     {
       title: "Knowledge Embedding-based Dynamic Hypergraph Neural Networks for Knowledge Graph Completion",
-      authors: ["Zhongyu He", "et al."],                                // TODO: 补全合作者列表
+      authors: ["Zhongyu He", "Shuting Jin", "Xiangrong Liu", "Junlin Xu", "Tengfei Ma", "Leyi Wei"],
       venue: "IEEE Transactions on Knowledge and Data Engineering (TKDE)",
       year: 2026,
       status: "Under Review",
