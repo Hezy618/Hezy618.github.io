@@ -145,16 +145,6 @@
       links.appendChild(a);
     });
     badges.appendChild(links);
-    if (pub.image) {                       // framework 缩略图：钉在徽章行最右侧，点击看大图/PDF
-      const a = el("a", "pub-thumb");
-      a.href = pub.imageFull || pub.image;
-      a.target = "_blank"; a.rel = "noopener";
-      a.title = "Click to enlarge";
-      const img = el("img");
-      img.src = pub.image; img.alt = `${pub.title} — framework`; img.loading = "lazy";
-      a.appendChild(img);
-      badges.appendChild(a);
-    }
     card.appendChild(badges);
     pubList.appendChild(card);
   });
