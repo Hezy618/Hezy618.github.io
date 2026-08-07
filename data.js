@@ -68,6 +68,10 @@ const SITE = {
    * level 可填: "CCF-A" / "CCF-B" / "CCF-C" / "CAS Q1 Top" / "CAS Q2" ...
    * badge 颜色会自动匹配；status 可填 "Accepted" / "Under Review" 等；
    * extraLevels 可填补充评级标签，如 ["CORE A*", "TH-CPL A"]（金色空心徽章）；
+   * keywords 为关键词数组，显示在作者名单下方（留空 [] 则不显示）；
+   * image 为论文主 idea / framework 图的缩略图路径，以 PNG 小图钉在卡片右下角，
+   *   点击放大查看 imageFull（可填 PDF 矢量图；imageFull 留空则放大查看 image 本身，
+   *   image 留空 "" 则整篇不显示缩略图）；
    * 作者名后加 * 表示共同一作（页面自动加 "* Equal contribution" 脚注）；
    * links 里的键可以随意增删（PDF / Code / arXiv / DOI / Project ...）；
    * 整段数组清空 [] 后该版块会自动隐藏
@@ -80,6 +84,9 @@ const SITE = {
       year: 2026,
       status: "Accepted",
       level: "CCF-A",
+      keywords: ["Knowledge Distillation", "Compound-Protein Interaction", "Inductive Prediction"],
+      image: "pic/HKD-CPI_framework.png",
+      imageFull: "pic/HKD-CPI_framework.pdf",
       links: { PDF: "https://doi.org/10.1093/bioinformatics/btag290" },
     },
     {
@@ -89,6 +96,8 @@ const SITE = {
       year: 2026,
       status: "Accepted",
       level: "CAS Q1 Top",
+      keywords: ["Compound-Protein Interaction", "Intra- & Inter-molecular", "Bilinear Attention"],
+      image: "",
       links: { PDF: "https://doi.org/10.1109/JBHI.2026.3678303" },
     },
     {
@@ -98,6 +107,8 @@ const SITE = {
       year: 2026,
       status: "Accepted",
       level: "CAS Q2",
+      keywords: ["Molecular Representation", "Graph-Text Alignment", "Chemical Language"],
+      image: "",
       links: { PDF: "https://doi.org/10.1021/acs.jcim.6c01205" },
     },
     {
@@ -108,6 +119,9 @@ const SITE = {
       status: "Under Review",
       level: "CCF-B",
       extraLevels: ["CORE A*", "TH-CPL A"],   // EMNLP: CORE2023 起 A*，清华 TH-CPL A 类
+      keywords: ["LLM Agents", "Reinforcement Learning", "Skill Internalization", "Self-Skill Mining"],
+      image: "pic/SIRI_framework.png",
+      imageFull: "pic/SIRI_framework.pdf",
       links: { PDF: "https://arxiv.org/pdf/2606.02355" },
     },
     {
@@ -118,6 +132,8 @@ const SITE = {
       status: "Under Review",
       level: "CCF-B",
       extraLevels: ["CORE A*", "TH-CPL A"],   // EMNLP: CORE2023 起 A*，清华 TH-CPL A 类
+      keywords: ["LLM Agents", "Reinforcement Learning", "Skill Evolution", "Ability Alignment"],
+      image: "",
       links: {},                                                        // TODO: 有公开链接后补上
     },
     {
@@ -127,6 +143,8 @@ const SITE = {
       year: 2026,
       status: "Under Review",
       level: "CCF-A",
+      keywords: ["Knowledge Graph Completion", "Dynamic Hypergraph", "Knowledge Embedding"],
+      image: "",
       links: {},                                                        // TODO: 有公开链接后补上
     },
   ],
