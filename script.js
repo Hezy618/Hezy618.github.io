@@ -207,22 +207,25 @@
   })();
 
   /* ==================== 像素月亮 ==================== */
-  /* 14 列圆形：m=月光 c=陨石坑 t=透明 */
+  /* 16 列圆形：t=透明 h=高光 m=月光 k=过渡 s=暗部 d=深影 c=陨石坑底 r=坑沿高光
+   * 光源在左上：整体沿对角线由亮到暗，陨石坑受光侧坑沿提亮 */
   const MOON = [
-    "ttttmmmmmmtttt",
-    "ttmmmmmmmmmmtt",
-    "tmmmmmmmmmmmmt",
-    "tmmmccmmmmmmmt",
-    "mmmcccmmmmmmcm",
-    "mmmccmmmmmmcmm",
-    "mmmmmmmmmmmmmm",
-    "mmmmmmmcmmmmmm",
-    "mmmmmmmccmmmmm",
-    "mmmcmmmmmmmmmm",
-    "tmmccmmmmmmmmt",
-    "tmmmmmmmmmmmmt",
-    "ttmmmmmmmmmmtt",
-    "ttttmmmmmmtttt",
+    "ttttttthhttttttt",
+    "tttthhhhmmmmtttt",
+    "ttthhhhmmmmmkttt",
+    "tthhrrmmmmrrkktt",
+    "thhrccmmmrcckkkt",
+    "thhrccmmmrcckkst",
+    "thhrccmmkkkkksst",
+    "hhmmmmmkkkkkssss",
+    "hmmmmmkkkkkssssd",
+    "tmmmmrrrkksrssdt",
+    "tmmmkrccksrcsddt",
+    "tmmrkrccssssdddt",
+    "ttrckkkssssdddtt",
+    "tttkkkssssdddttt",
+    "ttttkssssdddtttt",
+    "tttttttsdttttttt",
   ];
   const moon = $("#moon");
   MOON.forEach((row) => {

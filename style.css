@@ -78,11 +78,16 @@ body {
   pointer-events: none;
 }
 @keyframes moonFloat { from { transform: translateY(0); } to { transform: translateY(14px); } }
-#moon { display: grid; grid-auto-rows: 9px; }
+#moon { display: grid; grid-auto-rows: 8px; }
 #moon .row { display: flex; }
-#moon .px { width: 9px; height: 9px; }
+#moon .px { width: 8px; height: 8px; }
+#moon .h  { background: #fff6d9; }   /* 高光 */
 #moon .m  { background: var(--cream); }
-#moon .c  { background: #d9c69a; }   /* 陨石坑 */
+#moon .k  { background: #ddcaa0; }   /* 亮暗过渡 */
+#moon .s  { background: #c3a876; }   /* 暗部 */
+#moon .d  { background: #9d8454; }   /* 深影 */
+#moon .c  { background: #b39a68; }   /* 陨石坑底 */
+#moon .r  { background: #fdf1d2; }   /* 坑沿高光 */
 #moon .t  { background: transparent; }
 
 /* 像素云 */
