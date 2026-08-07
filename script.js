@@ -121,6 +121,10 @@
     card.appendChild(el("h3", "pub-title", esc(pub.title)));
     card.appendChild(el("p", "pub-authors", authors));
     if (hasEqual) card.appendChild(el("p", "pub-note", "* Equal contribution"));
+    if ((pub.keywords || []).length) {
+      card.appendChild(el("p", "pub-keywords",
+        pub.keywords.map((k) => `<span class="kw">${esc(k)}</span>`).join("")));
+    }
     card.appendChild(el("p", "pub-venue", `${esc(pub.venue)}, ${esc(pub.year)}`));
 
     const badges = el("div", "pub-badges");
@@ -141,6 +145,16 @@
       links.appendChild(a);
     });
     badges.appendChild(links);
+    if (pub.image) {                       // framework 缩略图：钉在徽章行最右侧，点击看大图/PDF
+      const a = el("a", "pub-thumb");
+      a.href = pub.imageFull || pub.image;
+      a.target = "_blank"; a.rel = "noopener";
+      a.title = "Click to enlarge";
+      const img = el("img");
+      img.src = pub.image; img.alt = `${pub.title} — framework`; img.loading = "lazy";
+      a.appendChild(img);
+      badges.appendChild(a);
+    }
     card.appendChild(badges);
     pubList.appendChild(card);
   });

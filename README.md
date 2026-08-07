@@ -34,6 +34,8 @@
 
 - 🏷️ **评级徽章自动配色**：`CCF-A` / `CCF-B` / `CAS Q1 Top`（中科院分区）等，按文字自动匹配颜色
 - 🔗 **徽章可点击**：CCF 徽章直达 CCF 官方目录、CORE 直达 ICORE 查询页、TH-CPL 直达清华官方 PDF（跳转表可自行增删）
+- 🔑 **论文关键词**：作者名单下方一行小 chips，悬停高亮
+- 🖼️ **Framework 图缩略展示**：论文主 idea 图以小缩略图钉在卡片右下角，点击放大查看（支持 PDF 矢量图）
 - ✍️ 你的名字在作者列表中**自动加粗**；名字后加 `*` 自动标注共同一作并生成 "* Equal contribution" 脚注
 - 📌 `Accepted`（绿）/ `Under Review`（紫）状态徽章自动区分
 
@@ -78,6 +80,9 @@
   status: "Accepted",                      // 或 "Under Review"
   level: "CCF-A",                          // 主评级徽章，颜色自动匹配
   extraLevels: ["CORE A*", "TH-CPL A"],    // 补充评级（金色空心徽章），可省略
+  keywords: ["LLM Agents", "Reinforcement Learning"],  // 关键词 chips（作者下方），留空 [] 不显示
+  image: "pic/xxx_framework.png",          // framework 缩略图（卡片右下角），留空 "" 不显示
+  imageFull: "pic/xxx_framework.pdf",      // 点击缩略图放大查看（可填 PDF 矢量图），留空则放大 image
   links: { PDF: "https://doi.org/..." },   // 论文链接，键名随意增删
 }
 ```
@@ -157,7 +162,7 @@ git add -A && git commit -m "更新说明" && git push
 ├── style.css       # 月夜像素风样式（星空 / 月亮 / 塔罗牌 / 猫 / 指针）
 ├── data.js         # ★ 你的所有信息都在这里，只改这个文件
 ├── script.js       # 渲染与动效（塔罗牌 3D / 像素猫 / 星尘 / 流星 / 视差）
-├── pic/            # 个人照片
+├── pic/            # 个人照片 + 论文 framework 图
 └── assets/         # 像素图标素材
 ```
 
