@@ -18,21 +18,20 @@ const SITE = {
   emailAlt: "",                              // 第二个邮箱（留空则不显示）
 
   /* ---------- 研究方向（显示为 chips） ---------- */
-  research: ["LLM Agents", "Reinforcement Learning", "Knowledge Distillation", "Hypergraph", "Knowledge Graph", "Bioinformatics"],
+  research: ["LLM Agents", "Agentic RL", "Knowledge Distillation", "Hypergraph", "Knowledge Graph", "Bioinformatics"],
 
   /* ---------- 外部链接（没有就删掉那一行） ---------- */
   links: {
-    "Google Scholar": "https://scholar.google.com/",  // TODO: 换成你的 Scholar 主页
+    "Google Scholar": "https://scholar.google.com/citations?user=O-E3TdAAAAAJ&hl=zh-CN&authuser=1",
     "GitHub": "https://github.com/Hezy618",
   },
 
   /* ---------- 塔罗牌（左侧照片卡） ----------
-   * numeral: 牌面顶部罗马数字；title: 底部牌名（大写更有塔罗味）；
-   * backQuote: 点击牌面翻面后背面显示的一句话
+   * numeral: 牌面顶部罗马数字；backQuote: 点击牌面翻面后背面显示的一句话；
+   * 牌面头像下方会自动显示上方 links 里的外链按钮（GitHub / Scholar 等）
    */
   tarot: {
     numeral: "",                            // 牌面顶部罗马数字（留空则整行隐藏）
-    title: "THE SCHOLAR",
     backQuote: "“Not all who wander are lost.”",
   },
 

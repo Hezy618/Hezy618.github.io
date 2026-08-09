@@ -44,19 +44,20 @@
   const chipRow = $("#chip-row");
   (SITE.research || []).forEach((r) => chipRow.appendChild(el("span", "chip", esc(r))));
 
-  const linkRow = $("#link-row");
+  /* GitHub / Scholar 等外链：渲染进塔罗牌头像下方，点击不触发翻面 */
+  const tarotLinks = $("#tarot-links");
   Object.entries(SITE.links || {}).forEach(([label, url]) => {
     const a = el("a", null, esc(label));
     a.href = url;
     a.target = "_blank";
     a.rel = "noopener";
-    linkRow.appendChild(a);
+    tarotLinks.appendChild(a);
   });
+  tarotLinks.addEventListener("click", (e) => e.stopPropagation());
 
   /* 塔罗牌文案 */
   if (SITE.tarot) {
     $("#tarot-numeral").textContent = SITE.tarot.numeral || "";
-    $("#tarot-caption").textContent = SITE.tarot.title || "";
     $("#tarot-back-quote").textContent = SITE.tarot.backQuote || "";
     if (!SITE.tarot.numeral) {                       // 无编号时隐藏整个顶部行
       const top = document.querySelector(".tarot-top");
