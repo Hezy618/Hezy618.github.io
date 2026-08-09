@@ -22,7 +22,7 @@ const SITE = {
 
   /* ---------- 外部链接（没有就删掉那一行） ---------- */
   links: {
-    "Google Scholar": "https://scholar.google.com/",  // TODO: 换成你的 Scholar 主页
+    "Google Scholar": "https://scholar.google.com/citations?user=O-E3TdAAAAAJ&hl=zh-CN&authuser=1",
     "GitHub": "https://github.com/Hezy618",
   },
 
