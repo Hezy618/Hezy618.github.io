@@ -225,28 +225,6 @@ body {
   background: rgba(143, 216, 232, .06);
 }
 
-/* 按钮 */
-.link-row { display: flex; flex-wrap: wrap; gap: 14px; }
-.link-row a {
-  font-family: var(--font-pixel);
-  font-size: 9px;
-  letter-spacing: 1px;
-  color: var(--cream);
-  border: 2px solid #3a3d66;
-  padding: 10px 14px;
-  text-decoration: none;
-  box-shadow: 4px 4px 0 rgba(0, 0, 0, .45);
-  transition: all .12s;
-  background: rgba(18, 19, 38, .6);
-}
-.link-row a:hover {
-  background: var(--cream);
-  border-color: var(--cream);
-  color: var(--bg0);
-  transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0 rgba(0, 0, 0, .45);
-}
-
 /* ============================================================
    塔罗牌
    ============================================================ */
@@ -345,12 +323,24 @@ body {
 }
 .tarot-scene:hover .tarot-glare { opacity: 1; }
 
-.tarot-caption {
+/* 牌面内外链按钮（GitHub / Scholar）：金色描边，与牌框同风格 */
+.tarot-links {
   margin-top: 14px;
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
+}
+.tarot-links a {
   font-family: var(--font-pixel);
-  font-size: 11px; letter-spacing: 3px;
-  color: var(--cream);
-  text-shadow: 0 0 14px rgba(243, 233, 200, .35);
+  font-size: 8px; letter-spacing: 1px;
+  color: var(--gold); text-decoration: none;
+  border: 1px solid var(--gold-dim);
+  padding: 7px 10px;
+  background: rgba(232, 196, 106, .06);
+  transition: all .12s;
+}
+.tarot-links a:hover {
+  background: var(--gold); border-color: var(--gold);
+  color: var(--bg0);
+  box-shadow: 0 0 12px rgba(232, 196, 106, .45);
 }
 .tarot-deco {
   margin-top: 10px;

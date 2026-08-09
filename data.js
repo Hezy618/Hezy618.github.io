@@ -27,12 +27,11 @@ const SITE = {
   },
 
   /* ---------- 塔罗牌（左侧照片卡） ----------
-   * numeral: 牌面顶部罗马数字；title: 底部牌名（大写更有塔罗味）；
-   * backQuote: 点击牌面翻面后背面显示的一句话
+   * numeral: 牌面顶部罗马数字；backQuote: 点击牌面翻面后背面显示的一句话；
+   * 牌面头像下方会自动显示上方 links 里的外链按钮（GitHub / Scholar 等）
    */
   tarot: {
     numeral: "",                            // 牌面顶部罗马数字（留空则整行隐藏）
-    title: "THE SCHOLAR",
     backQuote: "“Not all who wander are lost.”",
   },
 
