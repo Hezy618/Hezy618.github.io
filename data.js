@@ -85,6 +85,18 @@ const SITE = {
       links: { PDF: "https://doi.org/10.1093/bioinformatics/btag290" },
     },
     {
+      title: "SIRI: Self-Internalizing Reinforcement Learning with Intrinsic Skills for LLM Agent Training",
+      authors: ["Zhongyu He", "Yuanfan Li", "Fei Huang", "Tianyu Chen", "Siyuan Chen", "Xingyang Li", "Meng Hsuan Yu", "Xiangrong Liu", "Leyi Wei", "Lu Pan", "Ke Zeng", "Xunliang Cai"],
+      venue: "EMNLP",
+      year: 2026,
+      status: "Under Review",
+      meta: 3.5,                              // ARR 审稿均分
+      level: "CCF-B",
+      extraLevels: ["CORE A*", "TH-CPL A"],   // EMNLP: CORE2023 起 A*，清华 TH-CPL A 类
+      keywords: ["LLM Agents", "Agentic RL", "SKILL", "Self-Distillation"],
+      links: { PDF: "https://arxiv.org/pdf/2606.02355" },
+    },
+    {
       title: "DualBAN: Unifying Intra- and Inter-molecular Features for Compound-Protein Interaction Prediction",
       authors: ["Shida He*", "Zhongyu He*", "Yuting Zhang", "Weidong Ye"],   // * 共同一作
       venue: "IEEE Journal of Biomedical and Health Informatics (JBHI)",
@@ -103,18 +115,6 @@ const SITE = {
       level: "CAS Q2",
       keywords: ["Graph2Token", "Molecular Representation"],
       links: { PDF: "https://doi.org/10.1021/acs.jcim.6c01205" },
-    },
-    {
-      title: "SIRI: Self-Internalizing Reinforcement Learning with Intrinsic Skills for LLM Agent Training",
-      authors: ["Zhongyu He", "Yuanfan Li", "Fei Huang", "Tianyu Chen", "Siyuan Chen", "Xingyang Li", "Meng Hsuan Yu", "Xiangrong Liu", "Leyi Wei", "Lu Pan", "Ke Zeng", "Xunliang Cai"],
-      venue: "EMNLP",
-      year: 2026,
-      status: "Under Review",
-      meta: 3.5,                              // ARR 审稿均分
-      level: "CCF-B",
-      extraLevels: ["CORE A*", "TH-CPL A"],   // EMNLP: CORE2023 起 A*，清华 TH-CPL A 类
-      keywords: ["LLM Agents", "Agentic RL", "SKILL", "Self-Distillation"],
-      links: { PDF: "https://arxiv.org/pdf/2606.02355" },
     },
     {
       title: "Ability-Aligned Skill Evolution for LLM Agents via Reinforcement Learning",
