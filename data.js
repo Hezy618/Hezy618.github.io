@@ -18,7 +18,7 @@ const SITE = {
   emailAlt: "",                              // 第二个邮箱（留空则不显示）
 
   /* ---------- 研究方向（显示为 chips） ---------- */
-  research: ["LLM Agents", "Reinforcement Learning", "Knowledge Distillation", "Hypergraph", "Knowledge Graph", "Bioinformatics"],
+  research: ["LLM Agents", "Agentic RL", "Knowledge Distillation", "Hypergraph", "Knowledge Graph", "Bioinformatics"],
 
   /* ---------- 外部链接（没有就删掉那一行） ---------- */
   links: {
