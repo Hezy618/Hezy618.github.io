@@ -37,7 +37,7 @@ const SITE = {
 
   /* ---------- About Me 简介（支持多段） ---------- */
   bio: [
-    "I am a Master's student at the School of Informatics, Xiamen University, majoring in Computer Science and Technology. My research interests include LLM agents, knowledge distillation, hypergraphs, knowledge graphs, and bioinformatics. Recently, I have been particularly focused on Agentic RL — training LLM agents to internalize skills through reinforcement learning.",
+    "I am a Master's student at the School of Informatics, Xiamen University, majoring in Computer Science and Technology. My research interests include LLM agents, Agentic RL, knowledge distillation, hypergraphs, knowledge graphs, and bioinformatics.",
     "Currently, I am an LLM Algorithm Engineer intern at Meituan (Core Local Commerce), focusing on post-training of the customer-service LLM — SFT, multi-turn dialogue Agent RL, and OPD.",
   ],
 
