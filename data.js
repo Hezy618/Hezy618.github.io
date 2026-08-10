@@ -156,5 +156,5 @@ const SITE = {
   ],
 
   /* ---------- 页脚 ---------- */
-  footer: "© 2026 Zhongyu He · Powered by pixels & moonlight",
+  footer: "© 2026 Zhongyu He",
 };
