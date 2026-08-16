@@ -214,26 +214,47 @@
   })();
 
   /* ==================== 像素月亮 ==================== */
-  /* 16 列圆形：t=透明 h=高光 m=月光 k=过渡 s=暗部 d=深影 c=陨石坑底 r=坑沿高光
-   * 光源在左上：整体沿对角线由亮到暗，陨石坑受光侧坑沿提亮 */
-  const MOON = [
-    "ttttttthhttttttt",
-    "tttthhhhmmmmtttt",
-    "ttthhhhmmmmmkttt",
-    "tthhrrmmmmrrkktt",
-    "thhrccmmmrcckkkt",
-    "thhrccmmmrcckkst",
-    "thhrccmmkkkkksst",
-    "hhmmmmmkkkkkssss",
-    "hmmmmmkkkkkssssd",
-    "tmmmmrrrkksrssdt",
-    "tmmmkrccksrcsddt",
-    "tmmrkrccssssdddt",
-    "ttrckkkssssdddtt",
-    "tttkkkssssdddttt",
-    "ttttkssssdddtttt",
-    "tttttttsdttttttt",
-  ];
+  /* 32×32 程序化生成（4px 粒度，比原 16 列手绘细腻得多）：
+   * 光源在左上，按到圆心距离与光向连续计算明暗，映射到调色板；
+   * 叠加坐标哈希噪声做表面斑驳；环形山坑底压暗、受光侧坑沿提亮、背光侧压暗。
+   * t=透明 h=高光 m=月光 k=过渡 s=暗部 d=深影 c=陨石坑底 r=坑沿高光 */
+  const MOON = (() => {
+    const N = 32, R = 14.6, C = N / 2 - .5;
+    const craters = [
+      { x: 10, y: 9,  r: 2.6 },   // 亮部大坑
+      { x: 21, y: 12, r: 3.2 },   // 中部大坑
+      { x: 13, y: 21, r: 2.2 },
+      { x: 18, y: 24, r: 1.6 },
+      { x: 16, y: 15, r: 1.2 },   // 中央小坑
+    ];
+    const noise = (x, y) => {
+      const n = Math.sin(x * 127.1 + y * 311.7) * 43758.5453;
+      return n - Math.floor(n);
+    };
+    const rows = [];
+    for (let y = 0; y < N; y++) {
+      let row = "";
+      for (let x = 0; x < N; x++) {
+        const dx = x - C, dy = y - C;
+        if (Math.hypot(dx, dy) > R) { row += "t"; continue; }
+        const lum = (-(dx + dy) / (2 * R)) * 1.6;                  // 光在左上：越靠左上越亮
+        const b = 0.52 + lum * 0.5 + (noise(x, y) - 0.5) * 0.14;   // 基础亮度 + 斑驳
+        const band = (v) => v > 0.88 ? "h" : v > 0.68 ? "m" : v > 0.48 ? "k" : v > 0.28 ? "s" : "d";
+        let ch = band(b);
+        for (const cr of craters) {
+          const dd = Math.hypot(x - cr.x, y - cr.y);
+          if (dd < cr.r) { ch = band(b - 0.24); break; }            // 坑底：沿用当地明暗、整体压暗一档
+          if (dd < cr.r + 1.1) {                                    // 坑沿：受光侧提亮（仅限亮区）
+            ch = ((x - cr.x) + (y - cr.y)) < 0 && b > 0.3 ? "r" : "d";
+            break;
+          }
+        }
+        row += ch;
+      }
+      rows.push(row);
+    }
+    return rows;
+  })();
   const moon = $("#moon");
   MOON.forEach((row) => {
     const r = el("div", "row");

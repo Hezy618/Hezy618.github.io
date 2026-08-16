@@ -78,9 +78,9 @@ body {
   pointer-events: none;
 }
 @keyframes moonFloat { from { transform: translateY(0); } to { transform: translateY(14px); } }
-#moon { display: grid; grid-auto-rows: 8px; }
+#moon { display: grid; grid-auto-rows: 4px; }
 #moon .row { display: flex; }
-#moon .px { width: 8px; height: 8px; }
+#moon .px { width: 4px; height: 4px; }
 #moon .h  { background: #fff6d9; }   /* 高光 */
 #moon .m  { background: var(--cream); }
 #moon .k  { background: #ddcaa0; }   /* 亮暗过渡 */
