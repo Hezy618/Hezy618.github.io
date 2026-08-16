@@ -53,7 +53,7 @@ const SITE = {
 
   /* ---------- 教育经历 ---------- */
   education: [
-    { period: "2024 – 2027 (expected)", degree: "M.S. in Computer Science and Technology", school: "Xiamen University (recommended admission)" },  // 保研
+    { period: "2024 – 2027", degree: "M.S. in Computer Science and Technology", school: "Xiamen University (recommended admission)" },  // 保研
     { period: "2020 – 2024", degree: "B.Eng. in Computer Science and Technology", school: "Wuhan University of Science and Technology" },
   ],
 
