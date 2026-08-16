@@ -592,6 +592,7 @@ a.badge:hover { transform: translateY(-2px); filter: brightness(1.15); }
 .cat .cpx.c { background: #f3e9c8; }
 .cat .cpx.p { background: #d98fb8; }
 .cat .cpx.s { background: #cdb98d; }
+.cat .cpx.g { background: #8f97bd; }
 
 /* 打盹猫：趴在塔罗牌上沿，随牌一起浮动，缓慢呼吸 */
 .cat-sleep {
@@ -625,6 +626,29 @@ a.badge:hover { transform: translateY(-2px); filter: brightness(1.15); }
 /* 坐姿猫：蹲在 SIDE QUESTS 板块上沿右侧（JS 驱动眨眼） */
 .cat-sit { top: -32px; right: 22px; }
 
+/* 打字猫被点到：疯狂敲键盘（快速抖动）+ 飘出代码符号 */
+.cat-type { top: -32px; right: 22px; }
+.cat-type.typing .catframe { animation: catType .12s linear infinite; }
+@keyframes catType {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-2px); }
+}
+.cat-type .code {
+  position: absolute; bottom: 100%;
+  font-family: var(--font-pixel); font-size: 12px;
+  color: #8fd6a0;
+  text-shadow: 0 0 8px rgba(143, 214, 160, .5);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  animation: codeFloat 1s ease-out forwards;
+}
+@keyframes codeFloat {
+  0%   { opacity: 0; transform: translate(0, 4px) scale(.7); }
+  20%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--cx, 0), -40px); }
+}
+
 /* About Me 互动猫：蹲在板块上沿左侧，点击会笑并飘出小爱心 */
 .cat-about { top: -32px; left: 22px; pointer-events: auto; cursor: pointer; }
 .cat-about.boop { animation: catBoop .45s ease-out; }
@@ -651,7 +675,7 @@ a.badge:hover { transform: translateY(-2px); filter: brightness(1.15); }
 }
 
 /* 所有猫都可以点 */
-.cat-sleep, .cat-patrol, .cat-sit, .cat-about { pointer-events: auto; cursor: pointer; }
+.cat-sleep, .cat-patrol, .cat-sit, .cat-about, .cat-type { pointer-events: auto; cursor: pointer; }
 
 /* 打盹猫被点醒：弹跳起来哆嗦几下（覆盖呼吸动画，醒完自动恢复） */
 .cat-sleep.startled { animation: catStartle .55s ease-out; }
@@ -716,12 +740,12 @@ a.badge:hover { transform: translateY(-2px); filter: brightness(1.15); }
 }
 
 @media (max-width: 640px) {
-  .cat-patrol, .cat-sit, .cat-about { display: none; }
+  .cat-patrol, .cat-sit, .cat-about, .cat-type { display: none; }
   .cat-sleep { animation: none; transform: scale(.72); top: -26px; right: 8px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .cat-sleep { animation: none; }
   .cat-sleep .zzz i { animation: none; opacity: 0; }
-  .cat-sleep.startled, .cat-sit.spin, .cat-about.boop, .cat-patrol .catframe.hop { animation: none; }
-  .cat-about .heart, .cat-sit .spark, .cat-patrol .meow { animation-duration: .01s; }
+  .cat-sleep.startled, .cat-sit.spin, .cat-about.boop, .cat-patrol .catframe.hop, .cat-type.typing .catframe { animation: none; }
+  .cat-about .heart, .cat-sit .spark, .cat-patrol .meow, .cat-type .code { animation-duration: .01s; }
 }

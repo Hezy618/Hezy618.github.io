@@ -326,6 +326,20 @@
     "ttoooooooooooott",
   ];
 
+  /* 打字猫：趴在笔记本电脑前（g=机身，粉色爱心贴纸），用于 EXPERIENCE 板块 */
+  const CAT_TYPE = [
+    "ttoottttttootttt",
+    "toccottttoccottt",
+    "tocccccccccccott",
+    "toccocccccoccott",
+    "tocccccpcccccott",
+    "tocccccccccccott",
+    "togggggggggggott",
+    "togggggpgggggott",
+    "ttoooooooooooott",
+  ];
+  const CAT_TYPE_BLINK = CAT_TYPE.map((r, i) => (i === 3 ? "tocccccccccccott" : r));
+
   function buildCat(box, rows, scale) {
     box.style.setProperty("--cs", scale + "px");
     rows.forEach((row) => {
@@ -394,6 +408,7 @@
     const CAT_W = 18 * 4, EDGE = 28;
     let cx = 60, dir = 1, lastT = performance.now();
     let boostUntil = 0;
+    let hopTimer = null;
     const meows = ["MEOW!", "MRRP!", "PURR~"];
     const meow = () => {
       boostUntil = performance.now() + 1500;
@@ -404,6 +419,9 @@
       if (dir === -1) m.style.scale = "-1 1";   // 猫朝左时容器被镜像，气泡文字要翻回来
       m.addEventListener("animationend", () => m.remove());
       patrolBox.appendChild(m);
+      // hop 动画只播一次；不及时摘掉的话，步态切帧会反复重启动画，猫就一直跳
+      clearTimeout(hopTimer);
+      hopTimer = setTimeout(() => [fA, fB].forEach((f) => f.classList.remove("hop")), 550);
     };
     patrolBox.addEventListener("click", meow);
     patrolBox.addEventListener("keydown", (e) => {
@@ -455,6 +473,42 @@
     sitBox.addEventListener("click", sparkle);
     sitBox.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") { e.preventDefault(); sparkle(); }
+    });
+  }
+
+  /* 打字猫：蹲在 EXPERIENCE 上沿敲笔记本，偶尔眨眼；点一下会疯狂打字并飘出代码符号 */
+  const typeBox = $("#catType");
+  if (typeBox) {
+    const tA = el("div", "catframe");
+    const tB = el("div", "catframe");
+    buildCat(tA, CAT_TYPE, 4);
+    buildCat(tB, CAT_TYPE_BLINK, 4);
+    tB.style.display = "none";
+    typeBox.append(tA, tB);
+    (function blink() {
+      tA.style.display = "none"; tB.style.display = "";
+      setTimeout(() => { tA.style.display = ""; tB.style.display = "none"; }, 180);
+      setTimeout(blink, 3000 + Math.random() * 3000);
+    })();
+
+    const glyphs = ["</>", "{ }", "01", "&&", "fn", ";"];
+    let typeTimer = null;
+    const type = () => {
+      typeBox.classList.add("typing");
+      clearTimeout(typeTimer);
+      typeTimer = setTimeout(() => typeBox.classList.remove("typing"), 1200);
+      for (let i = 0; i < 5; i++) {
+        const c = el("span", "code", glyphs[Math.floor(Math.random() * glyphs.length)]);
+        c.style.left = (4 + Math.random() * 52) + "px";
+        c.style.animationDelay = (Math.random() * 0.4) + "s";
+        c.style.setProperty("--cx", (Math.random() * 32 - 16) + "px");
+        c.addEventListener("animationend", () => c.remove());
+        typeBox.appendChild(c);
+      }
+    };
+    typeBox.addEventListener("click", type);
+    typeBox.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); type(); }
     });
   }
 
