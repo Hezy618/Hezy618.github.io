@@ -8,7 +8,7 @@ const SITE = {
   /* ---------- 基本信息 ---------- */
   name: "Zhongyu He",                      // 姓名（论文作者列表里同名会自动加粗）
   tagline: "M.S. student @ Xiamen University · LLM Algorithm Engineer Intern @ Meituan",
-  photo: "pic/hezhongyu.png",              // 你的照片路径（pic/hezhongyu.png）
+  photo: "pic/hezhongyu.jpg",              // 你的照片路径（pic/hezhongyu.jpg）
   university: "Xiamen University",
   school: "School of Informatics",         // 信息学院
   major: "Computer Science and Technology",
