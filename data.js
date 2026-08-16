@@ -54,7 +54,7 @@ const SITE = {
   /* ---------- 教育经历 ---------- */
   education: [
     { period: "2024 – 2027", degree: "M.S. in Computer Science and Technology", school: "Xiamen University" },
-    { period: "2020 – 2024", degree: "B.Eng. in Computer Science and Technology", school: "Wuhan University of Science and Technology (Rank 2/256, recommended admission to Xiamen University)" },  // 保研
+    { period: "2020 – 2024", degree: "B.Eng. in Computer Science and Technology", school: "Wuhan University of Science and Technology (Rank 2/255, recommended admission to Xiamen University)" },  // 保研
   ],
 
   /* ---------- 评级徽章的跳转链接（按徽章文字前缀匹配，点击徽章即可跳转） ---------- */
