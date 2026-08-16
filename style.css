@@ -625,11 +625,103 @@ a.badge:hover { transform: translateY(-2px); filter: brightness(1.15); }
 /* 坐姿猫：蹲在 SIDE QUESTS 板块上沿右侧（JS 驱动眨眼） */
 .cat-sit { top: -32px; right: 22px; }
 
+/* About Me 互动猫：蹲在板块上沿左侧，点击会笑并飘出小爱心 */
+.cat-about { top: -32px; left: 22px; pointer-events: auto; cursor: pointer; }
+.cat-about.boop { animation: catBoop .45s ease-out; }
+@keyframes catBoop {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.12, .85); }
+  70%  { transform: scale(.95, 1.08); }
+  100% { transform: scale(1); }
+}
+.cat-about .heart {
+  position: absolute; bottom: 100%;
+  font-family: var(--font-pixel);
+  font-size: 14px;
+  color: #d98fb8;
+  text-shadow: 0 0 8px rgba(217, 143, 184, .55);
+  pointer-events: none;
+  opacity: 0;
+  animation: heartFloat 1s ease-out forwards;
+}
+@keyframes heartFloat {
+  0%   { opacity: 0; transform: translate(0, 6px) scale(.6); }
+  20%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--hx, 0), -44px) scale(1.1); }
+}
+
+/* 所有猫都可以点 */
+.cat-sleep, .cat-patrol, .cat-sit, .cat-about { pointer-events: auto; cursor: pointer; }
+
+/* 打盹猫被点醒：弹跳起来哆嗦几下（覆盖呼吸动画，醒完自动恢复） */
+.cat-sleep.startled { animation: catStartle .55s ease-out; }
+@keyframes catStartle {
+  0%   { transform: translateY(0); }
+  22%  { transform: translateY(-14px); }
+  40%  { transform: translateY(0) rotate(-5deg); }
+  55%  { transform: translateY(-5px) rotate(4deg); }
+  70%  { transform: translateY(0) rotate(-2deg); }
+  85%  { transform: translateY(-2px) rotate(1deg); }
+  100% { transform: translateY(0); }
+}
+
+/* 巡逻猫被点到：跳一下 + 喵声气泡 */
+.cat-patrol .catframe.hop { animation: catHop .5s ease-out; }
+@keyframes catHop {
+  0%   { transform: translateY(0); }
+  40%  { transform: translateY(-16px); }
+  70%  { transform: translateY(0); }
+  85%  { transform: translateY(-4px); }
+  100% { transform: translateY(0); }
+}
+.cat-patrol .meow {
+  position: absolute; bottom: calc(100% + 6px); left: 50%;
+  padding: 2px 6px;
+  background: var(--panel-2);
+  border: 2px solid var(--gold);
+  font-family: var(--font-pixel); font-size: 12px; color: var(--gold);
+  white-space: nowrap;
+  pointer-events: none;
+  animation: meowPop .9s ease-out forwards;
+}
+@keyframes meowPop {
+  0%   { opacity: 0; transform: translate(-50%, 6px) scale(.6); }
+  20%  { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  75%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -10px); }
+}
+
+/* 坐姿猫被点到：开心翻滚一周 + 金色火花 */
+.cat-sit { transform-origin: 50% 60%; }
+.cat-sit.spin { animation: catSpin .6s ease-in-out; }
+@keyframes catSpin {
+  0%   { transform: rotate(0deg); }
+  60%  { transform: rotate(370deg); }
+  80%  { transform: rotate(355deg); }
+  100% { transform: rotate(360deg); }
+}
+.cat-sit .spark {
+  position: absolute; bottom: 60%;
+  font-family: var(--font-pixel); font-size: 12px;
+  color: var(--gold);
+  text-shadow: 0 0 8px rgba(232, 196, 106, .55);
+  pointer-events: none;
+  opacity: 0;
+  animation: sparkBurst .8s ease-out forwards;
+}
+@keyframes sparkBurst {
+  0%   { opacity: 0; transform: translate(0, 0) scale(.5); }
+  25%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--sx, 0), var(--sy, -30px)) scale(1.2) rotate(90deg); }
+}
+
 @media (max-width: 640px) {
-  .cat-patrol, .cat-sit { display: none; }
+  .cat-patrol, .cat-sit, .cat-about { display: none; }
   .cat-sleep { animation: none; transform: scale(.72); top: -26px; right: 8px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .cat-sleep { animation: none; }
   .cat-sleep .zzz i { animation: none; opacity: 0; }
+  .cat-sleep.startled, .cat-sit.spin, .cat-about.boop, .cat-patrol .catframe.hop { animation: none; }
+  .cat-about .heart, .cat-sit .spark, .cat-patrol .meow { animation-duration: .01s; }
 }

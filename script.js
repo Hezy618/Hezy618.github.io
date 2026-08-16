@@ -260,9 +260,21 @@
     "ttootttoottttttt",
     "toccotoccotttttt",
     "toccccccccccottt",
-    "toccocccoccccott",
+    "toccooccoocccott",
     "toccccpccccccott",
     "toccccccccccccot",
+    "tosccccccccccsot",
+    "ttoooooooooooott",
+  ];
+  /* 惊醒帧：瞪圆眼 + 张嘴，打盹猫被点醒的瞬间用 */
+  const CAT_STARTLE = [
+    "tttttttttttttttt",
+    "ttootttoottttttt",
+    "toccotoccotttttt",
+    "toccccccccccottt",
+    "toccocccoccccott",
+    "toccccpccccccott",
+    "tocccooccccccott",
     "tosccccccccccsot",
     "ttoooooooooooott",
   ];
@@ -301,6 +313,19 @@
   ];
   const CAT_SIT_BLINK = CAT_SIT.map((r, i) => (i === 3 ? "tocccccccccccott" : r));
 
+  /* 笑脸帧：眯眯眼（∩∩）+ 张嘴笑（含舌头），用于 About Me 互动猫 */
+  const CAT_HAPPY = [
+    "ttoottttttootttt",
+    "toccottttoccottt",
+    "toccocccccoccott",
+    "tocococccococott",
+    "tocccccpcccccott",
+    "toccccooocccott",
+    "toccccopocccott",
+    "toscccccccccsott",
+    "ttoooooooooooott",
+  ];
+
   function buildCat(box, rows, scale) {
     box.style.setProperty("--cs", scale + "px");
     rows.forEach((row) => {
@@ -310,10 +335,16 @@
     });
   }
 
-  /* 打盹猫：趴在塔罗牌上沿 + 漂浮的 Zzz */
+  /* 打盹猫：趴在塔罗牌上沿 + 漂浮的 Zzz；点一下会惊醒，愣一会儿再继续睡 */
   const sleepBox = $("#catSleep");
   if (sleepBox) {
-    buildCat(sleepBox, CAT_SLEEP, 4);
+    const sSleep = el("div", "catframe");
+    const sAwake = el("div", "catframe");
+    buildCat(sSleep, CAT_SLEEP, 4);
+    buildCat(sAwake, CAT_STARTLE, 4);
+    sAwake.style.display = "none";
+    sleepBox.append(sSleep, sAwake);
+
     const zzz = el("span", "zzz");
     for (let zi = 0; zi < 3; zi++) {
       const z = el("i", null, "z");
@@ -322,9 +353,28 @@
       zzz.appendChild(z);
     }
     sleepBox.appendChild(zzz);
+
+    let dozeTimer = null;
+    const startle = () => {
+      sSleep.style.display = "none"; sAwake.style.display = "";
+      zzz.style.display = "none";
+      sleepBox.classList.remove("startled");
+      void sleepBox.offsetWidth;          // 强制回流，让惊醒动画可以连续触发
+      sleepBox.classList.add("startled");
+      clearTimeout(dozeTimer);
+      dozeTimer = setTimeout(() => {
+        sSleep.style.display = ""; sAwake.style.display = "none";
+        zzz.style.display = "";
+        sleepBox.classList.remove("startled");
+      }, 1500);
+    };
+    sleepBox.addEventListener("click", (e) => { e.stopPropagation(); startle(); });  // 不触发塔罗牌翻面
+    sleepBox.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); startle(); }
+    });
   }
 
-  /* 巡逻猫：沿 PUBLICATIONS 上沿来回巡逻，到边自动转身 */
+  /* 巡逻猫：沿 PUBLICATIONS 上沿来回巡逻，到边自动转身；点一下会吓一跳、喵一声并加速逃窜 */
   const patrolBox = $("#catPatrol");
   const pubsPanel = $("#publications");
   if (patrolBox && pubsPanel) {
@@ -343,11 +393,28 @@
 
     const CAT_W = 18 * 4, EDGE = 28;
     let cx = 60, dir = 1, lastT = performance.now();
+    let boostUntil = 0;
+    const meows = ["MEOW!", "MRRP!", "PURR~"];
+    const meow = () => {
+      boostUntil = performance.now() + 1500;
+      [fA, fB].forEach((f) => {
+        f.classList.remove("hop"); void f.offsetWidth; f.classList.add("hop");
+      });
+      const m = el("span", "meow", meows[Math.floor(Math.random() * meows.length)]);
+      if (dir === -1) m.style.scale = "-1 1";   // 猫朝左时容器被镜像，气泡文字要翻回来
+      m.addEventListener("animationend", () => m.remove());
+      patrolBox.appendChild(m);
+    };
+    patrolBox.addEventListener("click", meow);
+    patrolBox.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); meow(); }
+    });
+
     (function patrolStep(now) {
       const dt = Math.min(60, now - lastT);
       lastT = now;
       const max = pubsPanel.clientWidth - CAT_W - EDGE;
-      cx += dir * dt * 0.05;      // ≈50px/s
+      cx += dir * dt * (now < boostUntil ? 0.18 : 0.05);   // 正常 ≈50px/s，受惊后 ≈180px/s
       if (cx >= max)  { cx = max;  dir = -1; }
       if (cx <= EDGE) { cx = EDGE; dir = 1; }
       patrolBox.style.left = cx + "px";
@@ -356,7 +423,7 @@
     })(lastT);
   }
 
-  /* 坐姿猫：蹲在 SIDE QUESTS 上沿，每隔几秒眨一次眼 */
+  /* 坐姿猫：蹲在 SIDE QUESTS 上沿，每隔几秒眨一次眼；点一下会开心翻滚并溅出金色火花 */
   const sitBox = $("#catSit");
   if (sitBox) {
     const sA = el("div", "catframe");
@@ -370,6 +437,58 @@
       setTimeout(() => { sA.style.display = ""; sB.style.display = "none"; }, 180);
       setTimeout(blink, 2600 + Math.random() * 2600);
     })();
+
+    const sparkle = () => {
+      sitBox.classList.remove("spin");
+      void sitBox.offsetWidth;          // 强制回流，让翻滚动画可以连续触发
+      sitBox.classList.add("spin");
+      for (let i = 0; i < 7; i++) {
+        const sp = el("span", "spark", "✦");
+        sp.style.left = (6 + Math.random() * 56) + "px";
+        sp.style.animationDelay = (Math.random() * 0.2) + "s";
+        sp.style.setProperty("--sx", (Math.random() * 72 - 36) + "px");
+        sp.style.setProperty("--sy", (-14 - Math.random() * 34) + "px");
+        sp.addEventListener("animationend", () => sp.remove());
+        sitBox.appendChild(sp);
+      }
+    };
+    sitBox.addEventListener("click", sparkle);
+    sitBox.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); sparkle(); }
+    });
+  }
+
+  /* About Me 互动猫：平时蹲坐，点击后笑一下并飘出小爱心 */
+  const aboutBox = $("#catAbout");
+  if (aboutBox) {
+    const nA = el("div", "catframe");
+    const nB = el("div", "catframe");
+    buildCat(nA, CAT_SIT, 4);
+    buildCat(nB, CAT_HAPPY, 4);
+    nB.style.display = "none";
+    aboutBox.append(nA, nB);
+
+    let happyTimer = null;
+    const boop = () => {
+      nA.style.display = "none"; nB.style.display = "";
+      clearTimeout(happyTimer);
+      happyTimer = setTimeout(() => { nA.style.display = ""; nB.style.display = "none"; }, 1100);
+      aboutBox.classList.remove("boop");
+      void aboutBox.offsetWidth;          // 强制回流，让挤压动画可以连续触发
+      aboutBox.classList.add("boop");
+      for (let i = 0; i < 6; i++) {
+        const h = el("span", "heart", "♥");
+        h.style.left = (10 + Math.random() * 44) + "px";
+        h.style.animationDelay = (Math.random() * 0.25) + "s";
+        h.style.setProperty("--hx", (Math.random() * 36 - 18) + "px");
+        h.addEventListener("animationend", () => h.remove());
+        aboutBox.appendChild(h);
+      }
+    };
+    aboutBox.addEventListener("click", boop);
+    aboutBox.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); boop(); }
+    });
   }
 
   /* ==================== 塔罗牌交互 ==================== */

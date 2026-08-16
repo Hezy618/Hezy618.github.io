@@ -79,8 +79,8 @@
           </div>
         </div>
         <div class="tarot-shadow"></div>
-        <!-- 打盹的像素猫（趴在牌框上沿，JS 生成） -->
-        <div class="cat cat-sleep" id="catSleep" aria-hidden="true"></div>
+        <!-- 打盹的像素猫（趴在牌框上沿，点一下会惊醒，JS 生成） -->
+        <div class="cat cat-sleep" id="catSleep" role="button" tabindex="0" title="Boop!" aria-label="Sleeping pixel cat — click to startle it awake"></div>
       </div>
 
       <!-- 角色信息 -->
@@ -97,6 +97,8 @@
     <section class="panel reveal">
       <h2 class="section-title"><span class="glyph">✦</span> ABOUT ME <span class="rule"></span></h2>
       <div id="bio"><!-- JS 渲染 --></div>
+      <!-- 互动像素猫（蹲在板块上沿，点击会笑并飘出小爱心，JS 生成） -->
+      <div class="cat cat-about" id="catAbout" role="button" tabindex="0" title="Boop me!" aria-label="Pixel cat — click to make it smile"></div>
     </section>
 
     <!-- ===== Experience 个人经历（工作 + 教育） ===== -->
@@ -112,8 +114,8 @@
     <section class="panel reveal" id="publications">
       <h2 class="section-title"><span class="glyph">✦</span> PUBLICATIONS <span class="rule"></span></h2>
       <div id="pub-list"><!-- JS 渲染 --></div>
-      <!-- 巡逻的像素猫（沿板块上沿来回走动，JS 生成） -->
-      <div class="cat cat-patrol" id="catPatrol" aria-hidden="true"></div>
+      <!-- 巡逻的像素猫（沿板块上沿来回走动，点一下会吓一跳喵一声，JS 生成） -->
+      <div class="cat cat-patrol" id="catPatrol" role="button" tabindex="0" title="Boop!" aria-label="Patrolling pixel cat — click to make it meow"></div>
     </section>
 
     <!-- ===== Awards ===== -->
@@ -126,8 +128,8 @@
     <section class="panel reveal" id="hobbies">
       <h2 class="section-title"><span class="glyph">✦</span> SIDE QUESTS <span class="rule"></span></h2>
       <div class="hobby-grid" id="hobby-grid"><!-- JS 渲染 --></div>
-      <!-- 坐姿像素猫（蹲在板块上沿，偶尔眨眼，JS 生成） -->
-      <div class="cat cat-sit" id="catSit" aria-hidden="true"></div>
+      <!-- 坐姿像素猫（蹲在板块上沿偶尔眨眼，点一下会开心翻滚，JS 生成） -->
+      <div class="cat cat-sit" id="catSit" role="button" tabindex="0" title="Boop!" aria-label="Sitting pixel cat — click to make it roll with sparkles"></div>
     </section>
 
     <footer class="footer">
