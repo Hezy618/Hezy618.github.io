@@ -337,7 +337,10 @@ body {
   padding: 7px 10px;
   background: rgba(232, 196, 106, .06);
   transition: all .12s;
+  display: inline-flex; align-items: center;
 }
+/* 链接前的官方 logo（内联 SVG）：currentColor 上色，悬停随文字一起反色 */
+.lico { width: 10px; height: 10px; margin-right: 6px; flex: none; }
 .tarot-links a:hover {
   background: var(--gold); border-color: var(--gold);
   color: var(--bg0);
