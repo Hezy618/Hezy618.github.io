@@ -794,6 +794,12 @@ html.day .cat .cpx.c { background: #ecd9a8; }   /* 猫身在浅底上稍微加�
 
 /* ---------- 白天论文徽章：浅底可读版（夜间配色是为深底设计的） ---------- */
 html.day .badge { color: #14152c; }   /* 徽章文字：夜间吃 var(--bg0) 近黑，白天 --bg0 是浅蓝，需固定深色 */
+/* 评级徽章：底色加深到与白天色板同族（暖金/深青/草绿/砖红），去掉夜间的彩色光晕 */
+html.day .badge.ccf-a   { background: #d84f4f; box-shadow: 0 3px 0 #8a3232; }
+html.day .badge.ccf-b   { background: #e0a83c; box-shadow: 0 3px 0 #8a6420; }
+html.day .badge.ccf-c   { background: #4da8bd; box-shadow: 0 3px 0 #2a6272; }
+html.day .badge.cas     { background: #c97aa5; box-shadow: 0 3px 0 #7e3f68; }
+html.day .badge.default { background: #4da354; box-shadow: 0 3px 0 #2c6634; color: #ffffff; }
 html.day .badge.status {
   background: rgba(46, 160, 90, .12);
   color: #1e7a4a; border: 1px solid #2e9e5c;
@@ -941,7 +947,7 @@ html.day #mario-scene {
 
 /* 场景装饰（水管/砖块/山/草丛/像素云，JS 逐像素生成） */
 .deco { position: absolute; bottom: 28px; z-index: 1; }
-.deco .drow, .pcloud .drow { display: flex; }
+.deco .drow, .pcloud .drow, #shroom .drow { display: flex; }
 #pipe1 { left: 24%; }
 #pipe2 { left: 72%; }
 #hill1 { left: 6%; }
@@ -961,11 +967,15 @@ html.day #mario-scene {
 }
 
 /* 马里奥精灵（JS 生成色块与位移；可点击，点了会原地跳一下） */
-#mario { position: absolute; bottom: 28px; left: -60px; width: 48px; height: 48px; z-index: 2; pointer-events: auto; cursor: pointer; }
+#mario { position: absolute; bottom: 28px; left: -60px; width: 48px; height: 48px; z-index: 2; pointer-events: auto; cursor: pointer; transform-origin: bottom left; transition: scale .25s ease; }
 
-/* 求助气泡：马里奥被水管挡住时出现，点击附近即可解救 */
+/* 蘑菇（中间问号砖撞出，落地向右滑，马里奥捡到变大；JS 生成精灵与移动） */
+#shroom { position: absolute; bottom: 28px; z-index: 1; display: none; }
+#shroom.show { display: block; }
+
+/* 求助气泡：马里奥被水管挡住时出现（与马里奥一起临时提升到内容层之上，保证可见可点） */
 #marioBubble {
-  position: absolute; bottom: 92px; z-index: 3;
+  position: absolute; bottom: 92px; z-index: 61;
   transform: translateX(-50%);
   padding: 6px 8px;
   font-family: var(--font-pixel); font-size: 8px; letter-spacing: 1px;
@@ -986,6 +996,18 @@ html.day #mario-scene {
   from { margin-bottom: 0; }
   to   { margin-bottom: 6px; }
 }
+
+/* 金币计数器（左下角，点问号砖帮马里奥赚金币） */
+#coinCount {
+  position: absolute; left: 14px; bottom: 40px; z-index: 3;
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--font-pixel); font-size: 10px; color: #5c2e00;
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, .6);
+}
+#coinCount .ccoin {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: #ffd94d; border: 3px solid #b8860b;
+}
 #mario .mframe { position: absolute; bottom: 0; left: 0; }
 #mario .mrow { display: flex; }
 #mario .mpx { width: 3px; height: 3px; }
@@ -996,9 +1018,9 @@ html.day #mario-scene {
 #mario .o { background: #241a12; }   /* 眼睛 */
 #mario .t { background: transparent; }
 
-/* 问号砖块 */
-#qblock {
-  position: absolute; bottom: 118px; left: 55%;
+/* 问号砖块（共三块，点击顶出金币；位置由 JS 按屏宽布置） */
+.qblk {
+  position: absolute; bottom: 118px;
   width: 42px; height: 42px;
   display: flex; align-items: center; justify-content: center;
   background: #f8a818;
@@ -1006,24 +1028,24 @@ html.day #mario-scene {
   box-shadow: inset -4px -4px 0 rgba(0, 0, 0, .25);
   font-family: var(--font-pixel); font-size: 16px; color: #5c2e00;
 }
-#qblock.used { background: #b08040; color: transparent; box-shadow: inset -4px -4px 0 rgba(0, 0, 0, .3); }
-#qblock.bump { animation: qBump .3s ease-out; }
+.qblk.used { background: #b08040; color: transparent; box-shadow: inset -4px -4px 0 rgba(0, 0, 0, .3); }
+.qblk.bump { animation: qBump .3s ease-out; }
 @keyframes qBump {
   0%   { transform: translateY(0); }
   40%  { transform: translateY(-10px); }
   100% { transform: translateY(0); }
 }
 
-/* 金币 */
-#coin {
-  position: absolute; bottom: 118px; left: 55%;
-  width: 26px; height: 26px; margin-left: 8px;
+/* 金币（从被点击的砖块里弹出） */
+.bcoin {
+  position: absolute; bottom: 100%; left: 50%;
+  width: 26px; height: 26px; margin-left: -13px;
   border-radius: 50%;
   background: #ffd94d;
   border: 4px solid #b8860b;
   opacity: 0;
 }
-#coin.pop { animation: coinPop .8s ease-out forwards; }
+.bcoin.pop { animation: coinPop .8s ease-out forwards; }
 @keyframes coinPop {
   0%   { opacity: 1; transform: translateY(0) scaleX(1); }
   60%  { opacity: 1; }

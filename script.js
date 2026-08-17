@@ -682,8 +682,8 @@
   ]);
 
   /* 场景：马里奥从左跑到右，路过问号砖时跳起顶出金币，跑出屏幕后循环 */
-  const marioScene = $("#mario-scene"), mario = $("#mario"), qblock = $("#qblock"), coin = $("#coin");
-  if (marioScene && mario && qblock && coin) {
+  const marioScene = $("#mario-scene"), mario = $("#mario");
+  if (marioScene && mario) {
     const mkFrame = (rows) => {
       const f = el("div", "mframe");
       rows.forEach((row) => {
@@ -704,8 +704,19 @@
       G: "#43a047", g: "#2e7d36",                 // 山/草丛
       L: "#8fe07a", D: "#1e5c26",                 // 水管高光/暗面
       B: "#c96a1e", s: "#5a2d08",                 // 悬浮砖块/砖缝
-      W: "#ffffff",                               // 像素云
+      W: "#ffffff",                               // 像素云/蘑菇斑点
+      R: "#e52521", S: "#ffcf9c",                 // 蘑菇伞盖/菌柄
     };
+    const SHROOM = [
+      "tttRRRRRRttt",
+      "ttRRRRRRRRtt",
+      "tRWWRRRRWWRt",
+      "tRRRRRRRRRRt",
+      "tRRRRRRRRRRt",
+      "ttRRRRRRRRtt",
+      "tttSSSSSSttt",
+      "tttSoSSoSttt",
+    ];
     const PIPE = [
       "oLLLGGGGGGDDDo",
       "oLLLGGGGGGDDDo",
@@ -771,89 +782,117 @@
     mkDeco($("#hill1"), HILL, 6);
     mkDeco($("#bush1"), BUSH, 5);  mkDeco($("#bush2"), BUSH, 4);
     mkDeco($("#pc1"), PCLOUD, 5);  mkDeco($("#pc2"), PCLOUD, 4);  mkDeco($("#pc3"), PCLOUD, 3);
+    const shroomEl = $("#shroom");
+    mkDeco(shroomEl, SHROOM, 3);
 
-    const SPEED = 130, JUMP_T = 0.62, JUMP_H = 84, GROUND = 28;
+    const SPEED = 130, GROUND = 28;
     const bubble = $("#marioBubble");
-    let blockX = 0, pipes = [], blocked = null;
+    let pipes = [], blocked = null;
+    const qbs = [$("#qb1"), $("#qb2"), $("#qb3")].filter(Boolean);
+    const coinNum = $("#coinNum");
     const brickL = $("#brickL"), brickR = $("#brickR");
+    const QB_POS = [0.35, 0.55, 0.75];                        // 三块问号砖的屏宽比例
     const layout = () => {
       const w = marioScene.clientWidth;
-      blockX = w * 0.55;
-      qblock.style.left = blockX + "px";
-      coin.style.left = blockX + "px";
-      if (brickL) brickL.style.left = (blockX - 50) + "px";   // 问号砖左右各贴一块悬浮砖
+      qbs.forEach((qb, i) => { qb.style.left = (w * QB_POS[i]) + "px"; });
+      const blockX = w * QB_POS[1];
+      if (brickL) brickL.style.left = (blockX - 50) + "px";   // 中间问号砖左右各贴一块悬浮砖
       if (brickR) brickR.style.left = (blockX + 46) + "px";
       pipes = [                                               // 水管位置（与 CSS 的 left% 对齐），宽 14px×4=56
         { x: w * 0.24, w: 56, cleared: false },
         { x: w * 0.72, w: 56, cleared: false },
       ];
-      blocked = null;                                         // 窗口变化后重新判定
-      if (bubble) bubble.classList.remove("show");
+      if (blocked) {                                          // 窗口尺寸变化：解除卡住状态重新判定
+        blocked = null;
+        mario.style.zIndex = "";
+        if (bubble) bubble.classList.remove("show");
+      }
     };
     layout();
     window.addEventListener("resize", layout);
 
-    let x = -80, jumpT = -1, jumpDur = JUMP_T, jumpH = JUMP_H, coinJump = false;
-    let blockJumped = false, coinPopped = false, gait = 0, gaitT = 0, last = performance.now();
-    const startJump = (dur, h, forCoin) => { jumpT = 0; jumpDur = dur; jumpH = h; coinJump = forCoin; };
-    /* 马里奥在背景层（z-index 低于正文与群山），直接绑 click 会被上层元素挡住。
+    let x = -80, jumpT = -1, jumpDur = 0.62, jumpH = 84, coins = 0;
+    let gait = 0, gaitT = 0, last = performance.now();
+    let big = false, hitDone = false;                            // big: 吃到蘑菇变大；hitDone: 本次起跳是否已撞过砖
+    const shroom = { active: false, phase: "up", x: 0, y: 0, t: 0 };
+    const startJump = (dur, h) => { jumpT = 0; jumpDur = dur; jumpH = h; hitDone = false; };
+    /* 场景在背景层（z-index 低于正文），直接绑 click 会被上层元素挡住。
        改为 document 级命中检测：按坐标判断点没点到他，视觉层级保持不变。 */
-    const hitMario = (cx, cy, pad) => {
-      const r = mario.getBoundingClientRect();
+    const hitEl = (elm, cx, cy, pad) => {
+      const r = elm.getBoundingClientRect();
       return cx >= r.left - pad && cx <= r.right + pad && cy >= r.top - pad && cy <= r.bottom + pad;
     };
     document.addEventListener("click", (e) => {
       if (!document.documentElement.classList.contains("day")) return;
-      if (blocked && hitMario(e.clientX, e.clientY, 80)) {     // 解救被水管挡住的马里奥
+      if (blocked && hitEl(mario, e.clientX, e.clientY, 80)) {     // 解救被水管挡住的马里奥
         blocked.cleared = true; blocked = null;
+        mario.style.zIndex = "";                                   // 回到背景层
         if (bubble) bubble.classList.remove("show");
-        startJump(0.85, 110, false);                           // 感恩大跳，抛物线保证完全越过水管
-      } else if (jumpT < 0 && !blocked && hitMario(e.clientX, e.clientY, 8)) {
-        startJump(0.5, 60, false);                             // 平时点他：原地小跳
+        startJump(0.85, 110);                                      // 感恩大跳，抛物线保证完全越过水管
+      } else if (jumpT < 0 && !blocked && hitEl(mario, e.clientX, e.clientY, 8)) {
+        startJump(0.5, 72);                                        // 平时点他：起跳撞砖
       }
     });
-    let hoverRaf = 0;                                    // 悬停到马里奥身上时显示手型（他被压在背景层，CSS cursor 不生效）
+    let hoverRaf = 0;                                    // 悬停马里奥时显示手型（背景层 CSS cursor 不生效）
     document.addEventListener("mousemove", (e) => {
       if (hoverRaf) return;
       hoverRaf = requestAnimationFrame(() => {
         hoverRaf = 0;
         const day = document.documentElement.classList.contains("day");
-        document.body.style.cursor = (day && hitMario(e.clientX, e.clientY, blocked ? 80 : 0)) ? "pointer" : "";
+        document.body.style.cursor = (day && hitEl(mario, e.clientX, e.clientY, blocked ? 80 : 0)) ? "pointer" : "";
       });
     });
+    const spawnShroom = (bx) => {                        // 中间砖块撞出蘑菇：冒出→落地→右滑
+      shroom.active = true; shroom.phase = "up"; shroom.t = 0;
+      shroom.x = bx + 5; shroom.y = 136;
+      if (shroomEl) shroomEl.classList.add("show");
+    };
     (function step(now) {
       const dt = Math.min(64, now - last) / 1000;
       last = now;
       if (document.documentElement.classList.contains("day")) {
-        if (blocked) {                                         // 被水管挡住：顶着原地踏步，等人解救
+        if (blocked) {                                         // 被水管挡住：顶着原地踏步，浮到内容层之上求助
           gaitT += dt;
           if (gaitT > 0.18) { gaitT = 0; gait ^= 1; }
           show(gait ? fRunB : fRunA);
         } else {
           x += SPEED * dt;
-          for (const p of pipes) {                             // 水管挡路判定
+          for (const p of pipes) {                             // 水管挡路：停下求助（临时提升层级，保证在面板前可见）
             if (!p.cleared && jumpT < 0 && x + 48 >= p.x) {
               x = p.x - 48; blocked = p;
+              mario.style.zIndex = "60";
               if (bubble) {
                 bubble.style.left = (x + 24) + "px";
+                bubble.style.bottom = big ? "116px" : "";      // 变大后个子高，气泡往上抬
                 bubble.classList.add("show");
               }
               break;
             }
           }
-          if (jumpT < 0 && !blockJumped && x + 48 >= blockX) { // 到达砖块起跳（只触发一次）
-            blockJumped = true;
-            startJump(JUMP_T, JUMP_H, true);
-          }
           if (jumpT >= 0) {
             jumpT += dt;
             const p = Math.min(1, jumpT / jumpDur);
-            mario.style.bottom = (GROUND + Math.sin(p * Math.PI) * jumpH) + "px";
+            const mBottom = GROUND + Math.sin(p * Math.PI) * jumpH;
+            mario.style.bottom = mBottom + "px";
             show(fJump);
-            if (coinJump && !coinPopped && p > 0.35) {            // 头顶到砖块：出金币
-              coinPopped = true;
-              qblock.classList.remove("bump"); void qblock.offsetWidth; qblock.classList.add("bump", "used");
-              coin.classList.remove("pop"); void coin.offsetWidth; coin.classList.add("pop");
+            if (!hitDone && mBottom + 48 >= 118) {             // 头顶够到砖块高度：判定横向重叠
+              for (let i = 0; i < qbs.length; i++) {
+                const qb = qbs[i];
+                if (qb.classList.contains("used")) continue;
+                const bx = parseFloat(qb.style.left) || 0;
+                if (x + 48 > bx && x < bx + 42) {
+                  hitDone = true;
+                  qb.classList.remove("bump"); void qb.offsetWidth; qb.classList.add("bump", "used");
+                  if (i === 1) {                               // 中间的砖块：出蘑菇
+                    spawnShroom(bx);
+                  } else {                                     // 两侧的砖块：出金币
+                    const bc = qb.querySelector(".bcoin");
+                    if (bc) { bc.classList.remove("pop"); void bc.offsetWidth; bc.classList.add("pop"); }
+                    if (coinNum) coinNum.textContent = String(++coins);
+                  }
+                  break;
+                }
+              }
             }
             if (p >= 1) { jumpT = -1; mario.style.bottom = GROUND + "px"; }
           } else {
@@ -861,12 +900,40 @@
             if (gaitT > 0.15) { gaitT = 0; gait ^= 1; }
             show(gait ? fRunB : fRunA);
           }
-          if (x > marioScene.clientWidth + 60) {                  // 跑出屏幕，循环重置
-            x = -80; jumpT = -1; blockJumped = false; coinPopped = false;
-            qblock.classList.remove("used");
+          if (x > marioScene.clientWidth + 60) {                  // 跑出屏幕，循环重置（变大状态与金币数延续）
+            x = -80; jumpT = -1;
             pipes.forEach((p) => { p.cleared = false; });
-            blocked = null;
-            if (bubble) bubble.classList.remove("show");
+            qbs.forEach((qb) => {                                 // 问号砖刷新，下一轮可以再撞
+              qb.classList.remove("used", "bump");
+              const bc = qb.querySelector(".bcoin");
+              if (bc) bc.classList.remove("pop");
+            });
+          }
+        }
+        if (shroom.active && shroomEl) {                        // 蘑菇移动与拾取
+          shroom.t += dt;
+          if (shroom.phase === "up") {                          // 从砖块顶部冒出来
+            shroom.y = 136 + Math.min(1, shroom.t / 0.45) * 58;
+            if (shroom.t >= 0.45) { shroom.phase = "down"; shroom.t = 0; }
+          } else if (shroom.phase === "down") {                 // 落到地面
+            shroom.y = 194 - Math.min(1, shroom.t / 0.5) * (194 - GROUND);
+            if (shroom.t >= 0.5) { shroom.phase = "walk"; shroom.y = GROUND; }
+          } else {
+            shroom.x += 70 * dt;                                // 落地后向右滑行
+          }
+          shroomEl.style.left = shroom.x + "px";
+          shroomEl.style.bottom = shroom.y + "px";
+          const mBottom2 = parseFloat(mario.style.bottom) || GROUND;
+          if (shroom.phase === "walk" && !big &&                // 马里奥碰到蘑菇：变大（跨循环保持）
+              shroom.x < x + 48 && shroom.x + 36 > x && mBottom2 < GROUND + 40) {
+            big = true;
+            mario.style.scale = "1.45";
+            shroom.active = false;
+            shroomEl.classList.remove("show");
+          }
+          if (shroom.x > marioScene.clientWidth + 40) {         // 滑出屏幕：消失
+            shroom.active = false;
+            shroomEl.classList.remove("show");
           }
         }
         mario.style.left = x + "px";
