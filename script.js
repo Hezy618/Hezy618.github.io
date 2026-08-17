@@ -698,12 +698,97 @@
     mario.append(fRunA, fRunB, fJump);
     const show = (f) => [fRunA, fRunB, fJump].forEach((x) => { x.style.display = x === f ? "" : "none"; });
 
+    /* 场景装饰：SMB 经典元素，全部用字符画逐像素生成（与猫/马里奥同一套工艺） */
+    const DECO_PAL = {
+      o: "#241a12", t: "transparent",
+      G: "#43a047", g: "#2e7d36",                 // 山/草丛
+      L: "#8fe07a", D: "#1e5c26",                 // 水管高光/暗面
+      B: "#c96a1e", s: "#5a2d08",                 // 悬浮砖块/砖缝
+      W: "#ffffff",                               // 像素云
+    };
+    const PIPE = [
+      "oLLLGGGGGGDDDo",
+      "oLLLGGGGGGDDDo",
+      "toLLGGGGGGDDot",
+      "toLLGGGGGGDDot",
+      "toLLGGGGGGDDot",
+      "toLLGGGGGGDDot",
+      "toLLGGGGGGDDot",
+      "toLLGGGGGGDDot",
+      "toLLGGGGGGDDot",
+      "toLLGGGGGGDDot",
+      "toLLGGGGGGDDot",
+      "toLLGGGGGGDDot",
+    ];
+    const PIPE_SHORT = PIPE.slice(0, 6);
+    const BRICK = [
+      "BBBBBBBsBBBBBBBs",
+      "BBBBBBBsBBBBBBBs",
+      "ssssssssssssssss",
+      "BBBsBBBBBBBsBBBB",
+      "BBBsBBBBBBBsBBBB",
+      "ssssssssssssssss",
+      "BBBBBBBsBBBBBBBs",
+      "BBBBBBBsBBBBBBBs",
+    ];
+    const HILL = [
+      "ttttttGGGGtttttt",
+      "tttttGGGGGGttttt",
+      "ttttGGGGgGGGtttt",
+      "tttGGGGGGGGGtttt",
+      "ttGGGGGGGGGGGGtt",
+      "tGGGGgGGGGGgGGGt",
+    ];
+    const BUSH = [
+      "ttttGGGttttttttttt",
+      "tttGGGGGtttGGGtttt",
+      "ttGGGGGGGtGGGGGttt",
+      "tGGGGGGGGGGGGGGGtt",
+      "GGGGGGGGGGGGGGGGGG",
+    ];
+    const PCLOUD = [
+      "ttttWWWWWttttttttttt",
+      "tttWWWWWWWttWWWWtttt",
+      "ttWWWWWWWWtWWWWWWttt",
+      "tWWWWWWWWWWWWWWWWttt",
+      "WWWWWWWWWWWWWWWWWWtt",
+    ];
+    const mkDeco = (elm, map, px) => {
+      if (!elm) return;
+      map.forEach((row) => {
+        const r = el("div", "drow");
+        for (const ch of row) {
+          const p = el("div", "dpx");
+          p.style.width = p.style.height = px + "px";
+          p.style.background = DECO_PAL[ch];
+          r.appendChild(p);
+        }
+        elm.appendChild(r);
+      });
+    };
+    mkDeco($("#pipe1"), PIPE, 4);  mkDeco($("#pipe2"), PIPE_SHORT, 4);
+    mkDeco($("#brickL"), BRICK, 3); mkDeco($("#brickR"), BRICK, 3);
+    mkDeco($("#hill1"), HILL, 6);
+    mkDeco($("#bush1"), BUSH, 5);  mkDeco($("#bush2"), BUSH, 4);
+    mkDeco($("#pc1"), PCLOUD, 5);  mkDeco($("#pc2"), PCLOUD, 4);  mkDeco($("#pc3"), PCLOUD, 3);
+
     const SPEED = 130, JUMP_T = 0.62, JUMP_H = 84, GROUND = 28;
-    let blockX = 0;
+    const bubble = $("#marioBubble");
+    let blockX = 0, pipes = [], blocked = null;
+    const brickL = $("#brickL"), brickR = $("#brickR");
     const layout = () => {
-      blockX = marioScene.clientWidth * 0.55;
+      const w = marioScene.clientWidth;
+      blockX = w * 0.55;
       qblock.style.left = blockX + "px";
       coin.style.left = blockX + "px";
+      if (brickL) brickL.style.left = (blockX - 50) + "px";   // 问号砖左右各贴一块悬浮砖
+      if (brickR) brickR.style.left = (blockX + 46) + "px";
+      pipes = [                                               // 水管位置（与 CSS 的 left% 对齐），宽 14px×4=56
+        { x: w * 0.24, w: 56, cleared: false },
+        { x: w * 0.72, w: 56, cleared: false },
+      ];
+      blocked = null;                                         // 窗口变化后重新判定
+      if (bubble) bubble.classList.remove("show");
     };
     layout();
     window.addEventListener("resize", layout);
@@ -711,37 +796,78 @@
     let x = -80, jumpT = -1, jumpDur = JUMP_T, jumpH = JUMP_H, coinJump = false;
     let blockJumped = false, coinPopped = false, gait = 0, gaitT = 0, last = performance.now();
     const startJump = (dur, h, forCoin) => { jumpT = 0; jumpDur = dur; jumpH = h; coinJump = forCoin; };
-    mario.addEventListener("click", () => {           // 点马里奥：原地小跳一下
-      if (jumpT < 0) startJump(0.5, 60, false);
+    /* 马里奥在背景层（z-index 低于正文与群山），直接绑 click 会被上层元素挡住。
+       改为 document 级命中检测：按坐标判断点没点到他，视觉层级保持不变。 */
+    const hitMario = (cx, cy, pad) => {
+      const r = mario.getBoundingClientRect();
+      return cx >= r.left - pad && cx <= r.right + pad && cy >= r.top - pad && cy <= r.bottom + pad;
+    };
+    document.addEventListener("click", (e) => {
+      if (!document.documentElement.classList.contains("day")) return;
+      if (blocked && hitMario(e.clientX, e.clientY, 80)) {     // 解救被水管挡住的马里奥
+        blocked.cleared = true; blocked = null;
+        if (bubble) bubble.classList.remove("show");
+        startJump(0.85, 110, false);                           // 感恩大跳，抛物线保证完全越过水管
+      } else if (jumpT < 0 && !blocked && hitMario(e.clientX, e.clientY, 8)) {
+        startJump(0.5, 60, false);                             // 平时点他：原地小跳
+      }
+    });
+    let hoverRaf = 0;                                    // 悬停到马里奥身上时显示手型（他被压在背景层，CSS cursor 不生效）
+    document.addEventListener("mousemove", (e) => {
+      if (hoverRaf) return;
+      hoverRaf = requestAnimationFrame(() => {
+        hoverRaf = 0;
+        const day = document.documentElement.classList.contains("day");
+        document.body.style.cursor = (day && hitMario(e.clientX, e.clientY, blocked ? 80 : 0)) ? "pointer" : "";
+      });
     });
     (function step(now) {
       const dt = Math.min(64, now - last) / 1000;
       last = now;
       if (document.documentElement.classList.contains("day")) {
-        x += SPEED * dt;
-        if (jumpT < 0 && !blockJumped && x + 48 >= blockX) {     // 到达砖块起跳（只触发一次）
-          blockJumped = true;
-          startJump(JUMP_T, JUMP_H, true);
-        }
-        if (jumpT >= 0) {
-          jumpT += dt;
-          const p = Math.min(1, jumpT / jumpDur);
-          mario.style.bottom = (GROUND + Math.sin(p * Math.PI) * jumpH) + "px";
-          show(fJump);
-          if (coinJump && !coinPopped && p > 0.35) {              // 头顶到砖块：出金币
-            coinPopped = true;
-            qblock.classList.remove("bump"); void qblock.offsetWidth; qblock.classList.add("bump", "used");
-            coin.classList.remove("pop"); void coin.offsetWidth; coin.classList.add("pop");
-          }
-          if (p >= 1) { jumpT = -1; mario.style.bottom = GROUND + "px"; }
-        } else {
-          gaitT += dt;                                            // 跑步两帧切换
-          if (gaitT > 0.15) { gaitT = 0; gait ^= 1; }
+        if (blocked) {                                         // 被水管挡住：顶着原地踏步，等人解救
+          gaitT += dt;
+          if (gaitT > 0.18) { gaitT = 0; gait ^= 1; }
           show(gait ? fRunB : fRunA);
-        }
-        if (x > marioScene.clientWidth + 60) {                    // 跑出屏幕，循环重置
-          x = -80; jumpT = -1; blockJumped = false; coinPopped = false;
-          qblock.classList.remove("used");
+        } else {
+          x += SPEED * dt;
+          for (const p of pipes) {                             // 水管挡路判定
+            if (!p.cleared && jumpT < 0 && x + 48 >= p.x) {
+              x = p.x - 48; blocked = p;
+              if (bubble) {
+                bubble.style.left = (x + 24) + "px";
+                bubble.classList.add("show");
+              }
+              break;
+            }
+          }
+          if (jumpT < 0 && !blockJumped && x + 48 >= blockX) { // 到达砖块起跳（只触发一次）
+            blockJumped = true;
+            startJump(JUMP_T, JUMP_H, true);
+          }
+          if (jumpT >= 0) {
+            jumpT += dt;
+            const p = Math.min(1, jumpT / jumpDur);
+            mario.style.bottom = (GROUND + Math.sin(p * Math.PI) * jumpH) + "px";
+            show(fJump);
+            if (coinJump && !coinPopped && p > 0.35) {            // 头顶到砖块：出金币
+              coinPopped = true;
+              qblock.classList.remove("bump"); void qblock.offsetWidth; qblock.classList.add("bump", "used");
+              coin.classList.remove("pop"); void coin.offsetWidth; coin.classList.add("pop");
+            }
+            if (p >= 1) { jumpT = -1; mario.style.bottom = GROUND + "px"; }
+          } else {
+            gaitT += dt;                                          // 跑步两帧切换
+            if (gaitT > 0.15) { gaitT = 0; gait ^= 1; }
+            show(gait ? fRunB : fRunA);
+          }
+          if (x > marioScene.clientWidth + 60) {                  // 跑出屏幕，循环重置
+            x = -80; jumpT = -1; blockJumped = false; coinPopped = false;
+            qblock.classList.remove("used");
+            pipes.forEach((p) => { p.cleared = false; });
+            blocked = null;
+            if (bubble) bubble.classList.remove("show");
+          }
         }
         mario.style.left = x + "px";
       }
@@ -766,7 +892,8 @@
     const WIPE_TO_DAY = ["#3f8ae0", "#6ba9e8", "#4da354", "#c9861a", "#1d7a99", "#8cc57e"];   // 去白天：蓝天/绿地/暖金
     const WIPE_TO_NIGHT = ["#e8c46a", "#8fd8e8", "#8b8db0", "#b48fe8", "#d98fb8", "#5a5ea0"]; // 回夜晚：金/青/紫深夜系
     const WIPE_FS = 15;                                  // 列宽 = 字号，列与列贴紧铺满
-    const HEAD = 0.12;                                   // 列顶亮白头部占比
+    const HEAD = 0.14;                                   // 列顶亮白头部占比
+    const MID = 0.58;                                    // 三段渐变的中段分界（c1→c2→c3）
     const lerpHex = (a, b, t) => {
       const pa = [1, 3, 5].map((i) => parseInt(a.slice(i, i + 2), 16));
       const pb = [1, 3, 5].map((i) => parseInt(b.slice(i, i + 2), 16));
@@ -787,18 +914,21 @@
       let maxEnd = 0, coverLo = 0, coverHi = Infinity;
       for (let i = 0; i < cols; i++) {
         const c = el("div", "bcol");
-        const dur = 2.6 + Math.random() * 0.4;          // 每列流速略有不同（方差小，保证全覆盖窗口存在）
-        const delay = Math.random() * 0.25;             // 每列错峰出发
+        const dur = 2.05 + Math.random() * 0.35;        // 每列流速略有不同（方差小，保证全覆盖窗口存在）
+        const delay = Math.random() * 0.2;              // 每列错峰出发
         const c1 = palette[Math.floor(Math.random() * palette.length)];
         let c2 = palette[Math.floor(Math.random() * palette.length)];
         if (c2 === c1) c2 = palette[(palette.indexOf(c1) + 1) % palette.length];
-        for (let r = 0; r < rows; r++) {                // 逐行渐变：亮白头部 → c1 → c2
+        let c3 = palette[Math.floor(Math.random() * palette.length)];
+        if (c3 === c2) c3 = palette[(palette.indexOf(c2) + 1) % palette.length];
+        for (let r = 0; r < rows; r++) {                // 逐行三段渐变：亮白头部 → c1 → c2 → c3
           const t = r / (rows - 1);
           const color = t < HEAD ? lerpHex("#ffffff", c1, t / HEAD)
-                                 : lerpHex(c1, c2, (t - HEAD) / (1 - HEAD));
+                       : t < MID  ? lerpHex(c1, c2, (t - HEAD) / (MID - HEAD))
+                                  : lerpHex(c2, c3, (t - MID) / (1 - MID));
           const row = el("div", "brow", Math.random() < 0.5 ? "0" : "1");
           row.style.color = color;
-          row.style.opacity = (0.75 + Math.random() * 0.25).toFixed(2);   // 轻微明度抖动
+          row.style.opacity = (0.4 + Math.random() * 0.35).toFixed(2);    // 轻微明度抖动，整体压柔不刺眼
           c.appendChild(row);
         }
         c.style.left = (i * WIPE_FS) + "px";
@@ -812,14 +942,34 @@
       }
       document.body.appendChild(w);
       document.documentElement.classList.add("wiping");   // 换肤期间给界面元素挂颜色过渡，衔接更顺滑
-      const flipAt = (coverLo < coverHi ? (coverLo + coverHi) / 2 : coverLo) * 1000;
-      setTimeout(() => {                                // 全屏被代码完全覆盖的瞬间换肤
+
+      /* 幕布层：垫在代码雨下面、页面上面的目标主题底色。
+         换肤前淡入到近不透明，把 class 切换的硬边完全藏住；代码雨散场前再缓缓淡出。 */
+      const flipS = (coverLo < coverHi ? (coverLo + coverHi) / 2 : coverLo);
+      const veil = el("div", "theme-veil");
+      veil.style.background = toDay
+        ? "linear-gradient(to bottom, #6ba9e8 0%, #a8d4f5 60%, #e4f3ff 100%)"
+        : "linear-gradient(to bottom, #07070f 0%, #0d0e20 100%)";
+      document.body.appendChild(veil);
+      const totalS = maxEnd + 0.1;
+      veil.animate(
+        [
+          { opacity: 0 },
+          { opacity: .97, offset: Math.max(0.01, (flipS - 0.5) / totalS) },
+          { opacity: .97, offset: Math.min(0.97, (flipS + 1.1) / totalS) },
+          { opacity: 0 },
+        ],
+        { duration: totalS * 1000, easing: "ease-in-out", fill: "both" }
+      );
+
+      setTimeout(() => {                                // 全屏被代码+幕布完全覆盖的瞬间换肤
         const day = document.documentElement.classList.toggle("day");
         localStorage.setItem("theme", day ? "day" : "night");
         syncHint();
-      }, flipAt);
+      }, flipS * 1000);
       setTimeout(() => {
         w.remove();
+        veil.remove();
         document.documentElement.classList.remove("wiping");
         wiping = false;
       }, maxEnd * 1000 + 100);

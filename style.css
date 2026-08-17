@@ -813,20 +813,20 @@ html.day .badge.meta {
 }
 html.day .pub-links a { border-color: rgba(29, 122, 153, .45); }
 
-/* 关键词/方向标签：白天象牙底上要足够显眼——深海军蓝文字 + 2px 像素描边 + 明显的青色底 */
+/* 关键词/方向标签：白天改为实心徽章——深青底白字，在象牙底上对比最强 */
 html.day .pub-keywords .kw {
-  color: #2b3a67;
-  border: 2px solid rgba(43, 58, 103, .55);
-  background: rgba(29, 122, 153, .16);
+  color: #ffffff;
+  border: 2px solid #155e77;
+  background: #1d7a99;
 }
 html.day .pub-keywords .kw:hover {
-  color: #1d7a99;
-  border-color: #1d7a99;
-  background: rgba(29, 122, 153, .24);
+  background: #155e77;
+  border-color: #0f4a5e;
 }
 html.day .chip {
-  border: 2px solid rgba(29, 122, 153, .6);
-  background: rgba(29, 122, 153, .16);
+  color: #ffffff;
+  border: 2px solid #155e77;
+  background: #1d7a99;
 }
 
 /* ---------- 白天塔罗牌：象牙羊皮纸质感，取代深夜蓝 ---------- */
@@ -899,8 +899,8 @@ html.day .moon-wrap { filter: drop-shadow(0 0 44px rgba(255, 208, 84, .6)); }
 }
 @keyframes binFloat {
   0%   { transform: translateY(105vh); opacity: 0; }
-  12%  { opacity: .95; }
-  75%  { opacity: .95; }
+  12%  { opacity: .55; }
+  75%  { opacity: .55; }
   100% { transform: translateY(-120%); opacity: 0; }
 }
 
@@ -912,6 +912,13 @@ html.wiping a, html.wiping h1, html.wiping p, html.wiping li {
   transition: background-color .45s ease, color .45s ease, border-color .45s ease;
 }
 
+/* 过场幕布：垫在代码雨（z200）之下、页面之上的目标主题底色，藏住换肤硬边 */
+.theme-veil {
+  position: fixed; inset: 0; z-index: 199;
+  pointer-events: none;
+  opacity: 0;
+}
+
 /* ---------- 马里奥奔跑场景（仅白天显示） ---------- */
 #mario-scene { display: none; }
 html.day #mario-scene {
@@ -920,18 +927,65 @@ html.day #mario-scene {
   pointer-events: none;
 }
 
-/* 砖块地面 */
+/* 砖块地面（顶部加一层草地，SMB 风味） */
 .mario-ground {
   position: absolute; left: 0; right: 0; bottom: 0; height: 28px;
   background:
+    repeating-linear-gradient(90deg, #3f8f46 0 4px, transparent 4px 11px) top / 100% 6px no-repeat,
+    linear-gradient(#5cb853, #4da354) top / 100% 6px no-repeat,
     repeating-linear-gradient(0deg, rgba(0, 0, 0, .28) 0 2px, transparent 2px 14px),
     repeating-linear-gradient(90deg, rgba(0, 0, 0, .28) 0 2px, transparent 2px 14px),
     linear-gradient(#e08030, #c85f10);
   border-top: 4px solid #7b3f00;
 }
 
+/* 场景装饰（水管/砖块/山/草丛/像素云，JS 逐像素生成） */
+.deco { position: absolute; bottom: 28px; z-index: 1; }
+.deco .drow, .pcloud .drow { display: flex; }
+#pipe1 { left: 24%; }
+#pipe2 { left: 72%; }
+#hill1 { left: 6%; }
+#bush1 { left: 38%; }
+#bush2 { left: 86%; }
+.deco-brick { bottom: 118px; }          /* 与问号砖同一高度，left 由 JS 按 blockX 贴齐 */
+.pcloud {
+  position: absolute; z-index: 0;
+  animation: cloudDrift 90s linear infinite;
+}
+#pc1 { top: 13%; animation-duration: 80s; }
+#pc2 { top: 27%; animation-duration: 115s; animation-delay: -45s; }
+#pc3 { top: 6%;  animation-duration: 95s;  animation-delay: -70s; }
+@keyframes cloudDrift {
+  from { left: -14%; }
+  to   { left: 104%; }
+}
+
 /* 马里奥精灵（JS 生成色块与位移；可点击，点了会原地跳一下） */
-#mario { position: absolute; bottom: 28px; left: -60px; width: 48px; height: 48px; pointer-events: auto; cursor: pointer; }
+#mario { position: absolute; bottom: 28px; left: -60px; width: 48px; height: 48px; z-index: 2; pointer-events: auto; cursor: pointer; }
+
+/* 求助气泡：马里奥被水管挡住时出现，点击附近即可解救 */
+#marioBubble {
+  position: absolute; bottom: 92px; z-index: 3;
+  transform: translateX(-50%);
+  padding: 6px 8px;
+  font-family: var(--font-pixel); font-size: 8px; letter-spacing: 1px;
+  color: #241a12; background: #ffffff;
+  border: 3px solid #241a12;
+  white-space: nowrap;
+  display: none;
+  animation: bubbleBob .6s ease-in-out infinite alternate;
+}
+#marioBubble.show { display: block; }
+#marioBubble::after {   /* 像素小尾巴 */
+  content: ""; position: absolute; left: 50%; bottom: -9px;
+  width: 6px; height: 6px; margin-left: -3px;
+  background: #ffffff;
+  border-right: 3px solid #241a12; border-bottom: 3px solid #241a12;
+}
+@keyframes bubbleBob {
+  from { margin-bottom: 0; }
+  to   { margin-bottom: 6px; }
+}
 #mario .mframe { position: absolute; bottom: 0; left: 0; }
 #mario .mrow { display: flex; }
 #mario .mpx { width: 3px; height: 3px; }
