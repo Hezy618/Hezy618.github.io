@@ -625,4 +625,208 @@
       setInterval(() => { title.style.color = rainbow[t++ % rainbow.length]; }, 150);
     }
   });
+
+  /* ==================== 白天主题：太阳 + 马里奥场景 + 切换按钮 ==================== */
+  /* 像素太阳：32×32 距离场圆盘 + 8 道光芒（与月亮同容器，白天替换显示） */
+  const sun = $("#sun");
+  if (sun) {
+    const N = 32, R = 9.5, C = N / 2 - .5;
+    for (let y = 0; y < N; y++) {
+      const r = el("div", "row");
+      for (let x = 0; x < N; x++) {
+        const dx = x - C, dy = y - C;
+        const d = Math.hypot(dx, dy);
+        let ch = "t";
+        if (d <= R) ch = d < R * 0.55 ? "y" : d < R * 0.82 ? "g" : "a";
+        else if (d > R + 1.5 && d < R + 6) {
+          const ang = Math.atan2(dy, dx);
+          const sector = Math.round(ang / (Math.PI / 4)) * (Math.PI / 4);
+          if (Math.abs(Math.sin(ang - sector) * d) < 1.2) ch = "g";
+        }
+        r.appendChild(el("div", "px " + ch));
+      }
+      sun.appendChild(r);
+    }
+  }
+
+  /* 马里奥精灵帧（16×16）：R=红 S=肤 B=蓝 W=棕 o=眼 t=透明 */
+  const MARIO_RUN_A = [
+    "tttttRRRRRtttttt",
+    "ttttRRRRRRRRRttt",
+    "ttttWWWSSoSttttt",
+    "tttWSSSWSSSStttt",
+    "tttWSSWWSSSStttt",
+    "ttttSSSSSSSttttt",
+    "tttRRBRRRBRRtttt",
+    "ttRRRBRRRBRRRttt",
+    "ttRRRRBBBBRRRttt",
+    "ttSSRRBBBBRSSttt",
+    "ttttBBBBBBBttttt",
+    "tttBBBBBBBBttttt",
+    "tttBBBttBBBBtttt",
+    "ttBBBtttttBBBttt",
+    "ttWWtttttttWWttt",
+    "tWWWtttttttWWWtt",
+  ];
+  const MARIO_RUN_B = MARIO_RUN_A.slice(0, 12).concat([
+    "ttttBBBBBBtttttt",
+    "tttBBBtttBBBtttt",
+    "tttWWtttttWWtttt",
+    "tttWWWtttWWWtttt",
+  ]);
+  const MARIO_JUMP = MARIO_RUN_A.slice(0, 12).concat([
+    "ttttBBBtBBBttttt",
+    "tttWWBBttBBWWttt",
+    "tttttttttttttttt",
+    "tttttttttttttttt",
+  ]);
+
+  /* 场景：马里奥从左跑到右，路过问号砖时跳起顶出金币，跑出屏幕后循环 */
+  const marioScene = $("#mario-scene"), mario = $("#mario"), qblock = $("#qblock"), coin = $("#coin");
+  if (marioScene && mario && qblock && coin) {
+    const mkFrame = (rows) => {
+      const f = el("div", "mframe");
+      rows.forEach((row) => {
+        const r = el("div", "mrow");
+        for (const ch of row) r.appendChild(el("div", "mpx " + ch));
+        f.appendChild(r);
+      });
+      return f;
+    };
+    const fRunA = mkFrame(MARIO_RUN_A), fRunB = mkFrame(MARIO_RUN_B), fJump = mkFrame(MARIO_JUMP);
+    fRunB.style.display = "none"; fJump.style.display = "none";
+    mario.append(fRunA, fRunB, fJump);
+    const show = (f) => [fRunA, fRunB, fJump].forEach((x) => { x.style.display = x === f ? "" : "none"; });
+
+    const SPEED = 130, JUMP_T = 0.62, JUMP_H = 84, GROUND = 28;
+    let blockX = 0;
+    const layout = () => {
+      blockX = marioScene.clientWidth * 0.55;
+      qblock.style.left = blockX + "px";
+      coin.style.left = blockX + "px";
+    };
+    layout();
+    window.addEventListener("resize", layout);
+
+    let x = -80, jumpT = -1, jumpDur = JUMP_T, jumpH = JUMP_H, coinJump = false;
+    let blockJumped = false, coinPopped = false, gait = 0, gaitT = 0, last = performance.now();
+    const startJump = (dur, h, forCoin) => { jumpT = 0; jumpDur = dur; jumpH = h; coinJump = forCoin; };
+    mario.addEventListener("click", () => {           // 点马里奥：原地小跳一下
+      if (jumpT < 0) startJump(0.5, 60, false);
+    });
+    (function step(now) {
+      const dt = Math.min(64, now - last) / 1000;
+      last = now;
+      if (document.documentElement.classList.contains("day")) {
+        x += SPEED * dt;
+        if (jumpT < 0 && !blockJumped && x + 48 >= blockX) {     // 到达砖块起跳（只触发一次）
+          blockJumped = true;
+          startJump(JUMP_T, JUMP_H, true);
+        }
+        if (jumpT >= 0) {
+          jumpT += dt;
+          const p = Math.min(1, jumpT / jumpDur);
+          mario.style.bottom = (GROUND + Math.sin(p * Math.PI) * jumpH) + "px";
+          show(fJump);
+          if (coinJump && !coinPopped && p > 0.35) {              // 头顶到砖块：出金币
+            coinPopped = true;
+            qblock.classList.remove("bump"); void qblock.offsetWidth; qblock.classList.add("bump", "used");
+            coin.classList.remove("pop"); void coin.offsetWidth; coin.classList.add("pop");
+          }
+          if (p >= 1) { jumpT = -1; mario.style.bottom = GROUND + "px"; }
+        } else {
+          gaitT += dt;                                            // 跑步两帧切换
+          if (gaitT > 0.15) { gaitT = 0; gait ^= 1; }
+          show(gait ? fRunB : fRunA);
+        }
+        if (x > marioScene.clientWidth + 60) {                    // 跑出屏幕，循环重置
+          x = -80; jumpT = -1; blockJumped = false; coinPopped = false;
+          qblock.classList.remove("used");
+        }
+        mario.style.left = x + "px";
+      }
+      requestAnimationFrame(step);
+    })(last);
+  }
+
+  /* 主题切换：月亮/太阳本身就是开关，旁边挂呼吸提示（moonWrap 已在上方视差代码里声明） */
+  const themeHint = $("#themeHint");
+  if (moonWrap) {
+    const syncHint = () => {
+      const day = document.documentElement.classList.contains("day");
+      if (themeHint) themeHint.textContent = day ? "☾ NIGHT" : "☀ DAY";
+      moonWrap.setAttribute("aria-label", day ? "Switch to night theme" : "Switch to day theme");
+    };
+    syncHint();
+
+    /* 过场动画：01 二进制列铺满全屏向上浮动、渐变隐去；配色跟随目标主题。
+       逐行插值出真实文字色（不依赖 background-clip），列顶加亮白"头部"仿代码雨。
+       换肤时机由所有列的 (delay, dur) 实时推算：取全屏被代码完全覆盖的时间窗口中点，
+       保证页面在代码后面完成换装，动画与渲染无缝衔接。 */
+    const WIPE_TO_DAY = ["#3f8ae0", "#6ba9e8", "#4da354", "#c9861a", "#1d7a99", "#8cc57e"];   // 去白天：蓝天/绿地/暖金
+    const WIPE_TO_NIGHT = ["#e8c46a", "#8fd8e8", "#8b8db0", "#b48fe8", "#d98fb8", "#5a5ea0"]; // 回夜晚：金/青/紫深夜系
+    const WIPE_FS = 15;                                  // 列宽 = 字号，列与列贴紧铺满
+    const HEAD = 0.12;                                   // 列顶亮白头部占比
+    const lerpHex = (a, b, t) => {
+      const pa = [1, 3, 5].map((i) => parseInt(a.slice(i, i + 2), 16));
+      const pb = [1, 3, 5].map((i) => parseInt(b.slice(i, i + 2), 16));
+      return "#" + pa.map((v, k) => Math.round(v + (pb[k] - v) * t).toString(16).padStart(2, "0")).join("");
+    };
+    let wiping = false;
+    const wipeTheme = () => {
+      if (wiping) return;
+      wiping = true;
+      const toDay = !document.documentElement.classList.contains("day");
+      const palette = toDay ? WIPE_TO_DAY : WIPE_TO_NIGHT;
+      const w = el("div", "theme-wipe");
+      const cols = Math.ceil(window.innerWidth / WIPE_FS);
+      /* 列高 ≈ 1.55 屏高：列从 105vh 出发、平移总量 ≈ 2.91 屏高，
+         列覆盖全屏 ⇔ 进度 p ∈ [0.361, 0.550]（推导：top=1.05-2.91p，需 top≤0 且 top≥-0.55） */
+      const rows = Math.ceil(window.innerHeight * 1.5 / (WIPE_FS * 1.6)) + 2;
+      const P_IN = 0.361, P_OUT = 0.550;
+      let maxEnd = 0, coverLo = 0, coverHi = Infinity;
+      for (let i = 0; i < cols; i++) {
+        const c = el("div", "bcol");
+        const dur = 2.6 + Math.random() * 0.4;          // 每列流速略有不同（方差小，保证全覆盖窗口存在）
+        const delay = Math.random() * 0.25;             // 每列错峰出发
+        const c1 = palette[Math.floor(Math.random() * palette.length)];
+        let c2 = palette[Math.floor(Math.random() * palette.length)];
+        if (c2 === c1) c2 = palette[(palette.indexOf(c1) + 1) % palette.length];
+        for (let r = 0; r < rows; r++) {                // 逐行渐变：亮白头部 → c1 → c2
+          const t = r / (rows - 1);
+          const color = t < HEAD ? lerpHex("#ffffff", c1, t / HEAD)
+                                 : lerpHex(c1, c2, (t - HEAD) / (1 - HEAD));
+          const row = el("div", "brow", Math.random() < 0.5 ? "0" : "1");
+          row.style.color = color;
+          row.style.opacity = (0.75 + Math.random() * 0.25).toFixed(2);   // 轻微明度抖动
+          c.appendChild(row);
+        }
+        c.style.left = (i * WIPE_FS) + "px";
+        c.style.width = WIPE_FS + "px";
+        c.style.setProperty("--wt", dur + "s");
+        c.style.setProperty("--wd", delay + "s");
+        maxEnd = Math.max(maxEnd, dur + delay);
+        coverLo = Math.max(coverLo, delay + P_IN * dur);   // 所有列都进入"全覆盖"的最早时刻
+        coverHi = Math.min(coverHi, delay + P_OUT * dur);  // 有列开始离开"全覆盖"的最早时刻
+        w.appendChild(c);
+      }
+      document.body.appendChild(w);
+      document.documentElement.classList.add("wiping");   // 换肤期间给界面元素挂颜色过渡，衔接更顺滑
+      const flipAt = (coverLo < coverHi ? (coverLo + coverHi) / 2 : coverLo) * 1000;
+      setTimeout(() => {                                // 全屏被代码完全覆盖的瞬间换肤
+        const day = document.documentElement.classList.toggle("day");
+        localStorage.setItem("theme", day ? "day" : "night");
+        syncHint();
+      }, flipAt);
+      setTimeout(() => {
+        w.remove();
+        document.documentElement.classList.remove("wiping");
+        wiping = false;
+      }, maxEnd * 1000 + 100);
+    };
+    moonWrap.addEventListener("click", wipeTheme);
+    moonWrap.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); wipeTheme(); }
+    });
+  }
 })();

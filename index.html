@@ -6,6 +6,9 @@
   <title>Zhongyu He — Homepage</title>
   <meta name="description" content="Personal homepage of Zhongyu He" />
 
+  <!-- 主题初始化：在样式加载前恢复上次选择的主题，避免闪烁（默认夜晚） -->
+  <script>if (localStorage.getItem("theme") === "day") document.documentElement.classList.add("day");</script>
+
   <!-- 像素字体：标题 Press Start 2P / 正文 VT323 -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -16,14 +19,22 @@
 </head>
 <body>
 
-  <!-- 夜空背景：星星 / 流星（JS）· 月亮 / 云 / 群山（CSS+JS） -->
+  <!-- 夜空背景：星星 / 流星（JS）· 月亮 / 云 / 群山（CSS+JS）；月亮/太阳即主题开关 -->
   <div id="starfield" aria-hidden="true"></div>
-  <div class="moon-wrap" aria-hidden="true"><div id="moon"></div></div>
+  <div class="moon-wrap" role="button" tabindex="0" title="Switch theme" aria-label="Switch day and night theme"><div id="moon"></div><div id="sun"></div><div id="themeHint" class="theme-hint"></div></div>
   <div class="cloud cloud-1" aria-hidden="true"></div>
   <div class="cloud cloud-2" aria-hidden="true"></div>
   <div class="mountains mountains-back" aria-hidden="true"></div>
   <div class="mountains mountains-front" aria-hidden="true"></div>
   <div class="grain" aria-hidden="true"></div>
+
+  <!-- 白天主题背景：马里奥奔跑场景（仅 html.day 时显示，JS 生成与驱动） -->
+  <div id="mario-scene" aria-hidden="true">
+    <div id="qblock">?</div>
+    <div id="coin"></div>
+    <div id="mario"></div>
+    <div class="mario-ground"></div>
+  </div>
 
   <!-- 鼠标星尘轨迹容器 -->
   <div id="stardust" aria-hidden="true"></div>
