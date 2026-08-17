@@ -361,6 +361,31 @@
   ];
   const CAT_TYPE_BLINK = CAT_TYPE.map((r, i) => (i === 3 ? "tocccccccccccott" : r));
 
+  /* 白天形态：About 猫戴墨镜；打字猫眯眼笑；巡逻猫吐舌头散热；坐姿猫躺平晒太阳 */
+  const setCh = (row, idx, ch) => row.slice(0, idx) + ch + row.slice(idx + 1);
+  const CAT_SIT_SHADES = CAT_SIT.map((r, i) => (i === 3 ? "toooooccoooooot" : r));
+  const CAT_TYPE_DAY = CAT_TYPE.map((r, i) => (i === 2 ? CAT_HAPPY[2] : i === 3 ? CAT_HAPPY[3] : r));
+  const CAT_TYPE_DAY_BLINK = CAT_TYPE_DAY.map((r, i) => (i === 3 ? "tocccccccccccott" : r));
+  const CAT_WALK_A_DAY = CAT_WALK_A.map((r, i) => (i === 6 ? setCh(r, 15, "p") : r));
+  const CAT_WALK_B_DAY = CAT_WALK_B.map((r, i) => (i === 6 ? setCh(r, 15, "p") : r));
+  /* 仰面躺平晒太阳：四爪朝天 + 右侧脑袋（耳朵、眼睛、粉鼻头） */
+  const CAT_LIE = [
+    "tttttttttttttttt",
+    "ttttoottootttttt",
+    "ttttccttccttotot",
+    "ttooooooooooooot",
+    "toccccccccccccot",
+    "tocccccccccococt",
+    "toccccccccccpcot",
+    "tosccccccccccsot",
+    "ttoooooooooooott",
+  ];
+
+  /* 主题联动：猫的形态跟随昼夜切换（syncCats 在主题翻转时调用） */
+  const catSyncs = [];
+  let catsDay = document.documentElement.classList.contains("day");
+  const syncCats = (day) => { catsDay = day; catSyncs.forEach((fn) => fn()); };
+
   function buildCat(box, rows, scale) {
     box.style.setProperty("--cs", scale + "px");
     rows.forEach((row) => {
@@ -370,15 +395,19 @@
     });
   }
 
-  /* 打盹猫：趴在塔罗牌上沿 + 漂浮的 Zzz；点一下会惊醒，愣一会儿再继续睡 */
+  /* 打盹猫：黑夜趴在塔罗牌上睡觉（Zzz 漂浮），白天醒来蹲坐；点一下：夜里惊醒，白天冲你笑 */
   const sleepBox = $("#catSleep");
   if (sleepBox) {
     const sSleep = el("div", "catframe");
     const sAwake = el("div", "catframe");
+    const sSit = el("div", "catframe");
+    const sHappy = el("div", "catframe");
     buildCat(sSleep, CAT_SLEEP, 4);
     buildCat(sAwake, CAT_STARTLE, 4);
-    sAwake.style.display = "none";
-    sleepBox.append(sSleep, sAwake);
+    buildCat(sSit, CAT_SIT, 4);
+    buildCat(sHappy, CAT_HAPPY, 4);
+    sleepBox.append(sSleep, sAwake, sSit, sHappy);
+    const showOnly = (f) => [sSleep, sAwake, sSit, sHappy].forEach((x) => { x.style.display = x === f ? "" : "none"; });
 
     const zzz = el("span", "zzz");
     for (let zi = 0; zi < 3; zi++) {
@@ -389,24 +418,30 @@
     }
     sleepBox.appendChild(zzz);
 
+    const applySleep = () => {                        // 按主题切默认形态：夜睡 / 日醒
+      showOnly(catsDay ? sSit : sSleep);
+      zzz.style.display = catsDay ? "none" : "";
+    };
+    catSyncs.push(applySleep);
+
     let dozeTimer = null;
-    const startle = () => {
-      sSleep.style.display = "none"; sAwake.style.display = "";
-      zzz.style.display = "none";
+    const poke = () => {
+      showOnly(catsDay ? sHappy : sAwake);            // 白天：笑一下；黑夜：惊醒
+      if (!catsDay) zzz.style.display = "none";
       sleepBox.classList.remove("startled");
       void sleepBox.offsetWidth;          // 强制回流，让惊醒动画可以连续触发
       sleepBox.classList.add("startled");
       clearTimeout(dozeTimer);
       dozeTimer = setTimeout(() => {
-        sSleep.style.display = ""; sAwake.style.display = "none";
-        zzz.style.display = "";
+        applySleep();
         sleepBox.classList.remove("startled");
       }, 1500);
     };
-    sleepBox.addEventListener("click", (e) => { e.stopPropagation(); startle(); });  // 不触发塔罗牌翻面
+    sleepBox.addEventListener("click", (e) => { e.stopPropagation(); poke(); });  // 不触发塔罗牌翻面
     sleepBox.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); startle(); }
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); poke(); }
     });
+    applySleep();
   }
 
   /* 巡逻猫：沿 PUBLICATIONS 上沿来回巡逻，到边自动转身；点一下会吓一跳、喵一声并加速逃窜 */
@@ -415,15 +450,27 @@
   if (patrolBox && pubsPanel) {
     const fA = el("div", "catframe");
     const fB = el("div", "catframe");
+    const fDA = el("div", "catframe");
+    const fDB = el("div", "catframe");
     buildCat(fA, CAT_WALK_A, 4);
     buildCat(fB, CAT_WALK_B, 4);
-    fB.style.display = "none";
-    patrolBox.append(fA, fB);
+    buildCat(fDA, CAT_WALK_A_DAY, 4);
+    buildCat(fDB, CAT_WALK_B_DAY, 4);
+    patrolBox.append(fA, fB, fDA, fDB);
+    const allPaws = [fA, fB, fDA, fDB];
+    const gaitPair = () => (catsDay ? [fDA, fDB] : [fA, fB]);   // 白天巡逻吐舌头散热
+    allPaws.forEach((f) => { f.style.display = "none"; });
+    gaitPair()[0].style.display = "";
+    catSyncs.push(() => {
+      allPaws.forEach((f) => { f.style.display = "none"; });
+      gaitPair()[0].style.display = "";
+    });
 
     setInterval(() => {           // 步态两帧切换（一显一隐）
-      const aHidden = fA.style.display === "none";
-      fA.style.display = aHidden ? "" : "none";
-      fB.style.display = aHidden ? "none" : "";
+      const [a, b] = gaitPair();
+      const aHidden = a.style.display === "none";
+      allPaws.forEach((f) => { f.style.display = "none"; });
+      (aHidden ? a : b).style.display = "";
     }, 220);
 
     const CAT_W = 18 * 4, EDGE = 28;
@@ -433,7 +480,7 @@
     const meows = ["MEOW!", "MRRP!", "PURR~"];
     const meow = () => {
       boostUntil = performance.now() + 1500;
-      [fA, fB].forEach((f) => {
+      allPaws.forEach((f) => {
         f.classList.remove("hop"); void f.offsetWidth; f.classList.add("hop");
       });
       const m = el("span", "meow", meows[Math.floor(Math.random() * meows.length)]);
@@ -442,7 +489,7 @@
       patrolBox.appendChild(m);
       // hop 动画只播一次；不及时摘掉的话，步态切帧会反复重启动画，猫就一直跳
       clearTimeout(hopTimer);
-      hopTimer = setTimeout(() => [fA, fB].forEach((f) => f.classList.remove("hop")), 550);
+      hopTimer = setTimeout(() => allPaws.forEach((f) => f.classList.remove("hop")), 550);
     };
     patrolBox.addEventListener("click", meow);
     patrolBox.addEventListener("keydown", (e) => {
@@ -462,18 +509,27 @@
     })(lastT);
   }
 
-  /* 坐姿猫：蹲在 SIDE QUESTS 上沿，每隔几秒眨一次眼；点一下会开心翻滚并溅出金色火花 */
+  /* 坐姿猫：蹲在 SIDE QUESTS 上沿，每隔几秒眨一次眼；白天躺平晒太阳；点一下会开心翻滚并溅出金色火花 */
   const sitBox = $("#catSit");
   if (sitBox) {
     const sA = el("div", "catframe");
     const sB = el("div", "catframe");
+    const sL = el("div", "catframe");
     buildCat(sA, CAT_SIT, 4);
     buildCat(sB, CAT_SIT_BLINK, 4);
-    sB.style.display = "none";
-    sitBox.append(sA, sB);
+    buildCat(sL, CAT_LIE, 4);
+    sB.style.display = "none"; sL.style.display = "none";
+    sitBox.append(sA, sB, sL);
+    catSyncs.push(() => {          // 白天切到躺平晒太阳形态
+      sB.style.display = "none";
+      sA.style.display = catsDay ? "none" : "";
+      sL.style.display = catsDay ? "" : "none";
+    });
     (function blink() {
-      sA.style.display = "none"; sB.style.display = "";
-      setTimeout(() => { sA.style.display = ""; sB.style.display = "none"; }, 180);
+      if (!catsDay) {              // 只有蹲坐形态才眨眼
+        sA.style.display = "none"; sB.style.display = "";
+        setTimeout(() => { sB.style.display = "none"; if (!catsDay) sA.style.display = ""; }, 180);
+      }
       setTimeout(blink, 2600 + Math.random() * 2600);
     })();
 
@@ -497,18 +553,28 @@
     });
   }
 
-  /* 打字猫：蹲在 EXPERIENCE 上沿敲笔记本，偶尔眨眼；点一下会疯狂打字并飘出代码符号 */
+  /* 打字猫：蹲在 EXPERIENCE 上沿敲笔记本，偶尔眨眼；白天换成眯眼笑的表情；点一下会疯狂打字并飘出代码符号 */
   const typeBox = $("#catType");
   if (typeBox) {
     const tA = el("div", "catframe");
     const tB = el("div", "catframe");
+    const tD = el("div", "catframe");
+    const tDB = el("div", "catframe");
     buildCat(tA, CAT_TYPE, 4);
     buildCat(tB, CAT_TYPE_BLINK, 4);
-    tB.style.display = "none";
-    typeBox.append(tA, tB);
+    buildCat(tD, CAT_TYPE_DAY, 4);
+    buildCat(tDB, CAT_TYPE_DAY_BLINK, 4);
+    tB.style.display = "none"; tD.style.display = "none"; tDB.style.display = "none";
+    typeBox.append(tA, tB, tD, tDB);
+    const typeBase = () => (catsDay ? tD : tA);
+    catSyncs.push(() => {
+      [tA, tB, tD, tDB].forEach((f) => { f.style.display = "none"; });
+      typeBase().style.display = "";
+    });
     (function blink() {
-      tA.style.display = "none"; tB.style.display = "";
-      setTimeout(() => { tA.style.display = ""; tB.style.display = "none"; }, 180);
+      const b = catsDay ? tDB : tB;
+      typeBase().style.display = "none"; b.style.display = "";
+      setTimeout(() => { b.style.display = "none"; typeBase().style.display = ""; }, 180);
       setTimeout(blink, 3000 + Math.random() * 3000);
     })();
 
@@ -533,21 +599,29 @@
     });
   }
 
-  /* About Me 互动猫：平时蹲坐，点击后笑一下并飘出小爱心 */
+  /* About Me 互动猫：平时蹲坐（白天戴墨镜），点击后笑一下并飘出小爱心 */
   const aboutBox = $("#catAbout");
   if (aboutBox) {
     const nA = el("div", "catframe");
     const nB = el("div", "catframe");
+    const nD = el("div", "catframe");
     buildCat(nA, CAT_SIT, 4);
     buildCat(nB, CAT_HAPPY, 4);
-    nB.style.display = "none";
-    aboutBox.append(nA, nB);
+    buildCat(nD, CAT_SIT_SHADES, 4);
+    nB.style.display = "none"; nD.style.display = "none";
+    aboutBox.append(nA, nB, nD);
+    const aboutBase = () => (catsDay ? nD : nA);
+    catSyncs.push(() => {
+      [nA, nB, nD].forEach((f) => { f.style.display = "none"; });
+      aboutBase().style.display = "";
+    });
 
     let happyTimer = null;
     const boop = () => {
-      nA.style.display = "none"; nB.style.display = "";
+      [nA, nB, nD].forEach((f) => { f.style.display = "none"; });
+      nB.style.display = "";
       clearTimeout(happyTimer);
-      happyTimer = setTimeout(() => { nA.style.display = ""; nB.style.display = "none"; }, 1100);
+      happyTimer = setTimeout(() => { nB.style.display = "none"; aboutBase().style.display = ""; }, 1100);
       aboutBox.classList.remove("boop");
       void aboutBox.offsetWidth;          // 强制回流，让挤压动画可以连续触发
       aboutBox.classList.add("boop");
@@ -565,6 +639,8 @@
       if (e.key === "Enter" || e.key === " ") { e.preventDefault(); boop(); }
     });
   }
+
+  syncCats(catsDay);   // 页面加载时按当前主题初始化所有猫的形态（localStorage 恢复了白天时尤其重要）
 
   /* ==================== 塔罗牌交互 ==================== */
   const scene = $("#tarotScene");
@@ -1033,6 +1109,7 @@
         const day = document.documentElement.classList.toggle("day");
         localStorage.setItem("theme", day ? "day" : "night");
         syncHint();
+        syncCats(day);                                  // 猫的形态跟随昼夜切换
       }, flipS * 1000);
       setTimeout(() => {
         w.remove();
