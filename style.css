@@ -862,26 +862,34 @@ html.day #moon { display: none; }
 html.day #sun { display: grid; grid-auto-rows: 4px; }
 html.day .moon-wrap { filter: drop-shadow(0 0 44px rgba(255, 208, 84, .6)); }
 
-/* ---------- 主题切换提示：月亮/太阳右侧的迷你像素徽章，周期性闪现 ---------- */
+/* ---------- 主题切换提示：月亮/太阳右侧的像素箭头 + 目标主题图标，周期性闪现 ---------- */
 .theme-hint {
-  position: absolute; left: calc(100% + 12px); top: 50%;
+  position: absolute; left: calc(100% + 14px); top: 50%;
+  display: flex; align-items: center; gap: 9px;
   transform: translateY(-50%);
-  padding: 4px 6px;
-  font-family: var(--font-pixel); font-size: 7px; letter-spacing: 1px;
+  font-family: var(--font-pixel); font-size: 10px;
   color: var(--gold);
-  background: var(--panel);
-  /* 像素风描边：四向 box-shadow 拼出缺角边框 */
-  box-shadow: 0 -3px 0 var(--gold), 0 3px 0 var(--gold),
-              -3px 0 0 var(--gold), 3px 0 0 var(--gold);
+  text-shadow: 0 0 8px var(--gold-dim);
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
   animation: hintBlink 6s ease-in-out infinite;
 }
+.theme-hint::before {   /* 像素箭头（box-shadow 逐像素拼），指向月亮/太阳 */
+  content: "";
+  width: 4px; height: 4px;
+  background: var(--gold);
+  box-shadow:
+    8px -8px 0 var(--gold),
+    4px -4px 0 var(--gold), 8px -4px 0 var(--gold),
+    0 0 0 var(--gold), 4px 0 0 var(--gold), 8px 0 0 var(--gold), 12px 0 0 var(--gold),
+    4px 4px 0 var(--gold), 8px 4px 0 var(--gold),
+    8px 8px 0 var(--gold);
+}
 @keyframes hintBlink {
-  0%, 10%   { opacity: 0; }
-  20%, 55%  { opacity: 1; }
-  65%, 100% { opacity: 0; }
+  0%, 10%   { opacity: 0; transform: translateY(-50%) translateX(5px); }
+  20%, 55%  { opacity: 1; transform: translateY(-50%) translateX(0); }
+  65%, 100% { opacity: 0; transform: translateY(-50%) translateX(5px); }
 }
 @media (max-width: 720px) {
   .theme-hint { display: none; }   /* 窄屏右侧空间不足，避免溢出 */

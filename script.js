@@ -1023,7 +1023,7 @@
   if (moonWrap) {
     const syncHint = () => {
       const day = document.documentElement.classList.contains("day");
-      if (themeHint) themeHint.textContent = day ? "☾ NIGHT" : "☀ DAY";
+      if (themeHint) themeHint.textContent = day ? "☾" : "☀";   // 箭头指向月亮/太阳，图标示意切换目标
       moonWrap.setAttribute("aria-label", day ? "Switch to night theme" : "Switch to day theme");
     };
     syncHint();
