@@ -33,6 +33,7 @@ const SITE = {
   tarot: {
     numeral: "",                            // 牌面顶部罗马数字（留空则整行隐藏）
     backQuote: "“Not all who wander are lost.”",
+    backQuoteDay: "“Every sunrise is a new quest.”",   // 白天模式背面座右铭（留空则昼夜共用 backQuote）
   },
 
   /* ---------- About Me 简介（支持多段） ---------- */

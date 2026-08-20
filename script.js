@@ -85,6 +85,17 @@
       if (top) top.style.display = "none";
     }
   }
+  /* 塔罗牌元素联动昼夜：白天把月亮纹样（☾/☽）换成太阳（☀），背面座右铭换积极版。
+     与 syncCats 一起在主题翻转和页面初始化时调用。 */
+  const syncTarot = (day) => {
+    document.querySelectorAll(".tgly").forEach((s) => {
+      s.textContent = day ? "☀︎" : (s.dataset.night || "☾");   // ☀ + VS15：强制文字形态，避免渲染成彩色 emoji
+    });
+    if (SITE.tarot) {
+      $("#tarot-back-quote").textContent =
+        (day && SITE.tarot.backQuoteDay) ? SITE.tarot.backQuoteDay : (SITE.tarot.backQuote || "");
+    }
+  };
 
   /* About */
   const bio = $("#bio");
@@ -662,6 +673,7 @@
   }
 
   syncCats(catsDay);   // 页面加载时按当前主题初始化所有猫的形态（localStorage 恢复了白天时尤其重要）
+  syncTarot(catsDay);  // 塔罗牌的月亮/太阳纹样与背面座右铭同理
 
   /* ==================== 塔罗牌交互 ==================== */
   const scene = $("#tarotScene");
@@ -1134,6 +1146,7 @@
         localStorage.setItem("theme", day ? "day" : "night");
         syncHint();
         syncCats(day);                                  // 猫的形态跟随昼夜切换
+        syncTarot(day);                                 // 塔罗牌纹样与座右铭同理
       }, flipS * 1000);
       setTimeout(() => {
         w.remove();
