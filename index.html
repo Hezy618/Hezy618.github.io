@@ -6,6 +6,9 @@
   <title>Zhongyu He — Homepage</title>
   <meta name="description" content="Personal homepage of Zhongyu He" />
 
+  <!-- 主题初始化：在样式加载前恢复上次选择的主题，避免闪烁（默认夜晚） -->
+  <script>if (localStorage.getItem("theme") === "day") document.documentElement.classList.add("day");</script>
+
   <!-- 像素字体：标题 Press Start 2P / 正文 VT323 -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -16,14 +19,36 @@
 </head>
 <body>
 
-  <!-- 夜空背景：星星 / 流星（JS）· 月亮 / 云 / 群山（CSS+JS） -->
+  <!-- 夜空背景：星星 / 流星（JS）· 月亮 / 云 / 群山（CSS+JS）；月亮/太阳即主题开关 -->
   <div id="starfield" aria-hidden="true"></div>
-  <div class="moon-wrap" aria-hidden="true"><div id="moon"></div></div>
+  <div class="moon-wrap" role="button" tabindex="0" title="Switch theme" aria-label="Switch day and night theme"><div id="moon"></div><div id="sun"></div><div id="themeHint" class="theme-hint"></div></div>
   <div class="cloud cloud-1" aria-hidden="true"></div>
   <div class="cloud cloud-2" aria-hidden="true"></div>
   <div class="mountains mountains-back" aria-hidden="true"></div>
   <div class="mountains mountains-front" aria-hidden="true"></div>
   <div class="grain" aria-hidden="true"></div>
+
+  <!-- 白天主题背景：马里奥奔跑场景（仅 html.day 时显示，JS 生成与驱动） -->
+  <div id="mario-scene" aria-hidden="true">
+    <div class="pcloud" id="pc1"></div>
+    <div class="pcloud" id="pc2"></div>
+    <div class="pcloud" id="pc3"></div>
+    <div class="deco" id="hill1"></div>
+    <div class="deco" id="bush1"></div>
+    <div class="deco" id="bush2"></div>
+    <div class="deco" id="pipe1"></div>
+    <div class="deco" id="pipe2"></div>
+    <div class="deco deco-brick" id="brickL"></div>
+    <div class="deco deco-brick" id="brickR"></div>
+    <div class="qblk" id="qb1">?<div class="bcoin"></div></div>
+    <div class="qblk" id="qb2">?<div class="bcoin"></div></div>
+    <div class="qblk" id="qb3">?<div class="bcoin"></div></div>
+    <div id="shroom"></div>
+    <div id="mario"></div>
+    <div id="marioBubble">HELP ME!</div>
+    <div id="coinCount"><span class="ccoin"></span>×<span id="coinNum">0</span></div>
+    <div class="mario-ground"></div>
+  </div>
 
   <!-- 鼠标星尘轨迹容器 -->
   <div id="stardust" aria-hidden="true"></div>
@@ -64,14 +89,14 @@
                 </div>
                 <div class="tarot-links" id="tarot-links"><!-- JS 渲染：GitHub / Scholar 等外链 --></div>
                 <div class="tarot-deco">
-                  <span>☾</span><span class="diamond"></span><span>✦</span><span class="diamond"></span><span>☽</span>
+                  <span class="tgly" data-night="☾">☾</span><span class="diamond"></span><span>✦</span><span class="diamond"></span><span class="tgly" data-night="☽">☽</span>
                 </div>
               </div>
             </div>
             <!-- 背面 -->
             <div class="tarot-face tarot-back">
               <div class="tarot-border-inner">
-                <div class="tarot-back-sigil">☾</div>
+                <div class="tarot-back-sigil tgly" data-night="☾">☾</div>
                 <p class="tarot-back-quote" id="tarot-back-quote"></p>
                 <div class="tarot-deco"><span>✦</span><span class="diamond"></span><span>✦</span></div>
               </div>
@@ -79,8 +104,8 @@
           </div>
         </div>
         <div class="tarot-shadow"></div>
-        <!-- 打盹的像素猫（趴在牌框上沿，JS 生成） -->
-        <div class="cat cat-sleep" id="catSleep" aria-hidden="true"></div>
+        <!-- 打盹的像素猫（趴在牌框上沿，点一下会惊醒，JS 生成） -->
+        <div class="cat cat-sleep" id="catSleep" role="button" tabindex="0" title="Boop!" aria-label="Sleeping pixel cat — click to startle it awake"></div>
       </div>
 
       <!-- 角色信息 -->
@@ -97,6 +122,8 @@
     <section class="panel reveal">
       <h2 class="section-title"><span class="glyph">✦</span> ABOUT ME <span class="rule"></span></h2>
       <div id="bio"><!-- JS 渲染 --></div>
+      <!-- 互动像素猫（蹲在板块上沿，点击会笑并飘出小爱心，JS 生成） -->
+      <div class="cat cat-about" id="catAbout" role="button" tabindex="0" title="Boop me!" aria-label="Pixel cat — click to make it smile"></div>
     </section>
 
     <!-- ===== Experience 个人经历（工作 + 教育） ===== -->
@@ -106,14 +133,16 @@
       <div id="exp-list"><!-- JS 渲染 --></div>
       <h3 class="sub-title">▸ EDUCATION</h3>
       <ul class="edu-list" id="edu-list"><!-- JS 渲染 --></ul>
+      <!-- 敲代码的像素猫（蹲在板块上沿，点一下会疯狂打字并飘出代码符号，JS 生成） -->
+      <div class="cat cat-type" id="catType" role="button" tabindex="0" title="Boop!" aria-label="Pixel cat typing on a laptop — click to make it type furiously"></div>
     </section>
 
     <!-- ===== Publications ===== -->
     <section class="panel reveal" id="publications">
       <h2 class="section-title"><span class="glyph">✦</span> PUBLICATIONS <span class="rule"></span></h2>
       <div id="pub-list"><!-- JS 渲染 --></div>
-      <!-- 巡逻的像素猫（沿板块上沿来回走动，JS 生成） -->
-      <div class="cat cat-patrol" id="catPatrol" aria-hidden="true"></div>
+      <!-- 巡逻的像素猫（沿板块上沿来回走动，点一下会吓一跳喵一声，JS 生成） -->
+      <div class="cat cat-patrol" id="catPatrol" role="button" tabindex="0" title="Boop!" aria-label="Patrolling pixel cat — click to make it meow"></div>
     </section>
 
     <!-- ===== Awards ===== -->
@@ -126,8 +155,8 @@
     <section class="panel reveal" id="hobbies">
       <h2 class="section-title"><span class="glyph">✦</span> SIDE QUESTS <span class="rule"></span></h2>
       <div class="hobby-grid" id="hobby-grid"><!-- JS 渲染 --></div>
-      <!-- 坐姿像素猫（蹲在板块上沿，偶尔眨眼，JS 生成） -->
-      <div class="cat cat-sit" id="catSit" aria-hidden="true"></div>
+      <!-- 坐姿像素猫（蹲在板块上沿偶尔眨眼，点一下会开心翻滚，JS 生成） -->
+      <div class="cat cat-sit" id="catSit" role="button" tabindex="0" title="Boop!" aria-label="Sitting pixel cat — click to make it roll with sparkles"></div>
     </section>
 
     <footer class="footer">

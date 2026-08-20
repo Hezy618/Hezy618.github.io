@@ -69,18 +69,19 @@ body {
   100% { transform: rotate(-32deg) translateX(340px);  opacity: 0; }
 }
 
-/* 像素月亮（JS 生成色块，此处负责光晕与浮动） */
+/* 像素月亮（JS 生成色块，此处负责光晕与浮动）；月亮/太阳本身即主题切换开关 */
 .moon-wrap {
-  position: fixed; z-index: -4;
+  position: fixed; z-index: 5;   /* 需高于正文才能接收点击，但低于导航栏 */
   top: 7%; right: 9%;
   filter: drop-shadow(0 0 34px rgba(243, 233, 200, .32));
   animation: moonFloat 9s ease-in-out infinite alternate;
-  pointer-events: none;
+  pointer-events: auto;
+  cursor: pointer;
 }
 @keyframes moonFloat { from { transform: translateY(0); } to { transform: translateY(14px); } }
-#moon { display: grid; grid-auto-rows: 8px; }
+#moon { display: grid; grid-auto-rows: 4px; }
 #moon .row { display: flex; }
-#moon .px { width: 8px; height: 8px; }
+#moon .px { width: 4px; height: 4px; }
 #moon .h  { background: #fff6d9; }   /* 高光 */
 #moon .m  { background: var(--cream); }
 #moon .k  { background: #ddcaa0; }   /* 亮暗过渡 */
@@ -336,7 +337,10 @@ body {
   padding: 7px 10px;
   background: rgba(232, 196, 106, .06);
   transition: all .12s;
+  display: inline-flex; align-items: center;
 }
+/* 链接前的官方 logo（内联 SVG）：currentColor 上色，悬停随文字一起反色 */
+.lico { width: 10px; height: 10px; margin-right: 6px; flex: none; }
 .tarot-links a:hover {
   background: var(--gold); border-color: var(--gold);
   color: var(--bg0);
@@ -592,6 +596,7 @@ a.badge:hover { transform: translateY(-2px); filter: brightness(1.15); }
 .cat .cpx.c { background: #f3e9c8; }
 .cat .cpx.p { background: #d98fb8; }
 .cat .cpx.s { background: #cdb98d; }
+.cat .cpx.g { background: #8f97bd; }
 
 /* 打盹猫：趴在塔罗牌上沿，随牌一起浮动，缓慢呼吸 */
 .cat-sleep {
@@ -625,11 +630,443 @@ a.badge:hover { transform: translateY(-2px); filter: brightness(1.15); }
 /* 坐姿猫：蹲在 SIDE QUESTS 板块上沿右侧（JS 驱动眨眼） */
 .cat-sit { top: -32px; right: 22px; }
 
+/* 打字猫被点到：疯狂敲键盘（快速抖动）+ 飘出代码符号 */
+.cat-type { top: -32px; right: 22px; }
+.cat-type.typing .catframe { animation: catType .12s linear infinite; }
+@keyframes catType {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-2px); }
+}
+.cat-type .code {
+  position: absolute; bottom: 100%;
+  font-family: var(--font-pixel); font-size: 12px;
+  color: #8fd6a0;
+  text-shadow: 0 0 8px rgba(143, 214, 160, .5);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  animation: codeFloat 1s ease-out forwards;
+}
+@keyframes codeFloat {
+  0%   { opacity: 0; transform: translate(0, 4px) scale(.7); }
+  20%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--cx, 0), -40px); }
+}
+
+/* About Me 互动猫：蹲在板块上沿左侧，点击会笑并飘出小爱心 */
+.cat-about { top: -32px; left: 22px; pointer-events: auto; cursor: pointer; }
+.cat-about.boop { animation: catBoop .45s ease-out; }
+@keyframes catBoop {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.12, .85); }
+  70%  { transform: scale(.95, 1.08); }
+  100% { transform: scale(1); }
+}
+.cat-about .heart {
+  position: absolute; bottom: 100%;
+  font-family: var(--font-pixel);
+  font-size: 14px;
+  color: #d98fb8;
+  text-shadow: 0 0 8px rgba(217, 143, 184, .55);
+  pointer-events: none;
+  opacity: 0;
+  animation: heartFloat 1s ease-out forwards;
+}
+@keyframes heartFloat {
+  0%   { opacity: 0; transform: translate(0, 6px) scale(.6); }
+  20%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--hx, 0), -44px) scale(1.1); }
+}
+
+/* 所有猫都可以点 */
+.cat-sleep, .cat-patrol, .cat-sit, .cat-about, .cat-type { pointer-events: auto; cursor: pointer; }
+
+/* 打盹猫被点醒：弹跳起来哆嗦几下（覆盖呼吸动画，醒完自动恢复） */
+.cat-sleep.startled { animation: catStartle .55s ease-out; }
+@keyframes catStartle {
+  0%   { transform: translateY(0); }
+  22%  { transform: translateY(-14px); }
+  40%  { transform: translateY(0) rotate(-5deg); }
+  55%  { transform: translateY(-5px) rotate(4deg); }
+  70%  { transform: translateY(0) rotate(-2deg); }
+  85%  { transform: translateY(-2px) rotate(1deg); }
+  100% { transform: translateY(0); }
+}
+
+/* 巡逻猫被点到：跳一下 + 喵声气泡 */
+.cat-patrol .catframe.hop { animation: catHop .5s ease-out; }
+@keyframes catHop {
+  0%   { transform: translateY(0); }
+  40%  { transform: translateY(-16px); }
+  70%  { transform: translateY(0); }
+  85%  { transform: translateY(-4px); }
+  100% { transform: translateY(0); }
+}
+.cat-patrol .meow {
+  position: absolute; bottom: calc(100% + 6px); left: 50%;
+  padding: 2px 6px;
+  background: var(--panel-2);
+  border: 2px solid var(--gold);
+  font-family: var(--font-pixel); font-size: 12px; color: var(--gold);
+  white-space: nowrap;
+  pointer-events: none;
+  animation: meowPop .9s ease-out forwards;
+}
+@keyframes meowPop {
+  0%   { opacity: 0; transform: translate(-50%, 6px) scale(.6); }
+  20%  { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  75%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -10px); }
+}
+
+/* 坐姿猫被点到：开心翻滚一周 + 金色火花 */
+.cat-sit { transform-origin: 50% 60%; }
+.cat-sit.spin { animation: catSpin .6s ease-in-out; }
+@keyframes catSpin {
+  0%   { transform: rotate(0deg); }
+  60%  { transform: rotate(370deg); }
+  80%  { transform: rotate(355deg); }
+  100% { transform: rotate(360deg); }
+}
+.cat-sit .spark {
+  position: absolute; bottom: 60%;
+  font-family: var(--font-pixel); font-size: 12px;
+  color: var(--gold);
+  text-shadow: 0 0 8px rgba(232, 196, 106, .55);
+  pointer-events: none;
+  opacity: 0;
+  animation: sparkBurst .8s ease-out forwards;
+}
+@keyframes sparkBurst {
+  0%   { opacity: 0; transform: translate(0, 0) scale(.5); }
+  25%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--sx, 0), var(--sy, -30px)) scale(1.2) rotate(90deg); }
+}
+
 @media (max-width: 640px) {
-  .cat-patrol, .cat-sit { display: none; }
+  .cat-patrol, .cat-sit, .cat-about, .cat-type { display: none; }
   .cat-sleep { animation: none; transform: scale(.72); top: -26px; right: 8px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .cat-sleep { animation: none; }
   .cat-sleep .zzz i { animation: none; opacity: 0; }
+  .cat-sleep.startled, .cat-sit.spin, .cat-about.boop, .cat-patrol .catframe.hop, .cat-type.typing .catframe { animation: none; }
+  .cat-about .heart, .cat-sit .spark, .cat-patrol .meow, .cat-type .code { animation-duration: .01s; }
+}
+
+/* ============================================================
+   白天主题（html.day）—— 马里奥风格的晴空
+   默认是夜晚主题：以下规则全部限定在 html.day 作用域内，
+   不设置 day 类时这套样式完全不生效，黑夜版不受任何影响。
+   ============================================================ */
+
+/* ---------- 白天配色：覆写变量 ---------- */
+html.day {
+  --bg0:      #6ba9e8;   /* 柔和晴空蓝 */
+  --bg1:      #a8d4f5;
+  --panel:    rgba(255, 251, 240, .85);
+  --panel-2:  #fdf6e3;
+  --line:     #d9c08a;
+  --line-soft:#e8dcc0;
+  --cream:    #2b3a67;   /* 标题/强调：深海军蓝（浅底上替代月光白） */
+  --gold:     #c9861a;
+  --gold-dim: rgba(201, 134, 26, .55);
+  --cyan:     #1d7a99;
+  --text:     #3a4066;
+  --dim:      #7a7f9e;
+  --pink:     #d2699e;
+}
+
+/* ---------- 白天天空：柔和蓝渐变，隐藏星星与流星 ---------- */
+html.day #starfield {
+  background:
+    radial-gradient(ellipse at 78% 6%, rgba(255, 236, 170, .35) 0%, transparent 55%),
+    linear-gradient(to bottom, var(--bg0) 0%, var(--bg1) 60%, #e4f3ff 100%);
+}
+html.day .star, html.day .shooting { display: none; }
+
+/* ---------- 白云与青山（马里奥风，低饱和） ---------- */
+html.day .cloud { --cl: rgba(255, 255, 255, .92); }
+html.day .mountains-back  { background: #8cc57e; opacity: .75; }
+html.day .mountains-front { background: #5da862; }
+html.day .grain { opacity: .03; }
+
+/* ---------- 白天导航与杂项 ---------- */
+html.day .navbar { background: rgba(250, 246, 232, .72); }
+html.day .cat .cpx.c { background: #ecd9a8; }   /* 猫身在浅底上稍微加深 */
+
+/* ---------- 白天论文徽章：浅底可读版（夜间配色是为深底设计的） ---------- */
+html.day .badge { color: #14152c; }   /* 徽章文字：夜间吃 var(--bg0) 近黑，白天 --bg0 是浅蓝，需固定深色 */
+/* 评级徽章：底色加深到与白天色板同族（暖金/深青/草绿/砖红），去掉夜间的彩色光晕 */
+html.day .badge.ccf-a   { background: #d84f4f; box-shadow: 0 3px 0 #8a3232; }
+html.day .badge.ccf-b   { background: #e0a83c; box-shadow: 0 3px 0 #8a6420; }
+html.day .badge.ccf-c   { background: #4da8bd; box-shadow: 0 3px 0 #2a6272; }
+html.day .badge.cas     { background: #c97aa5; box-shadow: 0 3px 0 #7e3f68; }
+html.day .badge.default { background: #4da354; box-shadow: 0 3px 0 #2c6634; color: #ffffff; }
+html.day .badge.status {
+  background: rgba(46, 160, 90, .12);
+  color: #1e7a4a; border: 1px solid #2e9e5c;
+  box-shadow: 0 0 10px rgba(46, 160, 90, .25);
+  animation: accPulseDay 2.2s ease-in-out infinite;
+}
+html.day .badge.status::before { background: #2e9e5c; }
+@keyframes accPulseDay {
+  0%, 100% { box-shadow: 0 0 6px rgba(46, 160, 90, .2); }
+  50%      { box-shadow: 0 0 14px rgba(46, 160, 90, .45); }
+}
+html.day .badge.status.review { color: #7a4fc0; border-color: #8a5fd0; }
+html.day .badge.meta {
+  background: rgba(122, 79, 192, .10);
+  color: #6b3fb8; border: 1px solid #8a5fd0;
+  box-shadow: 0 0 10px rgba(122, 79, 192, .22);
+}
+html.day .pub-links a { border-color: rgba(29, 122, 153, .45); }
+
+/* 关键词/方向标签：白天改为实心徽章——深青底白字，在象牙底上对比最强 */
+html.day .pub-keywords .kw {
+  color: #ffffff;
+  border: 2px solid #155e77;
+  background: #1d7a99;
+}
+html.day .pub-keywords .kw:hover {
+  background: #155e77;
+  border-color: #0f4a5e;
+}
+html.day .chip {
+  color: #ffffff;
+  border: 2px solid #155e77;
+  background: #1d7a99;
+}
+
+/* ---------- 白天塔罗牌：象牙羊皮纸质感，取代深夜蓝 ---------- */
+html.day .tarot-face {
+  background: linear-gradient(165deg, #fffaf0 0%, #f8ecd2 55%, #f0deb4 100%);
+  box-shadow:
+    0 0 0 1px rgba(120, 90, 30, .25),
+    0 0 44px rgba(201, 134, 26, .18),
+    14px 18px 0 rgba(90, 70, 30, .18);
+}
+html.day .tarot-scene:hover .tarot-face {
+  box-shadow:
+    0 0 0 1px rgba(120, 90, 30, .3),
+    0 0 64px rgba(201, 134, 26, .3),
+    18px 26px 0 rgba(90, 70, 30, .16);
+}
+
+/* ---------- 太阳：替换月亮（与月亮同一容器，复用浮动动画） ---------- */
+#sun { display: none; }
+#sun .row { display: flex; }
+#sun .px { width: 4px; height: 4px; }
+#sun .y { background: #fff3a0; }   /* 核心亮黄 */
+#sun .g { background: #ffd94d; }   /* 中层金色 */
+#sun .a { background: #ffb61a; }   /* 边缘琥珀 */
+#sun .t { background: transparent; }
+html.day #moon { display: none; }
+html.day #sun { display: grid; grid-auto-rows: 4px; }
+html.day .moon-wrap { filter: drop-shadow(0 0 44px rgba(255, 208, 84, .6)); }
+
+/* ---------- 主题切换提示：月亮/太阳右侧的像素箭头 + 目标主题图标，周期性闪现 ---------- */
+.theme-hint {
+  position: absolute; left: calc(100% + 14px); top: 50%;
+  display: flex; align-items: center; gap: 9px;
+  transform: translateY(-50%);
+  font-family: var(--font-pixel); font-size: 10px;
+  color: var(--gold);
+  text-shadow: 0 0 8px var(--gold-dim);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  animation: hintBlink 6s ease-in-out infinite;
+}
+.theme-hint::before {   /* 像素箭头（box-shadow 逐像素拼），指向月亮/太阳 */
+  content: "";
+  width: 4px; height: 4px;
+  background: var(--gold);
+  box-shadow:
+    8px -8px 0 var(--gold),
+    4px -4px 0 var(--gold), 8px -4px 0 var(--gold),
+    0 0 0 var(--gold), 4px 0 0 var(--gold), 8px 0 0 var(--gold), 12px 0 0 var(--gold),
+    4px 4px 0 var(--gold), 8px 4px 0 var(--gold),
+    8px 8px 0 var(--gold);
+}
+@keyframes hintBlink {
+  0%, 10%   { opacity: 0; transform: translateY(-50%) translateX(5px); }
+  20%, 55%  { opacity: 1; transform: translateY(-50%) translateX(0); }
+  65%, 100% { opacity: 0; transform: translateY(-50%) translateX(5px); }
+}
+@media (max-width: 720px) {
+  .theme-hint { display: none; }   /* 窄屏右侧空间不足，避免溢出 */
+}
+
+/* ---------- 主题切换过场：一列列 01 代码向上浮动、渐变隐去（透明背景，不遮挡） ---------- */
+.theme-wipe {
+  position: fixed; inset: 0; z-index: 200;
+  overflow: hidden;
+  pointer-events: none;
+}
+.theme-wipe .bcol {
+  position: absolute; top: 0;
+  font-family: var(--font-pixel); font-size: 15px; line-height: 1.6;
+  text-align: center;
+  opacity: 0;
+  /* 列的上下两端做透明渐变，隐去更柔和（顶部收窄淡出区，保住亮白头部） */
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 80%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 80%, transparent);
+  animation: binFloat var(--wt, 2.8s) linear var(--wd, 0s) both;
+}
+@keyframes binFloat {
+  0%   { transform: translateY(105vh); opacity: 0; }
+  12%  { opacity: .55; }
+  75%  { opacity: .55; }
+  100% { transform: translateY(-120%); opacity: 0; }
+}
+
+/* 换肤瞬间给主要界面元素挂上短暂的颜色过渡，让新旧主题在代码雨后面平滑融合 */
+html.wiping body, html.wiping .panel, html.wiping .navbar,
+html.wiping .badge, html.wiping .chip, html.wiping .tarot-card,
+html.wiping .pub-item, html.wiping .section-title,
+html.wiping a, html.wiping h1, html.wiping p, html.wiping li {
+  transition: background-color .45s ease, color .45s ease, border-color .45s ease;
+}
+
+/* 过场幕布：垫在代码雨（z200）之下、页面之上的目标主题底色，藏住换肤硬边 */
+.theme-veil {
+  position: fixed; inset: 0; z-index: 199;
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* ---------- 马里奥奔跑场景（仅白天显示） ---------- */
+#mario-scene { display: none; }
+html.day #mario-scene {
+  display: block;
+  position: fixed; inset: 0; z-index: -1;
+  pointer-events: none;
+}
+
+/* 砖块地面（顶部加一层草地，SMB 风味） */
+.mario-ground {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 28px;
+  background:
+    repeating-linear-gradient(90deg, #3f8f46 0 4px, transparent 4px 11px) top / 100% 6px no-repeat,
+    linear-gradient(#5cb853, #4da354) top / 100% 6px no-repeat,
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, .28) 0 2px, transparent 2px 14px),
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, .28) 0 2px, transparent 2px 14px),
+    linear-gradient(#e08030, #c85f10);
+  border-top: 4px solid #7b3f00;
+}
+
+/* 场景装饰（水管/砖块/山/草丛/像素云，JS 逐像素生成） */
+.deco { position: absolute; bottom: 28px; z-index: 1; }
+.deco .drow, .pcloud .drow, #shroom .drow { display: flex; }
+#pipe1 { left: 24%; }
+#pipe2 { left: 72%; }
+#hill1 { left: 6%; }
+#bush1 { left: 38%; }
+#bush2 { left: 86%; }
+.deco-brick { bottom: 118px; }          /* 与问号砖同一高度，left 由 JS 按 blockX 贴齐 */
+.pcloud {
+  position: absolute; z-index: 0;
+  animation: cloudDrift 90s linear infinite;
+}
+#pc1 { top: 13%; animation-duration: 80s; }
+#pc2 { top: 27%; animation-duration: 115s; animation-delay: -45s; }
+#pc3 { top: 6%;  animation-duration: 95s;  animation-delay: -70s; }
+@keyframes cloudDrift {
+  from { left: -14%; }
+  to   { left: 104%; }
+}
+
+/* 马里奥精灵（JS 生成色块与位移；可点击，点了会原地跳一下） */
+#mario { position: absolute; bottom: 28px; left: -60px; width: 48px; height: 48px; z-index: 2; pointer-events: auto; cursor: pointer; transform-origin: bottom left; transition: scale .25s ease; }
+
+/* 蘑菇（中间问号砖撞出，落地向右滑，马里奥捡到变大；JS 生成精灵与移动） */
+#shroom { position: absolute; bottom: 28px; z-index: 1; display: none; }
+#shroom.show { display: block; }
+
+/* 求助气泡：马里奥被水管挡住时出现（与马里奥一起临时提升到内容层之上，保证可见可点） */
+#marioBubble {
+  position: absolute; bottom: 92px; z-index: 61;
+  transform: translateX(-50%);
+  padding: 6px 8px;
+  font-family: var(--font-pixel); font-size: 8px; letter-spacing: 1px;
+  color: #241a12; background: #ffffff;
+  border: 3px solid #241a12;
+  white-space: nowrap;
+  display: none;
+  animation: bubbleBob .6s ease-in-out infinite alternate;
+}
+#marioBubble.show { display: block; }
+#marioBubble::after {   /* 像素小尾巴 */
+  content: ""; position: absolute; left: 50%; bottom: -9px;
+  width: 6px; height: 6px; margin-left: -3px;
+  background: #ffffff;
+  border-right: 3px solid #241a12; border-bottom: 3px solid #241a12;
+}
+@keyframes bubbleBob {
+  from { margin-bottom: 0; }
+  to   { margin-bottom: 6px; }
+}
+
+/* 金币计数器（左下角，点问号砖帮马里奥赚金币） */
+#coinCount {
+  position: absolute; left: 14px; bottom: 40px; z-index: 3;
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--font-pixel); font-size: 10px; color: #5c2e00;
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, .6);
+}
+#coinCount .ccoin {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: #ffd94d; border: 3px solid #b8860b;
+}
+#mario .mframe { position: absolute; bottom: 0; left: 0; }
+#mario .mrow { display: flex; }
+#mario .mpx { width: 3px; height: 3px; }
+#mario .R { background: #e52521; }   /* 帽子与上衣 */
+#mario .S { background: #ffcf9c; }   /* 皮肤 */
+#mario .B { background: #2b5de4; }   /* 背带裤 */
+#mario .W { background: #7b3f00; }   /* 头发与鞋 */
+#mario .o { background: #241a12; }   /* 眼睛 */
+#mario .t { background: transparent; }
+
+/* 问号砖块（共三块，点击顶出金币；位置由 JS 按屏宽布置） */
+.qblk {
+  position: absolute; bottom: 118px;
+  width: 42px; height: 42px;
+  display: flex; align-items: center; justify-content: center;
+  background: #f8a818;
+  border: 4px solid #5c2e00;
+  box-shadow: inset -4px -4px 0 rgba(0, 0, 0, .25);
+  font-family: var(--font-pixel); font-size: 16px; color: #5c2e00;
+}
+.qblk.used { background: #b08040; color: transparent; box-shadow: inset -4px -4px 0 rgba(0, 0, 0, .3); }
+.qblk.bump { animation: qBump .3s ease-out; }
+@keyframes qBump {
+  0%   { transform: translateY(0); }
+  40%  { transform: translateY(-10px); }
+  100% { transform: translateY(0); }
+}
+
+/* 金币（从被点击的砖块里弹出） */
+.bcoin {
+  position: absolute; bottom: 100%; left: 50%;
+  width: 26px; height: 26px; margin-left: -13px;
+  border-radius: 50%;
+  background: #ffd94d;
+  border: 4px solid #b8860b;
+  opacity: 0;
+}
+.bcoin.pop { animation: coinPop .8s ease-out forwards; }
+@keyframes coinPop {
+  0%   { opacity: 1; transform: translateY(0) scaleX(1); }
+  60%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-72px) scaleX(.2); }
+}
+
+/* 小屏与减少动态偏好下不显示马里奥场景 */
+@media (max-width: 640px) {
+  html.day #mario-scene { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.day #mario-scene { display: none; }
 }

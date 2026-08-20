@@ -27,12 +27,14 @@ const SITE = {
   },
 
   /* ---------- 塔罗牌（左侧照片卡） ----------
-   * numeral: 牌面顶部罗马数字；backQuote: 点击牌面翻面后背面显示的一句话；
+   * numeral: 牌面顶部罗马数字；backQuote: 点击牌面翻面后背面显示的一句话（夜晚）；
+   * backQuoteDay: 白天模式的背面座右铭（留空则昼夜共用 backQuote）；
    * 牌面头像下方会自动显示上方 links 里的外链按钮（GitHub / Scholar 等）
    */
   tarot: {
     numeral: "",                            // 牌面顶部罗马数字（留空则整行隐藏）
     backQuote: "“Not all who wander are lost.”",
+    backQuoteDay: "“Every sunrise is a new quest.”",
   },
 
   /* ---------- About Me 简介（支持多段） ---------- */
