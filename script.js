@@ -672,7 +672,7 @@
     });
   }
 
-  syncCats(catsDay);   // 页面加载时按当前主题初始化所有猫的形态（localStorage 恢复了白天时尤其重要）
+  syncCats(catsDay);   // 页面加载时按当前主题初始化所有猫的形态（固定黑夜开场，此处恒为夜晚）
   syncTarot(catsDay);  // 塔罗牌的月亮/太阳纹样与背面座右铭同理
 
   /* ==================== 塔罗牌交互 ==================== */
@@ -1142,8 +1142,7 @@
       );
 
       setTimeout(() => {                                // 全屏被代码+幕布完全覆盖的瞬间换肤
-        const day = document.documentElement.classList.toggle("day");
-        localStorage.setItem("theme", day ? "day" : "night");
+        const day = document.documentElement.classList.toggle("day");   // 不写入 localStorage：每次打开固定黑夜开场
         syncHint();
         syncCats(day);                                  // 猫的形态跟随昼夜切换
         syncTarot(day);                                 // 塔罗牌纹样与座右铭同理
