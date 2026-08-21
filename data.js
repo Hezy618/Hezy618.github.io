@@ -77,16 +77,6 @@ const SITE = {
    */
   publications: [
     {
-      title: "HKD-CPI: High-Order Knowledge Distillation Enhanced Inductive Compound-Protein Interaction Prediction",
-      authors: ["Zhongyu He", "Xiangrong Liu", "Yinghui Jiang", "Junlin Xu", "Yuan Lin", "Shuting Jin", "Leyi Wei", "Youyu Wang"],
-      venue: "Bioinformatics",
-      year: 2026,
-      status: "Accepted",
-      level: "CCF-A",
-      keywords: ["Knowledge Distillation", "Graph2Token", "Hypergraph", "Chemical Language Model"],
-      links: { PDF: "https://doi.org/10.1093/bioinformatics/btag290" },
-    },
-    {
       title: "SIRI: Self-Internalizing Reinforcement Learning with Intrinsic Skills for LLM Agent Training",
       authors: ["Zhongyu He*", "Yuanfan Li*", "Fei Huang", "Tianyu Chen", "Siyuan Chen", "Xingyang Li", "Meng Hsuan Yu", "Xiangrong Liu", "Leyi Wei", "Lu Pan", "Ke Zeng", "Xunliang Cai"],   // * 共同一作
       venue: "EMNLP (Main Conference)",
@@ -96,6 +86,16 @@ const SITE = {
       extraLevels: ["CORE A*", "TH-CPL A"],   // EMNLP: CORE2023 起 A*，清华 TH-CPL A 类
       keywords: ["LLM Agents", "Agentic RL", "SKILL", "Self-Distillation"],
       links: { PDF: "https://arxiv.org/pdf/2606.02355" },
+    },
+    {
+      title: "HKD-CPI: High-Order Knowledge Distillation Enhanced Inductive Compound-Protein Interaction Prediction",
+      authors: ["Zhongyu He", "Xiangrong Liu", "Yinghui Jiang", "Junlin Xu", "Yuan Lin", "Shuting Jin", "Leyi Wei", "Youyu Wang"],
+      venue: "Bioinformatics",
+      year: 2026,
+      status: "Accepted",
+      level: "CCF-A",
+      keywords: ["Knowledge Distillation", "Graph2Token", "Hypergraph", "Chemical Language Model"],
+      links: { PDF: "https://doi.org/10.1093/bioinformatics/btag290" },
     },
     {
       title: "DualBAN: Unifying Intra- and Inter-molecular Features for Compound-Protein Interaction Prediction",
