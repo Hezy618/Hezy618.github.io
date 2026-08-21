@@ -89,10 +89,9 @@ const SITE = {
     {
       title: "SIRI: Self-Internalizing Reinforcement Learning with Intrinsic Skills for LLM Agent Training",
       authors: ["Zhongyu He*", "Yuanfan Li*", "Fei Huang", "Tianyu Chen", "Siyuan Chen", "Xingyang Li", "Meng Hsuan Yu", "Xiangrong Liu", "Leyi Wei", "Lu Pan", "Ke Zeng", "Xunliang Cai"],   // * 共同一作
-      venue: "EMNLP",
+      venue: "EMNLP (Main Conference)",
       year: 2026,
-      status: "Under Review",
-      meta: 3.5,                              // ARR 审稿均分
+      status: "Accepted",
       level: "CCF-B",
       extraLevels: ["CORE A*", "TH-CPL A"],   // EMNLP: CORE2023 起 A*，清华 TH-CPL A 类
       keywords: ["LLM Agents", "Agentic RL", "SKILL", "Self-Distillation"],
@@ -121,12 +120,9 @@ const SITE = {
     {
       title: "Ability-Aligned Skill Evolution for LLM Agents via Reinforcement Learning",
       authors: ["Fei Huang", "Tianyu Chen", "Zhongyu He", "Yuanfan Li", "Meng Hsuan Yu", "Xingyang Li", "Lu Pan", "Ke Zeng", "Xunliang Cai"],
-      venue: "EMNLP",
+      venue: "Findings of EMNLP",
       year: 2026,
-      status: "Under Review",
-      meta: 3,                                // ARR 审稿均分
-      level: "CCF-B",
-      extraLevels: ["CORE A*", "TH-CPL A"],   // EMNLP: CORE2023 起 A*，清华 TH-CPL A 类
+      status: "Accepted",
       keywords: ["LLM Agents", "Agentic RL", "SKILL"],
       links: {},                                                        // TODO: 有公开链接后补上
     },
