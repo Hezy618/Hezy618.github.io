@@ -1156,13 +1156,22 @@
       }, maxEnd * 1000 + 100);
     };
     moonWrap.addEventListener("click", wipeTheme);
-    /* 月亮在背景层（z-index 低于正文），被正文透明区域盖住时点击无法直达；
-       兜底：点击落在月亮包围盒内、且目标不是可交互元素时，视同点击月亮 */
+    /* 月亮在背景层（z-index 低于正文），被正文透明区域盖住时点击/悬停无法直达。
+       兜底：指针落在月亮包围盒内、且目标不是可交互元素时——
+       点击视同点击月亮；悬停给 <html> 加 .moon-hot 显示手型光标（提示可以点）。 */
+    const INTERACTIVE_SEL = "a, button, input, textarea, select, [role='button'], .pub-links, .badge, .chip, .kw";
+    const inMoonRect = (e) => {
+      const r = moonWrap.getBoundingClientRect();
+      return e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+    };
     document.addEventListener("click", (e) => {
       if (e.target.closest(".moon-wrap")) return;          // 直接命中月亮时由上面的监听器处理
-      if (e.target.closest("a, button, input, textarea, select, [role='button'], .pub-links, .badge, .chip, .kw")) return;
-      const r = moonWrap.getBoundingClientRect();
-      if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) wipeTheme();
+      if (e.target.closest(INTERACTIVE_SEL)) return;
+      if (inMoonRect(e)) wipeTheme();
+    });
+    document.addEventListener("mousemove", (e) => {
+      const hot = !e.target.closest(".moon-wrap") && !e.target.closest(INTERACTIVE_SEL) && inMoonRect(e);
+      document.documentElement.classList.toggle("moon-hot", hot);
     });
     moonWrap.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") { e.preventDefault(); wipeTheme(); }
