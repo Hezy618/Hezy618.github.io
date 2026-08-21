@@ -27,14 +27,13 @@ const SITE = {
   },
 
   /* ---------- 塔罗牌（左侧照片卡） ----------
-   * numeral: 牌面顶部罗马数字；backQuote: 点击牌面翻面后背面显示的一句话（夜晚）；
-   * backQuoteDay: 白天模式的背面座右铭（留空则昼夜共用 backQuote）；
+   * numeral: 牌面顶部罗马数字；backQuote: 点击牌面翻面后背面显示的一句话；
    * 牌面头像下方会自动显示上方 links 里的外链按钮（GitHub / Scholar 等）
    */
   tarot: {
     numeral: "",                            // 牌面顶部罗马数字（留空则整行隐藏）
     backQuote: "“Not all who wander are lost.”",
-    backQuoteDay: "“Every sunrise is a new quest.”",
+    backQuoteDay: "“Every sunrise is a new quest.”",   // 白天模式背面座右铭（留空则昼夜共用 backQuote）
   },
 
   /* ---------- About Me 简介（支持多段） ---------- */
@@ -55,7 +54,8 @@ const SITE = {
 
   /* ---------- 教育经历 ---------- */
   education: [
-    { period: "2024 – 2027 (expected)", degree: "M.S. in Computer Science and Technology", school: "Xiamen University" },  // TODO: 确认入学/毕业年份
+    { period: "2024 – 2027", degree: "M.S. in Computer Science and Technology", school: "Xiamen University" },
+    { period: "2020 – 2024", degree: "B.Eng. in Computer Science and Technology", school: "Wuhan University of Science and Technology (Rank 2/255, recommended admission to Xiamen University)" },  // 保研
   ],
 
   /* ---------- 评级徽章的跳转链接（按徽章文字前缀匹配，点击徽章即可跳转） ---------- */
@@ -89,10 +89,9 @@ const SITE = {
     {
       title: "SIRI: Self-Internalizing Reinforcement Learning with Intrinsic Skills for LLM Agent Training",
       authors: ["Zhongyu He*", "Yuanfan Li*", "Fei Huang", "Tianyu Chen", "Siyuan Chen", "Xingyang Li", "Meng Hsuan Yu", "Xiangrong Liu", "Leyi Wei", "Lu Pan", "Ke Zeng", "Xunliang Cai"],   // * 共同一作
-      venue: "EMNLP",
+      venue: "EMNLP (Main Conference)",
       year: 2026,
-      status: "Under Review",
-      meta: 3.5,                              // ARR 审稿均分
+      status: "Accepted",
       level: "CCF-B",
       extraLevels: ["CORE A*", "TH-CPL A"],   // EMNLP: CORE2023 起 A*，清华 TH-CPL A 类
       keywords: ["LLM Agents", "Agentic RL", "SKILL", "Self-Distillation"],
@@ -121,12 +120,9 @@ const SITE = {
     {
       title: "Ability-Aligned Skill Evolution for LLM Agents via Reinforcement Learning",
       authors: ["Fei Huang", "Tianyu Chen", "Zhongyu He", "Yuanfan Li", "Meng Hsuan Yu", "Xingyang Li", "Lu Pan", "Ke Zeng", "Xunliang Cai"],
-      venue: "EMNLP",
+      venue: "Findings of EMNLP",
       year: 2026,
-      status: "Under Review",
-      meta: 3,                                // ARR 审稿均分
-      level: "CCF-B",
-      extraLevels: ["CORE A*", "TH-CPL A"],   // EMNLP: CORE2023 起 A*，清华 TH-CPL A 类
+      status: "Accepted",
       keywords: ["LLM Agents", "Agentic RL", "SKILL"],
       links: {},                                                        // TODO: 有公开链接后补上
     },
