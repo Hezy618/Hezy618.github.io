@@ -894,9 +894,8 @@ html.day .moon-wrap { filter: drop-shadow(0 0 44px rgba(255, 208, 84, .6)); }
     8px 8px 0 var(--gold);
 }
 @keyframes hintBlink {
-  0%, 10%   { opacity: 0; transform: translateY(-50%) translateX(5px); }
-  20%, 55%  { opacity: 1; transform: translateY(-50%) translateX(0); }
-  65%, 100% { opacity: 0; transform: translateY(-50%) translateX(5px); }
+  0%, 100% { opacity: .38; transform: translateY(-50%) translateX(3px); }
+  50%      { opacity: 1;   transform: translateY(-50%) translateX(0); }
 }
 @media (max-width: 720px) {
   .theme-hint { display: none; }   /* 窄屏右侧空间不足，避免溢出 */
