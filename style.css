@@ -45,6 +45,7 @@ body {
 /* ---------- 夜空层次 ---------- */
 #starfield {
   position: fixed; inset: 0; z-index: -5;
+  pointer-events: none;   /* 全屏背景层不拦截点击（月亮在两侧留白处仍需接收点击） */
   background:
     radial-gradient(ellipse at 78% 6%, rgba(60, 56, 110, .35) 0%, transparent 55%),
     radial-gradient(ellipse at 8% 100%, rgba(40, 32, 80, .3) 0%, transparent 50%),
@@ -71,7 +72,7 @@ body {
 
 /* 像素月亮（JS 生成色块，此处负责光晕与浮动）；月亮/太阳本身即主题切换开关 */
 .moon-wrap {
-  position: fixed; z-index: 5;   /* 需高于正文才能接收点击，但低于导航栏 */
+  position: fixed; z-index: -3;   /* 背景层：与流星/云朵同层，正文压在它上面；两侧留白处仍可点击切主题 */
   top: 7%; right: 9%;
   filter: drop-shadow(0 0 34px rgba(243, 233, 200, .32));
   animation: moonFloat 9s ease-in-out infinite alternate;

@@ -1156,6 +1156,14 @@
       }, maxEnd * 1000 + 100);
     };
     moonWrap.addEventListener("click", wipeTheme);
+    /* 月亮在背景层（z-index 低于正文），被正文透明区域盖住时点击无法直达；
+       兜底：点击落在月亮包围盒内、且目标不是可交互元素时，视同点击月亮 */
+    document.addEventListener("click", (e) => {
+      if (e.target.closest(".moon-wrap")) return;          // 直接命中月亮时由上面的监听器处理
+      if (e.target.closest("a, button, input, textarea, select, [role='button'], .pub-links, .badge, .chip, .kw")) return;
+      const r = moonWrap.getBoundingClientRect();
+      if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) wipeTheme();
+    });
     moonWrap.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") { e.preventDefault(); wipeTheme(); }
     });
