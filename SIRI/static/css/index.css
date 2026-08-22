@@ -317,7 +317,7 @@ body {
   white-space: pre;
 }
 
-/* Method name: small-caps like the paper's \textsc{Siri} (large S, small-caps IRI) */
-.methodname {
-  font-variant-caps: small-caps;
+/* Method name: mimic the paper's \textsc{Siri} — full-size S + smaller uppercase IRI */
+.methodname .mn-small {
+  font-size: 0.74em;
 }

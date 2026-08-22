@@ -26,10 +26,10 @@
   <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
   <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
   <link rel="stylesheet" href="static/css/academicons.min.css">
-  <link rel="stylesheet" href="static/css/index.css">
+  <link rel="stylesheet" href="static/css/index.css?v=2">
 
   <script defer src="static/js/bulma-carousel.min.js"></script>
-  <script defer src="static/js/index.js"></script>
+  <script defer src="static/js/index.js?v=2"></script>
 </head>
 <body>
 
@@ -39,7 +39,7 @@
     <div class="container is-max-desktop">
       <div class="columns is-centered">
         <div class="column has-text-centered">
-          <h1 class="title is-1 publication-title"><span class="methodname">Siri</span>: Self-Internalizing Reinforcement Learning with Intrinsic Skills for LLM Agent Training</h1>
+          <h1 class="title is-1 publication-title"><span class="methodname">S<span class="mn-small">IRI</span></span>: Self-Internalizing Reinforcement Learning with Intrinsic Skills for LLM Agent Training</h1>
           <div class="is-size-5 publication-authors">
             <span class="author-block">
               <a href="https://hezy618.github.io/" target="_blank">Zhongyu He</a><sup>1,2,*</sup>,</span>
@@ -111,7 +111,7 @@
       <img src="static/images/motivation.png" alt="Motivation: comparison between skill-augmentation methods and SIRI" class="teaser-image" width="75%" style="display: block; margin: 0 auto;">
       <h2 class="subtitle has-text-centered">
         (a) Prior skill-based methods rely on external skill generators during training and retrieve skills from a persistent skill bank at inference.
-        (b) <b><span class="methodname">Siri</span></b> mines skills from its own successful rollouts and internalizes them into the policy — retrieval-free at inference.
+        (b) <b><span class="methodname">S<span class="mn-small">IRI</span></span></b> mines skills from its own successful rollouts and internalizes them into the policy — retrieval-free at inference.
       </h2>
     </div>
   </div>
@@ -126,7 +126,7 @@
         <h2 class="title is-3">Abstract</h2>
         <div class="content has-text-justified">
           <p>
-            Long-horizon LLM agents can benefit from reusable skills, yet existing skill-based methods often rely on external skill generators during training or persistent skill retrieval at inference, increasing engineering complexity, context length, and deployment latency. We propose <b>S</b>elf-<b>I</b>nternalizing <b>R</b>einforcement learning with <b>I</b>ntrinsic skills (<b><span class="methodname">Siri</span></b>), a three-phase framework that enables agents to discover, validate, and internalize skills without external skill generators or inference-time skill banks. <span class="methodname">Siri</span> first warms up the policy with GiGPO to acquire basic interaction ability and collect successful skill-free trajectories. It then performs self-skill mining, where the current policy summarizes compact skills from its own successful plain rollouts and validates them through paired skill-augmented and skill-free rollouts. Finally, <span class="methodname">Siri</span> distills only beneficial skill-guided action tokens into the plain policy using trajectory-level utility and action-level advantage. At inference, the agent runs with the original prompt only. On ALFWorld and WebShop with Qwen2.5-7B-Instruct, <span class="methodname">Siri</span> improves GiGPO from 0.908 to <b>0.930</b> on ALFWorld and from 0.728 to <b>0.813</b> on WebShop, outperforming prompt-based, RL-based, and memory-augmented baselines. Further analysis shows that our self-mining strategy can achieve performance comparable to distillation with closed-source large model.
+            Long-horizon LLM agents can benefit from reusable skills, yet existing skill-based methods often rely on external skill generators during training or persistent skill retrieval at inference, increasing engineering complexity, context length, and deployment latency. We propose <b>S</b>elf-<b>I</b>nternalizing <b>R</b>einforcement learning with <b>I</b>ntrinsic skills (<b><span class="methodname">S<span class="mn-small">IRI</span></span></b>), a three-phase framework that enables agents to discover, validate, and internalize skills without external skill generators or inference-time skill banks. <span class="methodname">S<span class="mn-small">IRI</span></span> first warms up the policy with GiGPO to acquire basic interaction ability and collect successful skill-free trajectories. It then performs self-skill mining, where the current policy summarizes compact skills from its own successful plain rollouts and validates them through paired skill-augmented and skill-free rollouts. Finally, <span class="methodname">S<span class="mn-small">IRI</span></span> distills only beneficial skill-guided action tokens into the plain policy using trajectory-level utility and action-level advantage. At inference, the agent runs with the original prompt only. On ALFWorld and WebShop with Qwen2.5-7B-Instruct, <span class="methodname">S<span class="mn-small">IRI</span></span> improves GiGPO from 0.908 to <b>0.930</b> on ALFWorld and from 0.728 to <b>0.813</b> on WebShop, outperforming prompt-based, RL-based, and memory-augmented baselines. Further analysis shows that our self-mining strategy can achieve performance comparable to distillation with closed-source large model.
           </p>
         </div>
       </div>
@@ -269,7 +269,7 @@
               <td class="webshop-col"><u>0.852</u></td><td class="webshop-col">0.727</td>
             </tr>
             <tr class="ours-row">
-              <td class="method-col"><span class="methodname">Siri</span> (Ours)</td>
+              <td class="method-col"><span class="methodname">S<span class="mn-small">IRI</span></span> (Ours)</td>
               <td>0.975</td><td><b>0.875</b></td><td><b>1.000</b></td><td>0.857</td><td>0.850</td><td><u>0.895</u></td><td class="all-col"><b>0.930</b></td>
               <td class="webshop-col"><b>0.899</b></td><td class="webshop-col"><b>0.813</b></td>
             </tr>
@@ -289,7 +289,7 @@
       <div id="results-carousel" class="carousel results-carousel">
         <div class="item" style="text-align: center;">
           <img src="static/images/training_dynamic.png" alt="Training curves on ALFWorld and WebShop" style="display: inline-block; max-width: 92%;">
-          <p class="carousel-caption"><span class="methodname">Siri</span> consistently improves over GiGPO throughout training on both ALFWorld and WebShop.</p>
+          <p class="carousel-caption"><span class="methodname">S<span class="mn-small">IRI</span></span> consistently improves over GiGPO throughout training on both ALFWorld and WebShop.</p>
         </div>
         <div class="item" style="text-align: center;">
           <img src="static/images/webshop_training_dynamic.png" alt="Self-mined vs externally-mined skills on WebShop" style="display: inline-block; max-width: 92%;">
@@ -318,7 +318,7 @@
                 <tr><td class="method-col">w/o Phase 2 (w/ Skill)</td><td><u>0.898</u></td><td><u>0.805</u></td></tr>
                 <tr><td class="method-col">w/o Phase 2 (w/o Skill)</td><td>0.852</td><td>0.719</td></tr>
                 <tr><td class="method-col">w/o Phase 1 and 2 (GiGPO)</td><td>0.844</td><td>0.728</td></tr>
-                <tr class="ours-row"><td class="method-col"><span class="methodname">Siri</span> (Full)</td><td><b>0.899</b></td><td><b>0.813</b></td></tr>
+                <tr class="ours-row"><td class="method-col"><span class="methodname">S<span class="mn-small">IRI</span></span> (Full)</td><td><b>0.899</b></td><td><b>0.813</b></td></tr>
               </tbody>
             </table>
           </div>
@@ -332,9 +332,9 @@
               </thead>
               <tbody>
                 <tr><td class="method-col">GRPO</td><td><u>0.758</u></td><td><u>0.568</u></td></tr>
-                <tr class="ours-row"><td class="method-col"><span class="methodname">Siri</span> (GRPO)</td><td><b>0.779</b><span class="delta">&uarr;0.021</span></td><td><b>0.648</b><span class="delta">&uarr;0.080</span></td></tr>
+                <tr class="ours-row"><td class="method-col"><span class="methodname">S<span class="mn-small">IRI</span></span> (GRPO)</td><td><b>0.779</b><span class="delta">&uarr;0.021</span></td><td><b>0.648</b><span class="delta">&uarr;0.080</span></td></tr>
                 <tr><td class="method-col">GiGPO</td><td><u>0.831</u></td><td><u>0.650</u></td></tr>
-                <tr class="ours-row"><td class="method-col"><span class="methodname">Siri</span> (GiGPO)</td><td><b>0.853</b><span class="delta">&uarr;0.022</span></td><td><b>0.727</b><span class="delta">&uarr;0.077</span></td></tr>
+                <tr class="ours-row"><td class="method-col"><span class="methodname">S<span class="mn-small">IRI</span></span> (GiGPO)</td><td><b>0.853</b><span class="delta">&uarr;0.022</span></td><td><b>0.727</b><span class="delta">&uarr;0.077</span></td></tr>
               </tbody>
             </table>
           </div>
@@ -364,7 +364,7 @@
             <tr><td class="method-col">RLOO</td><td>0.883</td><td>0.710</td><td>0.664</td><td>0.528</td><td>0.628</td><td>0.569</td><td class="all-col">0.697</td><td class="webshop-col">0.739</td><td class="webshop-col">0.521</td></tr>
             <tr><td class="method-col">GRPO</td><td>0.853</td><td>0.845</td><td>0.597</td><td>0.537</td><td>0.782</td><td>0.535</td><td class="all-col">0.728</td><td class="webshop-col">0.758</td><td class="webshop-col">0.568</td></tr>
             <tr><td class="method-col">GiGPO</td><td><b>0.944</b></td><td><u>0.948</u></td><td><u>0.798</u></td><td><u>0.675</u></td><td><u>0.944</u></td><td><b>0.764</b></td><td class="all-col"><u>0.867</u></td><td class="webshop-col"><u>0.831</u></td><td class="webshop-col"><u>0.650</u></td></tr>
-            <tr class="ours-row"><td class="method-col"><span class="methodname">Siri</span> (Ours)</td><td><u>0.897</u></td><td><b>1.000</b></td><td><b>0.870</b></td><td><b>0.833</b></td><td><b>0.947</b></td><td><u>0.600</u></td><td class="all-col"><b>0.875</b></td><td class="webshop-col"><b>0.853</b></td><td class="webshop-col"><b>0.727</b></td></tr>
+            <tr class="ours-row"><td class="method-col"><span class="methodname">S<span class="mn-small">IRI</span></span> (Ours)</td><td><u>0.897</u></td><td><b>1.000</b></td><td><b>0.870</b></td><td><b>0.833</b></td><td><b>0.947</b></td><td><u>0.600</u></td><td class="all-col"><b>0.875</b></td><td class="webshop-col"><b>0.853</b></td><td class="webshop-col"><b>0.727</b></td></tr>
           </tbody>
         </table>
       </div>
