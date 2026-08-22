@@ -110,8 +110,7 @@
     <div class="hero-body">
       <img src="static/images/motivation.png?v=2" alt="Motivation: comparison between skill-augmentation methods and SIRI" class="teaser-image" width="75%" style="display: block; margin: 0 auto;">
       <h2 class="subtitle has-text-centered">
-        (a) Prior skill-based methods rely on external skill generators during training and retrieve skills from a persistent skill bank at inference.
-        (b) <b><span class="methodname">S<span class="mn-small">IRI</span></span></b> mines skills from its own successful rollouts and internalizes them into the policy — retrieval-free at inference.
+        Conceptual comparison between (a) traditional skill-augmentation frameworks and (b) our <span class="methodname">S<span class="mn-small">IRI</span></span>.
       </h2>
     </div>
   </div>
@@ -145,6 +144,12 @@
           <img src="static/images/framework.png?v=3" alt="Overview of the SIRI framework" class="framework-image" style="max-width: 95%; height: auto;">
         </div>
       </div>
+      <p class="has-text-centered results-note" style="max-width: 92%; margin: 0 auto 1.5rem auto;">
+        <b>Overview of <span class="methodname">S<span class="mn-small">IRI</span></span>.</b>
+        <b>(a) Phase 0:</b> The agent interacts with the environment to collect initial trajectory data for cold-start policy initialization.
+        <b>(b) Phase 1:</b> Candidate skills are extracted into a structured <code>SkillBank</code>, followed by parallel rollouts with and without skills to compute the hindsight macro utility &Delta;<sub>g</sub> for dynamic skill evaluation.
+        <b>(c) Phase 2:</b> The shared policy parameterizes validated skills via cross-context self-distillation under asymmetric inputs, optimized by an advantage-weighted loss &#8466;<sub>int</sub> gated by the macro performance indicator <b>1</b>[&Delta;<sub>g</sub><sup>(i)</sup> &gt; 0].
+      </p>
       <div class="columns is-centered">
         <div class="column is-one-third">
           <div class="phase-card">
@@ -176,8 +181,10 @@
     <div class="container is-max-desktop">
       <h2 class="title is-3 has-text-centered">Quantitative Results</h2>
       <p class="has-text-centered results-note">
-        Performance on ALFWorld (success rate per subtask and overall) and WebShop (average score and success rate), with Qwen2.5-7B-Instruct as the base model.
-        <b>Bold</b> and <u>underline</u> mark the best and second-best results.
+        <b>Performance on ALFWorld and WebShop.</b>
+        For ALFWorld, we report the success rate on each subtask and the overall average.
+        For WebShop, we report both the average score and the success rate.
+        The best and second-best results among all listed methods are highlighted in <b>bold</b> and <u>underline</u>, respectively.
       </p>
       <div class="table-wrapper">
         <table class="results-table">
@@ -289,15 +296,15 @@
       <div id="results-carousel" class="carousel results-carousel">
         <div class="item" style="text-align: center;">
           <img src="static/images/training_dynamic.png" alt="Training curves on ALFWorld and WebShop" style="display: inline-block; max-width: 92%;">
-          <p class="carousel-caption"><span class="methodname">S<span class="mn-small">IRI</span></span> consistently improves over GiGPO throughout training on both ALFWorld and WebShop.</p>
+          <p class="carousel-caption">Training curves on ALFWorld and WebShop, showing that <span class="methodname">S<span class="mn-small">IRI</span></span> consistently improves over GiGPO throughout training.</p>
         </div>
         <div class="item" style="text-align: center;">
           <img src="static/images/webshop_training_dynamic.png" alt="Self-mined vs externally-mined skills on WebShop" style="display: inline-block; max-width: 92%;">
-          <p class="carousel-caption">Self-mined skills start behind Gemini-3-Flash-mined skills, but the gap closes as training progresses — final performance is comparable.</p>
+          <p class="carousel-caption">Training success rate trajectories on WebShop, comparing the standard <span class="methodname">S<span class="mn-small">IRI</span></span> against a variant utilizing Gemini-3-Flash for skill mining.</p>
         </div>
         <div class="item" style="text-align: center;">
           <img src="static/images/skill_evaluation_results.png" alt="LLM-as-a-Judge skill quality scores" style="display: inline-block; max-width: 92%;">
-          <p class="carousel-caption">Multi-model LLM-as-a-Judge scores show the intrinsic quality of self-mined skills improves continuously during training.</p>
+          <p class="carousel-caption">LLM-as-a-Judge quality scores for skills stored during training on ALFWorld and WebShop. The solid black line highlights the aggregated mean score across all evaluators, indicating continuous skill improvement.</p>
         </div>
       </div>
       <h2 class="subtitle has-text-centered">
@@ -308,6 +315,9 @@
       <div class="columns is-centered small-tables">
         <div class="column is-half">
           <h3 class="title is-5 has-text-centered">Ablation Study on WebShop</h3>
+          <p class="has-text-centered results-note">
+            Ablation study of <span class="methodname">S<span class="mn-small">IRI</span></span> on WebShop. We report the average score and success rate with Qwen2.5-7B-Instruct backbone.
+          </p>
           <div class="table-wrapper">
             <table class="results-table small">
               <thead>
@@ -325,6 +335,9 @@
         </div>
         <div class="column is-half">
           <h3 class="title is-5 has-text-centered">Impact of Base Optimization Algorithm</h3>
+          <p class="has-text-centered results-note">
+            Impact of different base optimization algorithms (GRPO vs. GiGPO) on the performance of <span class="methodname">S<span class="mn-small">IRI</span></span> on WebShop. We report the average score and success rate with Qwen2.5-1.5B-Instruct backbone.
+          </p>
           <div class="table-wrapper">
             <table class="results-table small">
               <thead>
@@ -343,6 +356,9 @@
 
       <!-- 1.5B results -->
       <h3 class="title is-5 has-text-centered">Robustness on a Smaller Backbone (Qwen2.5-1.5B-Instruct)</h3>
+      <p class="has-text-centered results-note">
+        Performance comparison of different models and methods on ALFWorld and WebShop benchmarks.
+      </p>
       <div class="table-wrapper">
         <table class="results-table">
           <thead>
