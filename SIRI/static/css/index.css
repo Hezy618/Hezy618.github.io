@@ -316,3 +316,8 @@ body {
   overflow-x: auto;
   white-space: pre;
 }
+
+/* Method name: small-caps like the paper's \textsc{Siri} (large S, small-caps IRI) */
+.methodname {
+  font-variant-caps: small-caps;
+}
