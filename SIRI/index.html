@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <!-- Meta tags for social media banners -->
+  <meta name="description" content="SIRI: Self-Internalizing Reinforcement Learning with Intrinsic Skills for LLM Agent Training">
+  <meta property="og:title" content="SIRI: Self-Internalizing Reinforcement Learning with Intrinsic Skills for LLM Agent Training"/>
+  <meta property="og:description" content="A three-phase framework that enables LLM agents to discover, validate, and internalize skills — no external skill generators, no inference-time skill banks."/>
+  <meta property="og:url" content="https://hezy618.github.io/SIRI/"/>
+  <meta property="og:image" content="https://hezy618.github.io/SIRI/static/images/motivation.png" />
+  <meta property="og:image:width" content="1200"/>
+  <meta property="og:image:height" content="630"/>
+
+  <meta name="twitter:title" content="SIRI: Self-Internalizing RL with Intrinsic Skills for LLM Agent Training">
+  <meta name="twitter:description" content="LLM agents that discover, validate, and internalize skills — retrieval-free at inference.">
+  <meta name="twitter:image" content="https://hezy618.github.io/SIRI/static/images/motivation.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="keywords" content="LLM agent, reinforcement learning, skill discovery, skill internalization, ALFWorld, WebShop">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>SIRI: Self-Internalizing RL with Intrinsic Skills</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="static/css/academicons.min.css">
+  <link rel="stylesheet" href="static/css/index.css">
+
+  <script defer src="static/js/bulma-carousel.min.js"></script>
+  <script defer src="static/js/index.js"></script>
+</head>
+<body>
+
+<!-- Hero: title, authors, affiliations, links -->
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">SIRI: Self-Internalizing Reinforcement Learning with Intrinsic Skills for LLM Agent Training</h1>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="https://hezy618.github.io/" target="_blank">Zhongyu He</a><sup>1,2,*</sup>,</span>
+            <span class="author-block">Yuanfan Li<sup>2,*</sup>,</span>
+            <span class="author-block">Fei Huang<sup>2</sup>,</span>
+            <span class="author-block">Tianyu Chen<sup>2</sup>,</span>
+            <span class="author-block">Siyuan Chen<sup>2,&dagger;</sup>,</span>
+            <span class="author-block">Xingyang Li<sup>2,&dagger;</sup>,</span>
+            <span class="author-block">Meng Hsuan Yu<sup>2</sup>,</span>
+            <span class="author-block">Xiangrong Liu<sup>1</sup>,</span>
+            <span class="author-block">Leyi Wei<sup>3</sup>,</span>
+            <span class="author-block">Lu Pan<sup>2</sup>,</span>
+            <span class="author-block">Ke Zeng<sup>2</sup>,</span>
+            <span class="author-block">Xunliang Cai<sup>2</sup></span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block"><sup>1</sup>Xiamen University,
+              <sup>2</sup>Meituan,
+              <sup>3</sup>Macao Polytechnic University</span>
+            <span class="eql-cntrb"><small><br><sup>*</sup>Equal Contribution&nbsp;&nbsp;&nbsp;<sup>&dagger;</sup>Corresponding Authors</small></span>
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- arXiv link -->
+              <span class="link-block">
+                <a href="https://arxiv.org/abs/2606.02355" target="_blank"
+                class="external-link button is-normal is-rounded is-dark">
+                <span class="icon">
+                  <i class="ai ai-arxiv"></i>
+                </span>
+                <span>arXiv</span>
+              </a>
+            </span>
+
+            <!-- PDF link -->
+            <span class="link-block">
+              <a href="https://arxiv.org/pdf/2606.02355" target="_blank"
+              class="external-link button is-normal is-rounded is-dark">
+              <span class="icon">
+                <i class="fas fa-file-pdf"></i>
+              </span>
+              <span>PDF</span>
+            </a>
+          </span>
+
+          <!-- Github link -->
+          <span class="link-block">
+            <a href="https://github.com/Hezy618/SIRI" target="_blank"
+            class="external-link button is-normal is-rounded is-dark">
+            <span class="icon">
+              <i class="fab fa-github"></i>
+            </span>
+            <span>Code</span>
+          </a>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</section>
+
+<!-- Teaser -->
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <img src="static/images/motivation.png" alt="Motivation: comparison between skill-augmentation methods and SIRI" class="teaser-image" width="75%" style="display: block; margin: 0 auto;">
+      <h2 class="subtitle has-text-centered">
+        (a) Prior skill-based methods rely on external skill generators during training and retrieve skills from a persistent skill bank at inference.
+        (b) <b>SIRI</b> mines skills from its own successful rollouts and internalizes them into the policy — retrieval-free at inference.
+      </h2>
+    </div>
+  </div>
+</section>
+<!-- End teaser -->
+
+<!-- Paper abstract -->
+<section class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            Long-horizon LLM agents can benefit from reusable skills, yet existing skill-based methods often rely on external skill generators during training or persistent skill retrieval at inference, increasing engineering complexity, context length, and deployment latency. We propose <b>S</b>elf-<b>I</b>nternalizing <b>R</b>einforcement learning with <b>I</b>ntrinsic skills (<b>SIRI</b>), a three-phase framework that enables agents to discover, validate, and internalize skills without external skill generators or inference-time skill banks. SIRI first warms up the policy with GiGPO to acquire basic interaction ability and collect successful skill-free trajectories. It then performs self-skill mining, where the current policy summarizes compact skills from its own successful plain rollouts and validates them through paired skill-augmented and skill-free rollouts. Finally, SIRI distills only beneficial skill-guided action tokens into the plain policy using trajectory-level utility and action-level advantage. At inference, the agent runs with the original prompt only. On ALFWorld and WebShop with Qwen2.5-7B-Instruct, SIRI improves GiGPO from 0.908 to <b>0.930</b> on ALFWorld and from 0.728 to <b>0.813</b> on WebShop, outperforming prompt-based, RL-based, and memory-augmented baselines. Further analysis shows that our self-mining strategy can achieve performance comparable to distillation with closed-source large model.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End paper abstract -->
+
+<!-- Framework -->
+<section class="hero is-small">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Framework</h2>
+      <div class="columns is-centered has-text-centered">
+        <div class="column">
+          <img src="static/images/framework.png" alt="Overview of the SIRI framework" class="framework-image" style="max-width: 95%; height: auto;">
+        </div>
+      </div>
+      <div class="columns is-centered">
+        <div class="column is-one-third">
+          <div class="phase-card">
+            <p class="phase-title">Phase 0: Policy Warmup</p>
+            <p class="phase-desc">The agent is warmed up with GiGPO to acquire basic interaction ability and collect successful skill-free trajectories as high-quality behavioral evidence for skill mining.</p>
+          </div>
+        </div>
+        <div class="column is-one-third">
+          <div class="phase-card">
+            <p class="phase-title">Phase 1: Self-Skill Mining &amp; Utilization</p>
+            <p class="phase-desc">The current policy summarizes compact skills from its own successful plain rollouts. Candidate skills are validated through paired skill-augmented and skill-free rollouts via the hindsight utility &Delta;<sub>g</sub>.</p>
+          </div>
+        </div>
+        <div class="column is-one-third">
+          <div class="phase-card">
+            <p class="phase-title">Phase 2: Skill Internalization</p>
+            <p class="phase-desc">Useful skill-guided action tokens are distilled into the plain policy through cross-context self-distillation, weighted by action-level advantage and gated by trajectory-level utility.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End framework -->
+
+<!-- Quantitative Results -->
+<section class="hero is-small is-light">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Quantitative Results</h2>
+      <p class="has-text-centered results-note">
+        Performance on ALFWorld (success rate per subtask and overall) and WebShop (average score and success rate), with Qwen2.5-7B-Instruct as the base model.
+        <b>Bold</b> and <u>underline</u> mark the best and second-best results.
+      </p>
+      <div class="table-wrapper">
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th rowspan="2" class="method-col">Method</th>
+              <th colspan="7" class="group-col">ALFWorld</th>
+              <th colspan="2" class="group-col webshop-col">WebShop</th>
+            </tr>
+            <tr>
+              <th>Pick</th><th>Look</th><th>Clean</th><th>Heat</th><th>Cool</th><th>Pick2</th><th class="all-col">All</th>
+              <th class="webshop-col">Score</th><th class="webshop-col">Succ.</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="group-row"><td colspan="10">API-based LLMs</td></tr>
+            <tr>
+              <td class="method-col">Gemini-3-Flash</td>
+              <td>0.964</td><td><u>0.857</u></td><td>0.571</td><td>0.722</td><td><b>0.962</b></td><td><b>0.953</b></td><td class="all-col">0.852</td>
+              <td class="webshop-col">0.141</td><td class="webshop-col">0.165</td>
+            </tr>
+            <tr>
+              <td class="method-col">GLM-5.1</td>
+              <td>0.913</td><td>0.818</td><td>0.852</td><td><b>0.938</b></td><td>0.667</td><td>0.667</td><td class="all-col">0.797</td>
+              <td class="webshop-col">0.156</td><td class="webshop-col">0.125</td>
+            </tr>
+            <tr class="group-row"><td colspan="10">Base Model: Qwen2.5-7B-Instruct</td></tr>
+            <tr>
+              <td class="method-col">Origin</td>
+              <td>0.179</td><td>0.643</td><td>0.048</td><td>0.000</td><td>0.038</td><td>0.053</td><td class="all-col">0.125</td>
+              <td class="webshop-col">0.166</td><td class="webshop-col">0.039</td>
+            </tr>
+            <tr class="group-row"><td colspan="10">Prompt-based Agentic or Memory-based Methods</td></tr>
+            <tr>
+              <td class="method-col">ReAct</td>
+              <td>0.485</td><td>0.354</td><td>0.343</td><td>0.132</td><td>0.182</td><td>0.176</td><td class="all-col">0.312</td>
+              <td class="webshop-col">0.462</td><td class="webshop-col">0.195</td>
+            </tr>
+            <tr>
+              <td class="method-col">Reflexion</td>
+              <td>0.620</td><td>0.416</td><td>0.449</td><td>0.309</td><td>0.363</td><td>0.238</td><td class="all-col">0.427</td>
+              <td class="webshop-col">0.581</td><td class="webshop-col">0.288</td>
+            </tr>
+            <tr class="group-row"><td colspan="10">RL-based Methods</td></tr>
+            <tr>
+              <td class="method-col">PPO</td>
+              <td>0.923</td><td>0.640</td><td>0.925</td><td>0.895</td><td>0.803</td><td>0.688</td><td class="all-col">0.804</td>
+              <td class="webshop-col">0.814</td><td class="webshop-col">0.687</td>
+            </tr>
+            <tr>
+              <td class="method-col">RLOO</td>
+              <td>0.876</td><td>0.782</td><td>0.873</td><td>0.813</td><td>0.719</td><td>0.489</td><td class="all-col">0.755</td>
+              <td class="webshop-col">0.803</td><td class="webshop-col">0.657</td>
+            </tr>
+            <tr>
+              <td class="method-col">GRPO</td>
+              <td>0.908</td><td>0.661</td><td>0.893</td><td>0.747</td><td>0.725</td><td>0.647</td><td class="all-col">0.776</td>
+              <td class="webshop-col">0.793</td><td class="webshop-col">0.661</td>
+            </tr>
+            <tr>
+              <td class="method-col">GiGPO</td>
+              <td><u>0.977</u></td><td>0.827</td><td><u>0.988</u></td><td>0.837</td><td>0.893</td><td>0.792</td><td class="all-col"><u>0.908</u></td>
+              <td class="webshop-col">0.844</td><td class="webshop-col"><u>0.728</u></td>
+            </tr>
+            <tr class="group-row"><td colspan="10">Memory-Augmented RL-based Methods</td></tr>
+            <tr>
+              <td class="method-col">MemRL</td>
+              <td>0.628</td><td>0.385</td><td>0.222</td><td>0.125</td><td>0.080</td><td>0.000</td><td class="all-col">0.214</td>
+              <td class="webshop-col">0.295</td><td class="webshop-col">0.092</td>
+            </tr>
+            <tr>
+              <td class="method-col">EvolveR</td>
+              <td>0.649</td><td>0.333</td><td>0.464</td><td>0.133</td><td>0.333</td><td>0.333</td><td class="all-col">0.438</td>
+              <td class="webshop-col">0.425</td><td class="webshop-col">0.176</td>
+            </tr>
+            <tr>
+              <td class="method-col">Mem0+GRPO</td>
+              <td>0.781</td><td>0.548</td><td>0.561</td><td>0.310</td><td>0.650</td><td>0.269</td><td class="all-col">0.547</td>
+              <td class="webshop-col">0.581</td><td class="webshop-col">0.375</td>
+            </tr>
+            <tr>
+              <td class="method-col">SimpleMem+GRPO</td>
+              <td>0.895</td><td>0.363</td><td>0.600</td><td>0.500</td><td>0.649</td><td>0.263</td><td class="all-col">0.625</td>
+              <td class="webshop-col">0.678</td><td class="webshop-col">0.469</td>
+            </tr>
+            <tr>
+              <td class="method-col">SkillRL</td>
+              <td><b>0.979</b></td><td>0.714</td><td>0.900</td><td><u>0.900</u></td><td><u>0.955</u></td><td>0.875</td><td class="all-col">0.899</td>
+              <td class="webshop-col"><u>0.852</u></td><td class="webshop-col">0.727</td>
+            </tr>
+            <tr class="ours-row">
+              <td class="method-col">SIRI (Ours)</td>
+              <td>0.975</td><td><b>0.875</b></td><td><b>1.000</b></td><td>0.857</td><td>0.850</td><td><u>0.895</u></td><td class="all-col"><b>0.930</b></td>
+              <td class="webshop-col"><b>0.899</b></td><td class="webshop-col"><b>0.813</b></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End quantitative results -->
+
+<!-- Training dynamics & analysis carousel -->
+<section class="hero is-small">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Training Dynamics &amp; Analysis</h2>
+      <div id="results-carousel" class="carousel results-carousel">
+        <div class="item" style="text-align: center;">
+          <img src="static/images/training_dynamic.png" alt="Training curves on ALFWorld and WebShop" style="display: inline-block; max-width: 92%;">
+          <p class="carousel-caption">SIRI consistently improves over GiGPO throughout training on both ALFWorld and WebShop.</p>
+        </div>
+        <div class="item" style="text-align: center;">
+          <img src="static/images/webshop_training_dynamic.png" alt="Self-mined vs externally-mined skills on WebShop" style="display: inline-block; max-width: 92%;">
+          <p class="carousel-caption">Self-mined skills start behind Gemini-3-Flash-mined skills, but the gap closes as training progresses — final performance is comparable.</p>
+        </div>
+        <div class="item" style="text-align: center;">
+          <img src="static/images/skill_evaluation_results.png" alt="LLM-as-a-Judge skill quality scores" style="display: inline-block; max-width: 92%;">
+          <p class="carousel-caption">Multi-model LLM-as-a-Judge scores show the intrinsic quality of self-mined skills improves continuously during training.</p>
+        </div>
+      </div>
+      <h2 class="subtitle has-text-centered">
+        You can slide to view more results.
+      </h2>
+
+      <!-- Ablation + base algorithm tables -->
+      <div class="columns is-centered small-tables">
+        <div class="column is-half">
+          <h3 class="title is-5 has-text-centered">Ablation Study on WebShop</h3>
+          <div class="table-wrapper">
+            <table class="results-table small">
+              <thead>
+                <tr><th class="method-col">Method</th><th>Score</th><th>Success</th></tr>
+              </thead>
+              <tbody>
+                <tr><td class="method-col">w/o Phase 0</td><td>0.850</td><td>0.711</td></tr>
+                <tr><td class="method-col">w/o Phase 2 (w/ Skill)</td><td><u>0.898</u></td><td><u>0.805</u></td></tr>
+                <tr><td class="method-col">w/o Phase 2 (w/o Skill)</td><td>0.852</td><td>0.719</td></tr>
+                <tr><td class="method-col">w/o Phase 1 and 2 (GiGPO)</td><td>0.844</td><td>0.728</td></tr>
+                <tr class="ours-row"><td class="method-col">SIRI (Full)</td><td><b>0.899</b></td><td><b>0.813</b></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="column is-half">
+          <h3 class="title is-5 has-text-centered">Impact of Base Optimization Algorithm</h3>
+          <div class="table-wrapper">
+            <table class="results-table small">
+              <thead>
+                <tr><th class="method-col">Method</th><th>Score</th><th>Success</th></tr>
+              </thead>
+              <tbody>
+                <tr><td class="method-col">GRPO</td><td><u>0.758</u></td><td><u>0.568</u></td></tr>
+                <tr class="ours-row"><td class="method-col">SIRI (GRPO)</td><td><b>0.779</b><span class="delta">&uarr;0.021</span></td><td><b>0.648</b><span class="delta">&uarr;0.080</span></td></tr>
+                <tr><td class="method-col">GiGPO</td><td><u>0.831</u></td><td><u>0.650</u></td></tr>
+                <tr class="ours-row"><td class="method-col">SIRI (GiGPO)</td><td><b>0.853</b><span class="delta">&uarr;0.022</span></td><td><b>0.727</b><span class="delta">&uarr;0.077</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 1.5B results -->
+      <h3 class="title is-5 has-text-centered">Robustness on a Smaller Backbone (Qwen2.5-1.5B-Instruct)</h3>
+      <div class="table-wrapper">
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th rowspan="2" class="method-col">Method</th>
+              <th colspan="7" class="group-col">ALFWorld</th>
+              <th colspan="2" class="group-col webshop-col">WebShop</th>
+            </tr>
+            <tr>
+              <th>Pick</th><th>Clean</th><th>Cool</th><th>Look</th><th>Heat</th><th>Pick2</th><th class="all-col">All</th>
+              <th class="webshop-col">Score</th><th class="webshop-col">Success</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="method-col">Origin</td><td>0.059</td><td>0.033</td><td>0.042</td><td>0.055</td><td>0.097</td><td>0.000</td><td class="all-col">0.041</td><td class="webshop-col">0.231</td><td class="webshop-col">0.052</td></tr>
+            <tr><td class="method-col">ReAct</td><td>0.174</td><td>0.157</td><td>0.077</td><td>0.205</td><td>0.062</td><td>0.020</td><td class="all-col">0.128</td><td class="webshop-col">0.401</td><td class="webshop-col">0.113</td></tr>
+            <tr><td class="method-col">Reflexion</td><td>0.353</td><td>0.217</td><td>0.194</td><td>0.222</td><td>0.136</td><td>0.037</td><td class="all-col">0.218</td><td class="webshop-col">0.558</td><td class="webshop-col">0.219</td></tr>
+            <tr><td class="method-col">PPO</td><td>0.648</td><td>0.571</td><td>0.464</td><td>0.405</td><td>0.606</td><td>0.474</td><td class="all-col">0.544</td><td class="webshop-col">0.738</td><td class="webshop-col">0.515</td></tr>
+            <tr><td class="method-col">RLOO</td><td>0.883</td><td>0.710</td><td>0.664</td><td>0.528</td><td>0.628</td><td>0.569</td><td class="all-col">0.697</td><td class="webshop-col">0.739</td><td class="webshop-col">0.521</td></tr>
+            <tr><td class="method-col">GRPO</td><td>0.853</td><td>0.845</td><td>0.597</td><td>0.537</td><td>0.782</td><td>0.535</td><td class="all-col">0.728</td><td class="webshop-col">0.758</td><td class="webshop-col">0.568</td></tr>
+            <tr><td class="method-col">GiGPO</td><td><b>0.944</b></td><td><u>0.948</u></td><td><u>0.798</u></td><td><u>0.675</u></td><td><u>0.944</u></td><td><b>0.764</b></td><td class="all-col"><u>0.867</u></td><td class="webshop-col"><u>0.831</u></td><td class="webshop-col"><u>0.650</u></td></tr>
+            <tr class="ours-row"><td class="method-col">SIRI (Ours)</td><td><u>0.897</u></td><td><b>1.000</b></td><td><b>0.870</b></td><td><b>0.833</b></td><td><b>0.947</b></td><td><u>0.600</u></td><td class="all-col"><b>0.875</b></td><td class="webshop-col"><b>0.853</b></td><td class="webshop-col"><b>0.727</b></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End training dynamics & analysis -->
+
+<!-- Skill examples -->
+<section class="hero is-small is-light">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Examples of Self-Mined Skills</h2>
+      <p class="has-text-centered results-note">
+        Each skill abstracts a successful trajectory into a reusable heuristic with applicability conditions, a high-level strategy, and actionable key steps.
+      </p>
+      <div class="columns is-centered">
+        <div class="column is-half">
+          <div class="skill-card">
+            <p class="skill-card-title">Skill Example — ALFWorld</p>
+            <div class="skill-card-body">
+              <p><b>When to apply:</b> When the required object is not found at the initial search location and must be located to proceed with the task.</p>
+              <p><b>Strategy:</b> Evaluate the current observation to confirm the object's absence, then systematically navigate to the next most logical storage receptacle based on the object's typical context.</p>
+              <p><b>Key steps:</b> Observe the current location | Verify the target object is absent | Identify the next probable storage receptacle | Navigate to the new location</p>
+            </div>
+          </div>
+        </div>
+        <div class="column is-half">
+          <div class="skill-card">
+            <p class="skill-card-title">Skill Example — WebShop</p>
+            <div class="skill-card-body">
+              <p><b>When to apply:</b> When a product page is open and specific attribute variations must be chosen to match task requirements.</p>
+              <p><b>Strategy:</b> Configure the product by selecting all required options, confirm that constraints like price remain satisfied, and finalize the transaction.</p>
+              <p><b>Key steps:</b> Select required item attributes | Verify constraints are met | Execute the purchase action</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End skill examples -->
+
+<!-- BibTeX citation -->
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>@article{he2026siri,
+  title={SIRI: Self-Internalizing Reinforcement Learning with Intrinsic Skills for LLM Agent Training},
+  author={He, Zhongyu and Li, Yuanfan and Huang, Fei and Chen, Tianyu and Chen, Siyuan and Li, Xingyang and Yu, Meng Hsuan and Liu, Xiangrong and Wei, Leyi and Pan, Lu and Zeng, Ke and Cai, Xunliang},
+  journal={arXiv preprint arXiv:2606.02355},
+  year={2026}
+}</code></pre>
+  </div>
+</section>
+<!-- End BibTeX citation -->
+
+<footer class="footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>
+            This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank">Academic Project Page Template</a> which was adopted from the <a href="https://nerfies.github.io" target="_blank">Nerfies</a> project page.
+            You are free to borrow the source code of this website, we just ask that you link back to this page in the footer. <br> This website is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative
+            Commons Attribution-ShareAlike 4.0 International License</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
