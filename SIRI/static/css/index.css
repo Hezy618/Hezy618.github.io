@@ -338,3 +338,15 @@ body {
   border-radius: 999px;
   border: 1px solid #f5c2d4;
 }
+
+.venue-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.venue-logo {
+  height: 1.25em;
+  width: auto;
+  display: block;
+}
