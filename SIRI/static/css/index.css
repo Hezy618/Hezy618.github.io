@@ -355,17 +355,17 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1.5rem;
-  margin: 1rem auto 0;
-  min-height: 58px;
+  gap: clamp(2rem, 6vw, 5rem);
+  margin: 1.25rem auto 0;
+  min-height: 72px;
 }
 
 .institution-links a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 64px;
-  height: 58px;
+  width: 112px;
+  height: 72px;
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
@@ -383,12 +383,21 @@ body {
 }
 
 .institution-links a:nth-child(2) img {
-  width: 48px;
-  height: 48px;
+  width: 112px;
+  height: auto;
 }
 
 @media screen and (max-width: 480px) {
   .institution-links {
-    gap: 1rem;
+    gap: 1.25rem;
+  }
+
+  .institution-links a {
+    width: 88px;
+    height: 64px;
+  }
+
+  .institution-links a:nth-child(2) img {
+    width: 88px;
   }
 }
