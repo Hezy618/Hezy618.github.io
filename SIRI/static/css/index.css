@@ -383,8 +383,8 @@ body {
 }
 
 .institution-links a:last-child img {
-  width: 112px;
-  height: 112px;
+  width: 235px;
+  height: 88px;
   object-fit: contain;
 }
 
@@ -399,7 +399,7 @@ body {
   }
 
   .institution-links a:last-child img {
-    width: 96px;
-    height: 96px;
+    width: 190px;
+    height: 71px;
   }
 }
