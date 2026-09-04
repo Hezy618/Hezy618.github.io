@@ -360,6 +360,10 @@ body {
   min-height: 112px;
 }
 
+.institution-links[hidden] {
+  display: none;
+}
+
 .institution-links a {
   display: inline-flex;
   align-items: center;
