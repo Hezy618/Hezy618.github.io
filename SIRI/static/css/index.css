@@ -383,9 +383,9 @@ body {
 }
 
 .institution-links a:last-child img {
-  width: 330px;
-  max-height: 112px;
-  height: auto;
+  width: 112px;
+  height: 112px;
+  object-fit: contain;
 }
 
 @media screen and (max-width: 480px) {
@@ -399,7 +399,7 @@ body {
   }
 
   .institution-links a:last-child img {
-    width: 270px;
-    max-height: 96px;
+    width: 96px;
+    height: 96px;
   }
 }
