@@ -24,11 +24,12 @@ const SITE = {
   links: {
     "Google Scholar": "https://scholar.google.com/citations?user=O-E3TdAAAAAJ&hl=zh-CN&authuser=1",
     "GitHub": "https://github.com/Hezy618",
+    "X": "https://x.com/hezzzyu",
   },
 
   /* ---------- 塔罗牌（左侧照片卡） ----------
    * numeral: 牌面顶部罗马数字；backQuote: 点击牌面翻面后背面显示的一句话；
-   * 牌面头像下方会自动显示上方 links 里的外链按钮（GitHub / Scholar 等）
+   * 牌面头像下方会自动显示上方 links 里的外链按钮（GitHub / Scholar / X 等）
    */
   tarot: {
     numeral: "",                            // 牌面顶部罗马数字（留空则整行隐藏）
