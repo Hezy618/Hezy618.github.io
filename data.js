@@ -86,7 +86,10 @@ const SITE = {
       level: "CCF-B",
       extraLevels: ["CORE A*", "TH-CPL A"],   // EMNLP: CORE2023 起 A*，清华 TH-CPL A 类
       keywords: ["LLM Agents", "Agentic RL", "SKILL", "Self-Distillation"],
-      links: { PDF: "https://arxiv.org/pdf/2606.02355" },
+      links: {
+        PDF: "https://arxiv.org/pdf/2606.02355",
+        Homepage: "https://hezy618.github.io/SIRI",
+      },
     },
     {
       title: "HKD-CPI: High-Order Knowledge Distillation Enhanced Inductive Compound-Protein Interaction Prediction",
