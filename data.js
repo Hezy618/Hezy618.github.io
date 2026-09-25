@@ -7,7 +7,8 @@ const SITE = {
 
   /* ---------- 基本信息 ---------- */
   name: "Zhongyu He",                      // 姓名（论文作者列表里同名会自动加粗）
-  tagline: "M.S. student @ Xiamen University · LLM Algorithm Engineer Intern @ Meituan",
+  tagline: "LLM Agents · Reinforcement Learning · Post-training",
+  heroSummary: "I build and study language-model agents that learn from interaction. M.S. researcher at Xiamen University and LLM algorithm engineer intern at Meituan.",
   photo: "pic/hezhongyu.jpg",              // 你的照片路径（pic/hezhongyu.jpg）
   university: "Xiamen University",
   school: "School of Informatics",         // 信息学院
@@ -151,10 +152,10 @@ const SITE = {
    * icon 可以是 emoji，也可以是 assets/ 下的图片路径（如 "assets/game.png"）
    */
   hobbies: [
-    { icon: "assets/clawd.svg", title: "Vibe Coding",        desc: "Heavy vibe coder — 10x-ing my research & work with Claude Code and other AI coding agents." },
+    { icon: "assets/clawd.svg", title: "AI-assisted Building", desc: "I use coding agents to prototype research ideas and build practical tools." },
     { icon: "📷", title: "Photography",        desc: "Experienced in portrait photography — capturing people at their best." },
-    { icon: "🏸", title: "Badminton & Running", desc: "Weekly badminton plus casual runs — sweating out the paper-rejection blues." },
-    { icon: "🎸", title: "Guitar & Singing",   desc: "Guitar strummer; can sing pretty much everything by Jay Chou, Wang Leehom, and JJ Lin." },
+    { icon: "🏸", title: "Badminton & Running", desc: "Regular badminton and running keep me active outside research." },
+    { icon: "🎸", title: "Guitar & Singing",   desc: "I enjoy playing guitar and singing songs by Jay Chou, Wang Leehom, and JJ Lin." },
   ],
 
   /* ---------- 页脚 ---------- */

@@ -23,15 +23,12 @@
     SITE.name.split(" ").map((w) => w[0]).join("").toUpperCase() || "PLAYER";
   $("#profile-name").textContent = SITE.name;
   $("#profile-photo").src = SITE.photo;
+  $("#hero-summary").textContent = SITE.heroSummary || "";
 
   const stats = [
-    ["UNIV", SITE.university],
-    ["SCHOOL", SITE.school],
-    ["MAJOR", SITE.major],
-    ["DEGREE", SITE.degree],
-    ["LOC", SITE.location],
-    ["MAIL", SITE.email && `<a href="mailto:${esc(SITE.email)}">${esc(SITE.email)}</a>`],
-    ["MAIL·QQ", SITE.emailAlt && `<a href="mailto:${esc(SITE.emailAlt)}">${esc(SITE.emailAlt)}</a>`],
+    ["CURRENT", "LLM Algorithm Engineer Intern · Meituan"],
+    ["STUDY", `${SITE.degree} · ${SITE.university}`],
+    ["BASED", SITE.location],
   ];
   const statList = $("#stat-list");
   stats.forEach(([k, v]) => {
@@ -42,7 +39,7 @@
 
   /* 研究方向 chips */
   const chipRow = $("#chip-row");
-  (SITE.research || []).forEach((r) => chipRow.appendChild(el("span", "chip", esc(r))));
+  (SITE.research || []).slice(0, 3).forEach((r) => chipRow.appendChild(el("span", "chip", esc(r))));
 
   /* GitHub / Scholar / X 等外链：渲染进塔罗牌头像下方，点击不触发翻面 */
   /* 已识别链接名前拼官方 logo（内联 SVG，currentColor 跟随悬停反色） */
@@ -155,10 +152,6 @@
     card.appendChild(el("h3", "pub-title", esc(pub.title)));
     card.appendChild(el("p", "pub-authors", authors));
     if (hasEqual) card.appendChild(el("p", "pub-note", "* Equal contribution"));
-    if ((pub.keywords || []).length) {
-      card.appendChild(el("p", "pub-keywords",
-        pub.keywords.map((k) => `<span class="kw">${esc(k)}</span>`).join("")));
-    }
     card.appendChild(el("p", "pub-venue", `${esc(pub.venue)}, ${esc(pub.year)}`));
 
     const badges = el("div", "pub-badges");
@@ -182,6 +175,10 @@
     });
     badges.appendChild(links);
     card.appendChild(badges);
+    if ((pub.keywords || []).length) {
+      card.appendChild(el("p", "pub-keywords",
+        pub.keywords.map((k) => `<span class="kw">${esc(k)}</span>`).join("")));
+    }
     pubList.appendChild(card);
   });
   if (!(SITE.publications || []).length) $("#publications").style.display = "none";
@@ -302,7 +299,9 @@
     if (ticking) return;
     ticking = true;
     requestAnimationFrame(() => {
-      moonWrap.style.transform = `translateY(${window.scrollY * 0.12}px)`;
+      moonWrap.style.transform = window.matchMedia("(max-width: 640px)").matches
+        ? ""
+        : `translateY(${window.scrollY * 0.12}px)`;
       ticking = false;
     });
   });
