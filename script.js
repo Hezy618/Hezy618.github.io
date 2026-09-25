@@ -1064,95 +1064,31 @@
     };
     syncHint();
 
-    /* 过场动画：01 二进制列铺满全屏向上浮动、渐变隐去；配色跟随目标主题。
-       逐行插值出真实文字色（不依赖 background-clip），列顶加亮白"头部"仿代码雨。
-       换肤时机由所有列的 (delay, dur) 实时推算：取全屏被代码完全覆盖的时间窗口中点，
-       保证页面在代码后面完成换装，动画与渲染无缝衔接。 */
-    const WIPE_TO_DAY = ["#3f8ae0", "#6ba9e8", "#4da354", "#c9861a", "#1d7a99", "#8cc57e"];   // 去白天：蓝天/绿地/暖金
-    const WIPE_TO_NIGHT = ["#e8c46a", "#8fd8e8", "#8b8db0", "#b48fe8", "#d98fb8", "#5a5ea0"]; // 回夜晚：金/青/紫深夜系
-    const WIPE_FS = 15;                                  // 列宽 = 字号，列与列贴紧铺满
-    const HEAD = 0.14;                                   // 列顶亮白头部占比
-    const MID = 0.58;                                    // 三段渐变的中段分界（c1→c2→c3）
-    const lerpHex = (a, b, t) => {
-      const pa = [1, 3, 5].map((i) => parseInt(a.slice(i, i + 2), 16));
-      const pb = [1, 3, 5].map((i) => parseInt(b.slice(i, i + 2), 16));
-      return "#" + pa.map((v, k) => Math.round(v + (pb[k] - v) * t).toString(16).padStart(2, "0")).join("");
-    };
     let wiping = false;
     const wipeTheme = () => {
       if (wiping) return;
       wiping = true;
       const toDay = !document.documentElement.classList.contains("day");
-      const palette = toDay ? WIPE_TO_DAY : WIPE_TO_NIGHT;
-      const w = el("div", "theme-wipe");
-      const cols = Math.ceil(window.innerWidth / WIPE_FS);
-      /* 列高 ≈ 1.55 屏高：列从 105vh 出发、平移总量 ≈ 2.91 屏高，
-         列覆盖全屏 ⇔ 进度 p ∈ [0.361, 0.550]（推导：top=1.05-2.91p，需 top≤0 且 top≥-0.55） */
-      const rows = Math.ceil(window.innerHeight * 1.5 / (WIPE_FS * 1.6)) + 2;
-      const P_IN = 0.361, P_OUT = 0.550;
-      let maxEnd = 0, coverLo = 0, coverHi = Infinity;
-      for (let i = 0; i < cols; i++) {
-        const c = el("div", "bcol");
-        const dur = 2.05 + Math.random() * 0.35;        // 每列流速略有不同（方差小，保证全覆盖窗口存在）
-        const delay = Math.random() * 0.2;              // 每列错峰出发
-        const c1 = palette[Math.floor(Math.random() * palette.length)];
-        let c2 = palette[Math.floor(Math.random() * palette.length)];
-        if (c2 === c1) c2 = palette[(palette.indexOf(c1) + 1) % palette.length];
-        let c3 = palette[Math.floor(Math.random() * palette.length)];
-        if (c3 === c2) c3 = palette[(palette.indexOf(c2) + 1) % palette.length];
-        for (let r = 0; r < rows; r++) {                // 逐行三段渐变：亮白头部 → c1 → c2 → c3
-          const t = r / (rows - 1);
-          const color = t < HEAD ? lerpHex("#ffffff", c1, t / HEAD)
-                       : t < MID  ? lerpHex(c1, c2, (t - HEAD) / (MID - HEAD))
-                                  : lerpHex(c2, c3, (t - MID) / (1 - MID));
-          const row = el("div", "brow", Math.random() < 0.5 ? "0" : "1");
-          row.style.color = color;
-          row.style.opacity = (0.4 + Math.random() * 0.35).toFixed(2);    // 轻微明度抖动，整体压柔不刺眼
-          c.appendChild(row);
-        }
-        c.style.left = (i * WIPE_FS) + "px";
-        c.style.width = WIPE_FS + "px";
-        c.style.setProperty("--wt", dur + "s");
-        c.style.setProperty("--wd", delay + "s");
-        maxEnd = Math.max(maxEnd, dur + delay);
-        coverLo = Math.max(coverLo, delay + P_IN * dur);   // 所有列都进入"全覆盖"的最早时刻
-        coverHi = Math.min(coverHi, delay + P_OUT * dur);  // 有列开始离开"全覆盖"的最早时刻
-        w.appendChild(c);
-      }
-      document.body.appendChild(w);
-      document.documentElement.classList.add("wiping");   // 换肤期间给界面元素挂颜色过渡，衔接更顺滑
-
-      /* 幕布层：垫在代码雨下面、页面上面的目标主题底色。
-         换肤前淡入到近不透明，把 class 切换的硬边完全藏住；代码雨散场前再缓缓淡出。 */
-      const flipS = (coverLo < coverHi ? (coverLo + coverHi) / 2 : coverLo);
       const veil = el("div", "theme-veil");
-      veil.style.background = toDay
-        ? "linear-gradient(to bottom, #6ba9e8 0%, #a8d4f5 60%, #e4f3ff 100%)"
-        : "linear-gradient(to bottom, #07070f 0%, #0d0e20 100%)";
+      veil.style.background = toDay ? "#f2f3f2" : "#0d0e20";
       document.body.appendChild(veil);
-      const totalS = maxEnd + 0.1;
-      veil.animate(
-        [
-          { opacity: 0 },
-          { opacity: .97, offset: Math.max(0.01, (flipS - 0.5) / totalS) },
-          { opacity: .97, offset: Math.min(0.97, (flipS + 1.1) / totalS) },
-          { opacity: 0 },
-        ],
-        { duration: totalS * 1000, easing: "ease-in-out", fill: "both" }
+      document.documentElement.classList.add("wiping");
+      const duration = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 600;
+      if (duration) veil.animate(
+        [{ opacity: 0 }, { opacity: .94, offset: .5 }, { opacity: 0 }],
+        { duration, easing: "ease-in-out", fill: "both" }
       );
-
-      setTimeout(() => {                                // 全屏被代码+幕布完全覆盖的瞬间换肤
+      setTimeout(() => {
         const day = document.documentElement.classList.toggle("day");   // 不写入 localStorage：每次打开固定黑夜开场
         syncHint();
         syncCats(day);                                  // 猫的形态跟随昼夜切换
         syncTarot(day);                                 // 塔罗牌纹样与座右铭同理
-      }, flipS * 1000);
+      }, duration / 2);
       setTimeout(() => {
-        w.remove();
         veil.remove();
         document.documentElement.classList.remove("wiping");
         wiping = false;
-      }, maxEnd * 1000 + 100);
+      }, duration + 50);
     };
     moonWrap.addEventListener("click", wipeTheme);
     /* 月亮在背景层（z-index 低于正文），被正文透明区域盖住时点击/悬停无法直达。
