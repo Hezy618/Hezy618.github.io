@@ -805,6 +805,7 @@ html.day #starfield {
 html.day .star, html.day .shooting { display: none; }
 
 html.day .cloud { --cl: rgba(75, 85, 87, .045); }
+html.day .ink-geese { display: block; }
 html.day .mountains-back {
   height: 260px;
   background: linear-gradient(to bottom, rgba(80, 93, 93, .18), rgba(80, 93, 93, .035));
@@ -889,13 +890,37 @@ html.day .tarot-links a { background: rgba(173, 129, 50, .05); }
 #sun { display: none; }
 #sun .row { display: flex; }
 #sun .px { width: 4px; height: 4px; }
-#sun .y { background: #f7e3a7; }
-#sun .g { background: #dfbd69; }
-#sun .a { background: #ad8132; }
+#sun .y { background: #f4d79a; }
+#sun .g { background: #c65d45; }
+#sun .a { background: #9f3f35; }
 #sun .t { background: transparent; }
 html.day #moon { display: none; }
 html.day #sun { display: grid; grid-auto-rows: 4px; }
-html.day .moon-wrap { filter: drop-shadow(0 0 24px rgba(173, 129, 50, .22)); }
+html.day .moon-wrap { filter: drop-shadow(0 0 24px rgba(178, 77, 55, .2)); }
+
+/* 水墨雁阵：低对比、慢速横掠，作为白天远景而不干扰正文 */
+.ink-geese { display: none; position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.ink-geese i {
+  position: absolute; left: -80px; width: 30px; height: 11px;
+  border-top: 2px solid rgba(50, 62, 62, .28);
+  border-radius: 50% 50% 0 0;
+  transform: rotate(-7deg) scaleX(.9);
+  animation: geeseFlight 28s linear infinite;
+}
+.ink-geese i::before, .ink-geese i::after {
+  content: ""; position: absolute; top: -6px; width: 15px; height: 8px;
+  border-top: 2px solid rgba(50, 62, 62, .28); border-radius: 50%;
+}
+.ink-geese i::before { left: 1px; transform: rotate(17deg); }
+.ink-geese i::after { right: 1px; transform: rotate(-17deg); }
+.ink-geese i:nth-child(1) { top: 22%; animation-delay: -7s; opacity: .75; }
+.ink-geese i:nth-child(2) { top: 28%; transform: scale(.7) rotate(-7deg); animation-delay: -18s; opacity: .5; }
+.ink-geese i:nth-child(3) { top: 19%; transform: scale(.52) rotate(-7deg); animation-delay: -25s; opacity: .42; }
+@keyframes geeseFlight {
+  0% { left: -80px; }
+  45% { transform: translateY(-12px) rotate(-7deg) scaleX(.9); }
+  100% { left: calc(100% + 80px); transform: translateY(8px) rotate(-7deg) scaleX(.9); }
+}
 
 /* ---------- 主题切换提示：月亮/太阳右侧的像素箭头 + 目标主题图标，周期性闪现 ---------- */
 .theme-hint {
