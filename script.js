@@ -1069,26 +1069,53 @@
       if (wiping) return;
       wiping = true;
       const toDay = !document.documentElement.classList.contains("day");
+      const syncTheme = () => {
+        const day = document.documentElement.classList.toggle("day");
+        syncHint();
+        syncCats(day);
+        syncTarot(day);
+      };
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        syncTheme();
+        wiping = false;
+        return;
+      }
+
+      const wipe = el("div", "theme-wipe");
+      wipe.setAttribute("aria-hidden", "true");
+      const width = 18;
+      const rows = Math.ceil(window.innerHeight / 18) * 2 + 8;
+      const cols = Math.ceil(window.innerWidth / width);
+      for (let i = 0; i < cols; i++) {
+        const column = el("div", "bcol");
+        column.textContent = Array.from({ length: rows }, () => Math.random() < .5 ? "0" : "1").join("\n");
+        column.style.left = `${i * width}px`;
+        column.style.width = `${width}px`;
+        column.style.setProperty("--wd", `${Math.random() * .12}s`);
+        column.style.setProperty("--wt", `${2.08 + Math.random() * .16}s`);
+        column.style.setProperty("--code-mid", toDay ? "#82918c" : "#8fd8e8");
+        column.style.setProperty("--code-end", toDay ? "#364d50" : "#786da0");
+        wipe.appendChild(column);
+      }
       const veil = el("div", "theme-veil");
+      veil.setAttribute("aria-hidden", "true");
       veil.style.background = toDay ? "#f2f3f2" : "#0d0e20";
       document.body.appendChild(veil);
+      document.body.appendChild(wipe);
       document.documentElement.classList.add("wiping");
-      const duration = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 600;
-      if (duration) veil.animate(
-        [{ opacity: 0 }, { opacity: .94, offset: .5 }, { opacity: 0 }],
-        { duration, easing: "ease-in-out", fill: "both" }
+      veil.animate(
+        [{ opacity: 0 }, { opacity: .94, offset: .4 }, { opacity: .94, offset: .64 }, { opacity: 0 }],
+        { duration: 2350, easing: "ease-in-out", fill: "both" }
       );
       setTimeout(() => {
-        const day = document.documentElement.classList.toggle("day");   // 不写入 localStorage：每次打开固定黑夜开场
-        syncHint();
-        syncCats(day);                                  // 猫的形态跟随昼夜切换
-        syncTarot(day);                                 // 塔罗牌纹样与座右铭同理
-      }, duration / 2);
+        syncTheme();
+      }, 1150);
       setTimeout(() => {
+        wipe.remove();
         veil.remove();
         document.documentElement.classList.remove("wiping");
         wiping = false;
-      }, duration + 50);
+      }, 2400);
     };
     moonWrap.addEventListener("click", wipeTheme);
     /* 月亮在背景层（z-index 低于正文），被正文透明区域盖住时点击/悬停无法直达。

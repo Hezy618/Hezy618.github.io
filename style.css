@@ -798,14 +798,28 @@ html.day {
 }
 
 html.day #starfield {
-  background: linear-gradient(to bottom, #e9edf0 0%, #f2f3f2 52%, #f7f7f4 100%);
+  background:
+    radial-gradient(ellipse 90% 22% at 85% 82%, rgba(74, 85, 88, .065), transparent 78%),
+    linear-gradient(to bottom, #eef0ef 0%, #f7f7f4 68%, #e9edeb 100%);
 }
 html.day .star, html.day .shooting { display: none; }
 
-html.day .cloud { --cl: rgba(114, 126, 141, .06); }
-html.day .mountains-back  { background: #cbd3d9; opacity: .45; }
-html.day .mountains-front { background: #b9c5ca; opacity: .35; }
-html.day .grain { opacity: .025; }
+html.day .cloud { --cl: rgba(75, 85, 87, .045); }
+html.day .mountains-back {
+  height: 260px;
+  background: linear-gradient(to bottom, rgba(80, 93, 93, .18), rgba(80, 93, 93, .035));
+  opacity: 1;
+  clip-path: polygon(0 100%, 0 78%, 7% 71%, 12% 73%, 20% 49%, 24% 44%, 28% 54%, 36% 75%, 43% 59%, 49% 63%, 56% 31%, 59% 28%, 64% 48%, 70% 69%, 79% 52%, 84% 56%, 90% 36%, 94% 46%, 100% 65%, 100% 100%);
+  filter: blur(2px);
+}
+html.day .mountains-front {
+  height: 145px;
+  background: linear-gradient(to bottom, rgba(62, 77, 78, .17), rgba(62, 77, 78, .04));
+  opacity: 1;
+  clip-path: polygon(0 100%, 0 70%, 8% 77%, 16% 45%, 20% 41%, 26% 60%, 32% 67%, 39% 38%, 44% 51%, 49% 76%, 57% 59%, 64% 64%, 72% 33%, 77% 46%, 85% 70%, 93% 54%, 100% 67%, 100% 100%);
+  filter: blur(1px);
+}
+html.day .grain { opacity: .07; }
 
 html.day .navbar { background: rgba(248, 249, 248, .86); border-color: var(--line); }
 html.day .panel {
@@ -915,7 +929,7 @@ html.day .moon-wrap { filter: drop-shadow(0 0 24px rgba(173, 129, 50, .22)); }
   .theme-hint { display: none; }   /* 窄屏右侧空间不足，避免溢出 */
 }
 
-/* ---------- 主题切换过场：一列列 01 代码向上浮动、渐变隐去（透明背景，不遮挡） ---------- */
+/* ---------- 主题切换过场：二进制列由下向上扫过画面 ---------- */
 .theme-wipe {
   position: fixed; inset: 0; z-index: 200;
   overflow: hidden;
@@ -923,18 +937,20 @@ html.day .moon-wrap { filter: drop-shadow(0 0 24px rgba(173, 129, 50, .22)); }
 }
 .theme-wipe .bcol {
   position: absolute; top: 0;
-  font-family: var(--font-pixel); font-size: 15px; line-height: 1.6;
-  text-align: center;
+  font-family: var(--font-pixel); font-size: 12px; line-height: 1.5;
+  white-space: pre; text-align: center;
+  color: transparent;
+  background: linear-gradient(to bottom, #f8f2df, var(--code-mid), var(--code-end));
+  -webkit-background-clip: text; background-clip: text;
   opacity: 0;
-  /* 列的上下两端做透明渐变，隐去更柔和（顶部收窄淡出区，保住亮白头部） */
-  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 80%, transparent);
-  mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 80%, transparent);
-  animation: binFloat var(--wt, 2.8s) linear var(--wd, 0s) both;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 8%, #000 84%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 8%, #000 84%, transparent);
+  animation: binFloat var(--wt, 2.2s) linear var(--wd, 0s) both;
 }
 @keyframes binFloat {
   0%   { transform: translateY(105vh); opacity: 0; }
-  12%  { opacity: .55; }
-  75%  { opacity: .55; }
+  12%  { opacity: .82; }
+  82%  { opacity: .82; }
   100% { transform: translateY(-120%); opacity: 0; }
 }
 
