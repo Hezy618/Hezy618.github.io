@@ -1091,8 +1091,8 @@
         column.textContent = Array.from({ length: rows }, () => Math.random() < .5 ? "0" : "1").join("\n");
         column.style.left = `${i * width}px`;
         column.style.width = `${width}px`;
-        column.style.setProperty("--wd", `${Math.random() * .12}s`);
-        column.style.setProperty("--wt", `${2.08 + Math.random() * .16}s`);
+        column.style.setProperty("--wd", `${Math.random() * .08}s`);
+        column.style.setProperty("--wt", `${1.95 + Math.random() * .12}s`);
         column.style.setProperty("--code-mid", toDay ? "#82918c" : "#8fd8e8");
         column.style.setProperty("--code-end", toDay ? "#364d50" : "#786da0");
         wipe.appendChild(column);
@@ -1103,19 +1103,23 @@
       document.body.appendChild(veil);
       document.body.appendChild(wipe);
       document.documentElement.classList.add("wiping");
-      veil.animate(
-        [{ opacity: 0 }, { opacity: .94, offset: .4 }, { opacity: .94, offset: .64 }, { opacity: 0 }],
-        { duration: 2350, easing: "ease-in-out", fill: "both" }
+      const enter = veil.animate(
+        [{ opacity: 0 }, { opacity: 1 }],
+        { duration: 1050, easing: "ease-in-out", fill: "forwards" }
       );
-      setTimeout(() => {
+      enter.finished.then(() => {
         syncTheme();
-      }, 1150);
-      setTimeout(() => {
-        wipe.remove();
-        veil.remove();
-        document.documentElement.classList.remove("wiping");
-        wiping = false;
-      }, 2400);
+        const exit = veil.animate(
+          [{ opacity: 1 }, { opacity: 0 }],
+          { duration: 1050, easing: "ease-in-out", fill: "forwards" }
+        );
+        exit.finished.then(() => {
+          wipe.remove();
+          veil.remove();
+          document.documentElement.classList.remove("wiping");
+          wiping = false;
+        });
+      });
     };
     moonWrap.addEventListener("click", wipeTheme);
     /* 月亮在背景层（z-index 低于正文），被正文透明区域盖住时点击/悬停无法直达。
