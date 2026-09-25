@@ -143,9 +143,9 @@ const SITE = {
     },
   ],
 
-  /* ---------- 荣誉奖项（没有可留空数组 []） ----------  TODO */
+  /* ---------- 荣誉奖项 ---------- */
   awards: [
-    // "National Scholarship (Top 1%), 2025",
+    "2026 · Graduate National Scholarship (China) · Xiamen University",
   ],
 
   /* ---------- 个人爱好 ----------  TODO: 换成你的真实爱好
