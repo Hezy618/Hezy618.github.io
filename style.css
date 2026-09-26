@@ -260,22 +260,28 @@ body {
     top: 92px;
     min-height: calc(100vh - 126px);
     height: auto;
-    padding: 22px 12px 34px;
+    padding: 12px 18px 34px 10px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 28px;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 22px;
   }
+
+  .hero .tarot-scene { margin-left: 18px; }
 
   .hero-info {
     width: 100%;
     max-width: 470px;
     flex: 0 1 auto;
+    padding: 4px 0 2px 18px;
+    border-left: 2px solid var(--line-soft);
   }
 
   .hero-info .hero-summary { max-width: 470px; }
   .hero-actions { justify-content: flex-start; }
+  .hero-hello { margin-bottom: 14px; }
+  .pixel-title { margin-bottom: 12px; }
 
   .resume-column {
     min-width: 0;
