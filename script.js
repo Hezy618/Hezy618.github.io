@@ -1096,35 +1096,37 @@
 
       const wipe = el("div", "theme-wipe");
       wipe.setAttribute("aria-hidden", "true");
-      const width = 18;
-      const rows = Math.ceil(window.innerHeight / 18) * 2 + 8;
+      const width = 22;
+      const rows = Math.ceil(window.innerHeight / 20) * 2 + 10;
       const cols = Math.ceil(window.innerWidth / width);
       for (let i = 0; i < cols; i++) {
         const column = el("div", "bcol");
         column.textContent = Array.from({ length: rows }, () => Math.random() < .5 ? "0" : "1").join("\n");
         column.style.left = `${i * width}px`;
         column.style.width = `${width}px`;
-        column.style.setProperty("--wd", `${Math.random() * .08}s`);
-        column.style.setProperty("--wt", `${1.95 + Math.random() * .12}s`);
+        column.style.setProperty("--wd", `${Math.random() * .34}s`);
+        column.style.setProperty("--wt", `${1.42 + Math.random() * .16}s`);
         column.style.setProperty("--code-mid", toDay ? "#82918c" : "#8fd8e8");
         column.style.setProperty("--code-end", toDay ? "#364d50" : "#786da0");
         wipe.appendChild(column);
       }
+      const scan = el("div", "theme-scan");
+      scan.setAttribute("aria-hidden", "true");
+      wipe.appendChild(scan);
       const veil = el("div", "theme-veil");
       veil.setAttribute("aria-hidden", "true");
       veil.style.background = toDay ? "#f2f3f2" : "#0d0e20";
       document.body.appendChild(veil);
       document.body.appendChild(wipe);
       document.documentElement.classList.add("wiping");
-      const enter = veil.animate(
-        [{ opacity: 0 }, { opacity: 1 }],
-        { duration: 1050, easing: "ease-in-out", fill: "forwards" }
-      );
-      enter.finished.then(() => {
+      const transitionDuration = 1780;
+      window.setTimeout(() => {
         syncTheme();
+      }, transitionDuration * .52);
+      window.setTimeout(() => {
         const exit = veil.animate(
-          [{ opacity: 1 }, { opacity: 0 }],
-          { duration: 1050, easing: "ease-in-out", fill: "forwards" }
+          [{ opacity: .3 }, { opacity: 0 }],
+          { duration: 300, easing: "ease-out", fill: "forwards" }
         );
         exit.finished.then(() => {
           wipe.remove();
@@ -1132,7 +1134,7 @@
           document.documentElement.classList.remove("wiping");
           wiping = false;
         });
-      });
+      }, transitionDuration - 300);
     };
     moonWrap.addEventListener("click", wipeTheme);
     /* 月亮在背景层（z-index 低于正文），被正文透明区域盖住时点击/悬停无法直达。
