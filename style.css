@@ -242,60 +242,6 @@ body {
 .hero-action-secondary { color: var(--cream); border: 1px solid var(--line); background: rgba(18, 19, 38, .75); }
 .hero-action-secondary:hover { border-color: var(--gold); }
 
-/* Desktop reading layout: the identity stays present while the resume unfolds beside it. */
-@media (min-width: 901px) {
-  .container {
-    width: min(100%, 1360px);
-    max-width: none;
-    min-height: calc(100vh - 78px);
-    padding: 34px 42px 110px;
-    display: grid;
-    grid-template-columns: minmax(340px, .72fr) minmax(0, 1.28fr);
-    align-items: start;
-    gap: clamp(38px, 6vw, 86px);
-  }
-
-  .hero {
-    position: sticky;
-    top: 92px;
-    min-height: calc(100vh - 126px);
-    height: auto;
-    padding: 22px 12px 34px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 28px;
-  }
-
-  .hero-info {
-    width: 100%;
-    max-width: 470px;
-    flex: 0 1 auto;
-  }
-
-  .hero-info .hero-summary { max-width: 470px; }
-  .hero-actions { justify-content: flex-start; }
-
-  .resume-column {
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 42px;
-  }
-
-  .resume-column .panel { scroll-margin-top: 100px; }
-  .resume-column .footer { margin-top: 0; }
-}
-
-@media (max-width: 900px) {
-  .resume-column {
-    display: flex;
-    flex-direction: column;
-    gap: 42px;
-  }
-}
-
 /* ============================================================
    塔罗牌
    ============================================================ */
