@@ -175,6 +175,8 @@ body {
 .nav-links { display: flex; gap: 22px; align-items: center; }
 .nav-links a { color: var(--dim); text-decoration: none; transition: color .15s; }
 .nav-links a:hover { color: var(--cream); text-shadow: 0 0 12px rgba(243, 233, 200, .5); }
+.nav-links a.active { color: var(--gold); text-shadow: 0 0 12px rgba(232, 196, 106, .32); }
+.nav-links a.active::before { content: "· "; color: var(--gold); }
 
 /* ---------- HERO ---------- */
 .hero {
@@ -825,8 +827,14 @@ html.day .grain { opacity: .07; }
 html.day .navbar { background: rgba(248, 249, 248, .86); border-color: var(--line); }
 html.day .panel {
   background: var(--panel);
-  box-shadow: inset 0 1px 0 #fff, 6px 6px 0 rgba(46, 58, 70, .05);
+  border-color: #c7c2b7;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .9), 6px 6px 0 rgba(112, 76, 48, .07);
 }
+html.day .section-title { color: #3b3430; text-shadow: none; }
+html.day .section-title .glyph { color: #9f3f35; }
+html.day .section-title .rule { border-color: rgba(159, 63, 53, .3); }
+html.day .nav-links a.active { color: #9f3f35; text-shadow: none; }
+html.day .nav-links a.active::before { color: #9f3f35; }
 html.day .hero-action-primary { color: #1e252c; }
 html.day .hero-action-primary {
   position: relative;

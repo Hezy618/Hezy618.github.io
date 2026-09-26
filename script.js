@@ -26,8 +26,8 @@
   $("#hero-summary").textContent = SITE.heroSummary || "";
 
   const stats = [
-    ["CURRENT", "LLM Algorithm Engineer Intern · Meituan"],
-    ["STUDY", `${SITE.degree} · ${SITE.university}`],
+    ["CURRENT", `${SITE.degree} · ${SITE.university}`],
+    ["EXPERIENCE", "6-month LLM Algorithm Engineer internship · Meituan"],
     ["BASED", SITE.location],
   ];
   const statList = $("#stat-list");
@@ -720,6 +720,19 @@
     });
   }, { threshold: 0.12 });
   document.querySelectorAll(".reveal").forEach((s) => io.observe(s));
+
+  /* Keep the compact pixel navigation synchronized with the section in view. */
+  const navLinks = [...document.querySelectorAll(".nav-links a[href^='#']")];
+  const navTargets = navLinks
+    .map((link) => ({ link, target: document.querySelector(link.getAttribute("href")) }))
+    .filter(({ target }) => target);
+  const navIO = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      navTargets.forEach(({ link, target }) => link.classList.toggle("active", target === entry.target));
+    });
+  }, { rootMargin: "-22% 0px -62% 0px", threshold: 0 });
+  navTargets.forEach(({ target }) => navIO.observe(target));
 
   /* ==================== 彩蛋：Konami 秘籍 ==================== */
   const KONAMI = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];

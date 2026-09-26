@@ -8,7 +8,7 @@ const SITE = {
   /* ---------- 基本信息 ---------- */
   name: "Zhongyu He",                      // 姓名（论文作者列表里同名会自动加粗）
   tagline: "LLM Agents · Reinforcement Learning · Post-training",
-  heroSummary: "I build and study language-model agents that learn from interaction. M.S. researcher at Xiamen University and LLM algorithm engineer intern at Meituan.",
+  heroSummary: "M.S. student in Computer Science and Technology at Xiamen University. I study LLM agents, reinforcement learning, and post-training.",
   photo: "pic/hezhongyu.jpg",              // 你的照片路径（pic/hezhongyu.jpg）
   university: "Xiamen University",
   school: "School of Informatics",         // 信息学院
@@ -40,8 +40,8 @@ const SITE = {
 
   /* ---------- About Me 简介（支持多段） ---------- */
   bio: [
-    "I am a Master's student at the School of Informatics, Xiamen University, majoring in Computer Science and Technology. My research interests include LLM agents, Agentic RL, knowledge distillation, hypergraphs, knowledge graphs, and bioinformatics.",
-    "Currently, I am an LLM Algorithm Engineer intern at Meituan (Core Local Commerce), focusing on post-training of the customer-service LLM — SFT, multi-turn dialogue Agent RL, and OPD.",
+    "I am a Master's student in Computer Science and Technology at Xiamen University. My research focuses on LLM agents, Agentic RL, knowledge distillation, hypergraphs, and bioinformatics. As a first author, I have work accepted or under review at CCF-A venues including Bioinformatics and TKDE, as well as EMNLP (CCF-B).",
+    "I previously completed a six-month internship as an LLM Algorithm Engineer at Meituan, where I worked on SFT, multi-turn dialogue Agent RL, and OPD for a customer-service language model.",
   ],
 
   /* ---------- 实习 / 工作经历 ---------- */
