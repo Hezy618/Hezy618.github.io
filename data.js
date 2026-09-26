@@ -40,7 +40,7 @@ const SITE = {
 
   /* ---------- About Me 简介（支持多段） ---------- */
   bio: [
-    "I am a Master's student in Computer Science and Technology at Xiamen University. My research focuses on LLM agents, Agentic RL, knowledge distillation, hypergraphs, and bioinformatics. As a first author, I have work accepted or under review at CCF-A venues including Bioinformatics and TKDE, as well as EMNLP (CCF-B).",
+    "I am a Master's student in Computer Science and Technology at Xiamen University. My research focuses on LLM agents, Agentic RL, knowledge distillation, hypergraphs, and bioinformatics.",
     "I previously completed a six-month internship as an LLM Algorithm Engineer at Meituan, where I worked on SFT, multi-turn dialogue Agent RL, and OPD for a customer-service language model.",
   ],
 
