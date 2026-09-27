@@ -1127,8 +1127,9 @@
 
       const wipe = el("div", "theme-wipe");
       wipe.setAttribute("aria-hidden", "true");
-      const width = 28;
-      const rows = Math.ceil(window.innerHeight / 22) * 2 + 10;
+      wipe.setAttribute("popover", "manual");
+      const width = 40;
+      const rows = Math.ceil(window.innerHeight / 24) * 2 + 8;
       const cols = Math.ceil(window.innerWidth / width);
       for (let i = 0; i < cols; i++) {
         const column = el("div", "bcol");
@@ -1137,23 +1138,27 @@
         column.style.left = `${i * width}px`;
         column.style.width = `${width}px`;
         column.style.setProperty("--wd", `${Math.random() * .16}s`);
-        column.style.setProperty("--wt", `${1.24 + Math.random() * .16}s`);
-        column.style.setProperty("--code-mid", toDay ? "#82918c" : "#8fd8e8");
-        column.style.setProperty("--code-end", toDay ? "#364d50" : "#786da0");
+        column.style.setProperty("--wt", `${1.1 + Math.random() * .12}s`);
+        column.style.setProperty("--code-color", toDay ? "#506b69" : "#8fd8e8");
         wipe.appendChild(column);
       }
-      document.body.appendChild(wipe);
-      document.documentElement.classList.add("wiping");
-      const switchAt = 680;
-      const cleanupAt = 1700;
-      window.setTimeout(() => {
+      if (!document.startViewTransition) {
         syncTheme();
-      }, switchAt);
-      window.setTimeout(() => {
-          wipe.remove();
-          document.documentElement.classList.remove("wiping");
-          wiping = false;
-      }, cleanupAt);
+        document.body.appendChild(wipe);
+        if (wipe.showPopover) wipe.showPopover();
+        setTimeout(() => { wipe.remove(); wiping = false; }, 1350);
+        return;
+      }
+
+      const transition = document.startViewTransition(syncTheme);
+      transition.ready.then(() => {
+        document.body.appendChild(wipe);
+        if (wipe.showPopover) wipe.showPopover();
+      }).catch(() => {});
+      const cleanup = () => {
+        setTimeout(() => { wipe.remove(); wiping = false; }, 550);
+      };
+      transition.finished.then(cleanup, cleanup);
     };
     moonWrap.addEventListener("click", wipeTheme);
     /* 月亮在背景层（z-index 低于正文），被正文透明区域盖住时点击/悬停无法直达。
