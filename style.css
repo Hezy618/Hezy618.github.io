@@ -987,7 +987,7 @@ html.day .moon-wrap { filter: drop-shadow(0 0 24px rgba(178, 77, 55, .2)); }
 }
 .theme-wipe .bcol {
   position: absolute; top: 0;
-  font-family: var(--font-pixel); font-size: 11px; line-height: 1.8;
+  font-family: var(--font-pixel); font-size: 10px; line-height: 2.2;
   white-space: pre; text-align: center;
   color: transparent;
   background: linear-gradient(to bottom, transparent 0%, #f8f2df 18%, var(--code-mid) 58%, var(--code-end) 100%);
@@ -1001,8 +1001,8 @@ html.day .moon-wrap { filter: drop-shadow(0 0 24px rgba(178, 77, 55, .2)); }
 @keyframes binFloat {
   0%   { transform: translateY(112vh); opacity: 0; }
   14%  { opacity: .12; }
-  28%  { opacity: .64; }
-  70%  { opacity: .46; }
+  28%  { opacity: .48; }
+  70%  { opacity: .32; }
   100% { transform: translateY(-122%); opacity: 0; }
 }
 .theme-scan {
@@ -1014,29 +1014,23 @@ html.day .moon-wrap { filter: drop-shadow(0 0 24px rgba(178, 77, 55, .2)); }
   background: var(--scan-color, #d5c48f);
   box-shadow: 0 0 12px 3px color-mix(in srgb, var(--scan-color, #d5c48f) 50%, transparent),
     0 0 50px 14px color-mix(in srgb, var(--scan-color, #d5c48f) 20%, transparent);
-  animation: scanRise 1.66s cubic-bezier(.2, .65, .28, 1) both;
+  animation: scanRise .78s cubic-bezier(.55, 0, .28, 1) both;
 }
+.theme-scan-reveal { animation-delay: .78s; }
 @keyframes scanRise {
   0% { transform: translateY(105vh); opacity: 0; }
-  12% { opacity: .72; }
-  58% { opacity: .42; }
-  88% { opacity: .12; }
+  12% { opacity: .5; }
+  58% { opacity: .35; }
+  88% { opacity: .08; }
   100% { transform: translateY(-5vh); opacity: 0; }
 }
 
-/* 换肤瞬间给主要界面元素挂上短暂的颜色过渡，让新旧主题在代码雨后面平滑融合 */
-html.wiping body, html.wiping .panel, html.wiping .navbar,
-html.wiping .badge, html.wiping .chip, html.wiping .tarot-card,
-html.wiping .pub-item, html.wiping .section-title,
-html.wiping a, html.wiping h1, html.wiping p, html.wiping li {
-  transition: background-color .45s ease, color .45s ease, border-color .45s ease;
-}
-
-/* 过场幕布：垫在代码雨（z200）之下、页面之上的目标主题底色，藏住换肤硬边 */
+/* The opaque sweep fully covers the old theme before the DOM changes. */
 .theme-veil {
   position: fixed; inset: 0; z-index: 199;
   pointer-events: none;
-  opacity: .3;
+  opacity: 1;
+  clip-path: inset(100% 0 0 0);
 }
 
 /* ---------- 马里奥奔跑场景（仅白天显示） ---------- */
