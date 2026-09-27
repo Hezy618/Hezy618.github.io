@@ -1117,32 +1117,18 @@
       const revealScan = el("div", "theme-scan theme-scan-reveal");
       revealScan.setAttribute("aria-hidden", "true");
       wipe.appendChild(revealScan);
-      const veil = el("div", "theme-veil");
-      veil.setAttribute("aria-hidden", "true");
-      veil.style.background = toDay
-        ? "linear-gradient(to bottom, #f5f5f2, #e8ecea)"
-        : "linear-gradient(to bottom, #121629, #0a0c1a)";
-      document.body.appendChild(veil);
       document.body.appendChild(wipe);
       document.documentElement.classList.add("wiping");
-      const phaseDuration = 780;
-      const cover = veil.animate(
-        [{ clipPath: "inset(100% 0 0 0)" }, { clipPath: "inset(0 0 0 0)" }],
-        { duration: phaseDuration, easing: "cubic-bezier(.55, 0, .28, 1)", fill: "forwards" }
-      );
-      cover.finished.then(() => {
+      const switchAt = 680;
+      const cleanupAt = 1700;
+      window.setTimeout(() => {
         syncTheme();
-        const reveal = veil.animate(
-          [{ clipPath: "inset(0 0 0 0)" }, { clipPath: "inset(0 0 100% 0)" }],
-          { duration: phaseDuration, easing: "cubic-bezier(.55, 0, .28, 1)", fill: "forwards" }
-        );
-        reveal.finished.then(() => {
+      }, switchAt);
+      window.setTimeout(() => {
           wipe.remove();
-          veil.remove();
           document.documentElement.classList.remove("wiping");
           wiping = false;
-        });
-      });
+      }, cleanupAt);
     };
     moonWrap.addEventListener("click", wipeTheme);
     /* 月亮在背景层（z-index 低于正文），被正文透明区域盖住时点击/悬停无法直达。
