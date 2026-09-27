@@ -672,6 +672,37 @@
     });
   }
 
+  const fireworkBox = $("#catFirework");
+  if (fireworkBox) {
+    const cat = el("div", "catframe");
+    buildCat(cat, CAT_HAPPY, 4);
+    fireworkBox.appendChild(cat);
+    fireworkBox.appendChild(el("span", "firework-sparkler"));
+
+    const celebrate = () => {
+      fireworkBox.classList.remove("celebrating");
+      void fireworkBox.offsetWidth;
+      fireworkBox.classList.add("celebrating");
+      for (let burstIndex = 0; burstIndex < 2; burstIndex++) {
+        const burst = el("span", "firework-burst");
+        burst.style.setProperty("--burst-x", burstIndex ? "76px" : "-12px");
+        burst.style.setProperty("--burst-y", burstIndex ? "-52px" : "-74px");
+        burst.style.setProperty("--burst-delay", burstIndex ? "120ms" : "0ms");
+        for (let i = 0; i < 8; i++) {
+          const spark = el("i", "firework-ray");
+          spark.style.setProperty("--ray", `${i * 45}deg`);
+          burst.appendChild(spark);
+        }
+        fireworkBox.appendChild(burst);
+        setTimeout(() => burst.remove(), 1000);
+      }
+    };
+    fireworkBox.addEventListener("click", celebrate);
+    fireworkBox.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); celebrate(); }
+    });
+  }
+
   syncCats(catsDay);   // 页面加载时按当前主题初始化所有猫的形态
   syncTarot(catsDay);  // 塔罗牌的月亮/太阳纹样与背面座右铭同理
 
