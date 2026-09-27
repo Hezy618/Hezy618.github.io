@@ -205,6 +205,7 @@ body {
 }
 .tagline { font-size: 17px; font-weight: 600; color: var(--cyan); min-height: 1.5em; margin-bottom: 14px; }
 .hero-summary { max-width: 560px; font-size: 17px; line-height: 1.6; color: var(--text); margin-bottom: 20px; }
+.hero-summary:empty { display: none; }
 .cursor { animation: blink .9s steps(1) infinite; }
 @keyframes blink { 50% { opacity: 0; } }
 
