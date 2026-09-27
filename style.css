@@ -887,6 +887,12 @@ html.day .hero-action-primary::before { display: none; }
 html.day .hero-action-primary:hover { background: #e9dfc6; border-color: #9f3f35; box-shadow: 4px 4px 0 rgba(112, 76, 48, .18); }
 html.day .hero-action-secondary { background: rgba(255, 255, 255, .88); }
 html.day .cat .cpx.c { background: #c1a66f; }
+/* Daylight ink palette for pixel cats: warm ink replaces the night-only purple outline. */
+html.day .cat .cpx.o { background: #4b4038; }
+html.day .cat .cpx.c { background: #f3eee2; }
+html.day .cat .cpx.p { background: #a44b42; }
+html.day .cat .cpx.s { background: #b89b65; }
+html.day .cat .cpx.g { background: #718383; }
 
 /* ---------- 白天论文徽章：浅底可读版（夜间配色是为深底设计的） ---------- */
 html.day .badge { color: #fff; }
