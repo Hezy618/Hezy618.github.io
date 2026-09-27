@@ -995,8 +995,8 @@ html.day .moon-wrap { filter: drop-shadow(0 0 24px rgba(178, 77, 55, .2)); }
   -webkit-background-clip: text; background-clip: text;
   opacity: 0;
   text-shadow: 0 0 10px color-mix(in srgb, var(--code-mid) 36%, transparent);
-  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 9%, #000 76%, transparent);
-  mask-image: linear-gradient(to bottom, transparent, #000 9%, #000 76%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, .08) 16%, #000 34%, #000 66%, rgba(0, 0, 0, .08) 84%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, .08) 16%, #000 34%, #000 66%, rgba(0, 0, 0, .08) 84%, transparent 100%);
   animation: binFloat var(--wt, 2.2s) linear var(--wd, 0s) both;
 }
 @keyframes binFloat {
@@ -1006,26 +1006,6 @@ html.day .moon-wrap { filter: drop-shadow(0 0 24px rgba(178, 77, 55, .2)); }
   70%  { opacity: .32; }
   100% { transform: translateY(-122%); opacity: 0; }
 }
-.theme-scan {
-  position: absolute;
-  z-index: 1;
-  left: -8%; right: -8%; top: 0;
-  height: 2px;
-  opacity: 0;
-  background: var(--scan-color, #d5c48f);
-  box-shadow: 0 0 12px 3px color-mix(in srgb, var(--scan-color, #d5c48f) 50%, transparent),
-    0 0 50px 14px color-mix(in srgb, var(--scan-color, #d5c48f) 20%, transparent);
-  animation: scanRise .78s cubic-bezier(.55, 0, .28, 1) both;
-}
-.theme-scan-reveal { animation-delay: .78s; }
-@keyframes scanRise {
-  0% { transform: translateY(105vh); opacity: 0; }
-  12% { opacity: .5; }
-  58% { opacity: .35; }
-  88% { opacity: .08; }
-  100% { transform: translateY(-5vh); opacity: 0; }
-}
-
 /* The page itself crossfades underneath the code stream; no solid curtain is used. */
 html.wiping body,
 html.wiping #starfield,

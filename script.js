@@ -1111,12 +1111,6 @@
         column.style.setProperty("--code-end", toDay ? "#364d50" : "#786da0");
         wipe.appendChild(column);
       }
-      const scan = el("div", "theme-scan");
-      scan.setAttribute("aria-hidden", "true");
-      wipe.appendChild(scan);
-      const revealScan = el("div", "theme-scan theme-scan-reveal");
-      revealScan.setAttribute("aria-hidden", "true");
-      wipe.appendChild(revealScan);
       document.body.appendChild(wipe);
       document.documentElement.classList.add("wiping");
       const switchAt = 680;
