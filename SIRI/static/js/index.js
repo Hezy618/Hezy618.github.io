@@ -9,26 +9,40 @@ document.addEventListener('DOMContentLoaded', function () {
     const controller = new AbortController();
     const timeout = setTimeout(function () { controller.abort(); }, 8000);
     try {
-      const response = await fetch('https://api.openalex.org/works/W7163219078?select=display_name,cited_by_count,ids', {
-        signal: controller.signal,
-        cache: 'no-store'
-      });
-      if (!response.ok) throw new Error('Citation service unavailable');
-      const work = await response.json();
-      if (work.ids?.doi?.toLowerCase() !== 'https://doi.org/10.48550/arxiv.2606.02355'
-          || !Number.isInteger(work.cited_by_count) || work.cited_by_count < 0) {
+      const urls = [
+        'https://raw.githubusercontent.com/Hezy618/Hezy618.github.io/main/SIRI/static/citations/siri-scholar.json',
+        'static/citations/siri-scholar.json'
+      ];
+      let record;
+      for (const url of urls) {
+        try {
+          const response = await fetch(url, { signal: controller.signal, cache: 'no-store' });
+          if (!response.ok) throw new Error('Citation snapshot unavailable');
+          record = await response.json();
+          break;
+        } catch (error) {
+          if (controller.signal.aborted) throw error;
+        }
+      }
+      const paperTitle = 'SIRI: Self-Internalizing Reinforcement Learning with Intrinsic Skills for LLM Agent Training';
+      const citationUrl = new URL(record?.citation_url);
+      if (record?.source !== 'Google Scholar' || record.title !== paperTitle
+          || !Number.isInteger(record.count) || record.count < 0
+          || citationUrl.hostname !== 'scholar.google.com'
+          || !citationUrl.searchParams.has('cites')) {
         throw new Error('Citation record mismatch');
       }
-      const count = work.cited_by_count.toLocaleString('en-US');
+      const count = record.count.toLocaleString('en-US');
       citationCount.textContent = count;
-      citationCounter.setAttribute('aria-label', `${count} citations indexed by OpenAlex; open source record`);
-      citationCounter.title = `OpenAlex citation count · checked ${new Date().toLocaleString()}`;
+      citationCounter.href = citationUrl.href;
+      citationCounter.setAttribute('aria-label', `${count} citations on Google Scholar; open citing papers`);
+      citationCounter.title = `Google Scholar citations · last updated ${new Date(record.updated_at).toLocaleDateString()}`;
       citationCounter.removeAttribute('data-unavailable');
     } catch (error) {
       citationCount.textContent = '—';
       citationCounter.dataset.unavailable = 'true';
-      citationCounter.setAttribute('aria-label', 'OpenAlex citation count is temporarily unavailable; open source record');
-      citationCounter.title = 'OpenAlex citation count is temporarily unavailable';
+      citationCounter.setAttribute('aria-label', 'Google Scholar citation count is temporarily unavailable; open citing papers');
+      citationCounter.title = 'Google Scholar citation count is temporarily unavailable';
     } finally {
       clearTimeout(timeout);
       citationLastChecked = Date.now();
