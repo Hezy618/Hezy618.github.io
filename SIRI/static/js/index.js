@@ -34,12 +34,14 @@ document.addEventListener('DOMContentLoaded', function () {
       }
       const count = record.count.toLocaleString('en-US');
       citationCount.textContent = count;
+      citationCounter.classList.add('has-count');
       citationCounter.href = citationUrl.href;
       citationCounter.setAttribute('aria-label', `${count} citations on Google Scholar; open citing papers`);
       citationCounter.title = `Google Scholar citations · last updated ${new Date(record.updated_at).toLocaleDateString()}`;
       citationCounter.removeAttribute('data-unavailable');
     } catch (error) {
       citationCount.textContent = '—';
+      citationCounter.classList.remove('has-count');
       citationCounter.dataset.unavailable = 'true';
       citationCounter.setAttribute('aria-label', 'Google Scholar citation count is temporarily unavailable; open citing papers');
       citationCounter.title = 'Google Scholar citation count is temporarily unavailable';
@@ -61,6 +63,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const reference = svg.querySelector('use');
     const symbol = reference && document.querySelector(reference.getAttribute('href'));
     if (!symbol) return;
+    svg.classList.add(symbol.id);
     svg.setAttribute('viewBox', symbol.getAttribute('viewBox'));
     reference.remove();
     const guide = document.createElementNS('http://www.w3.org/2000/svg', 'g');

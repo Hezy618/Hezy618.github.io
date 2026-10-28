@@ -57,17 +57,43 @@ button, .button, .title, .subtitle, .publication-title, .publication-authors,
   transform: rotate(-3deg);
 }
 .section-heading-small .section-doodle { width: 1.2em; height: 1.2em; }
-.section-doodle.is-complete:not(.doodle-building) { animation: sketchNudge 6s ease-in-out infinite; }
 .section-doodle .sketch-stroke {
   stroke-dasharray: var(--stroke-length, 160);
   stroke-dashoffset: var(--stroke-length, 160);
 }
 .section-doodle .doodle-guide { opacity: .16; transition: opacity .35s ease; }
 .section-doodle.is-complete .doodle-guide { opacity: 0; }
-@keyframes sketchNudge {
-  0%, 100% { transform: rotate(-3deg) translateY(0); }
-  50% { transform: rotate(-1deg) translateY(-1px); }
-}
+.section-doodle .sketch-stroke { transform-box: fill-box; transform-origin: center; }
+.doodle-spark.is-complete .spark-core.sketch-stroke { animation: sparkBreathe 4.2s ease-in-out infinite; }
+.doodle-spark.is-complete .spark-rays.sketch-stroke { animation: inkFlicker 4.2s ease-in-out infinite; }
+.doodle-nodes.is-complete .node-dot.sketch-stroke { animation: nodePulse 3.6s ease-in-out infinite; }
+.doodle-nodes.is-complete .node-dot-two.sketch-stroke { animation-delay: .65s; }
+.doodle-nodes.is-complete .node-dot-three.sketch-stroke { animation-delay: 1.3s; }
+.doodle-nodes.is-complete .node-sparks.sketch-stroke { animation: inkFlicker 3.6s ease-in-out infinite; }
+.doodle-bars.is-complete .bar-one.sketch-stroke,
+.doodle-bars.is-complete .bar-two.sketch-stroke,
+.doodle-bars.is-complete .bar-three.sketch-stroke { transform-origin: center bottom; animation: barRise 4.5s ease-in-out infinite; }
+.doodle-bars.is-complete .bar-two.sketch-stroke { animation-delay: .4s; }
+.doodle-bars.is-complete .bar-three.sketch-stroke { animation-delay: .8s; }
+.doodle-bars.is-complete .bar-arrow.sketch-stroke { animation: arrowNudge 4.5s ease-in-out infinite; }
+.doodle-wave.is-complete .wave-line.sketch-stroke { animation: waveFloat 4s ease-in-out infinite; }
+.doodle-wave.is-complete .wave-dot.sketch-stroke { animation: nodePulse 4s ease-in-out infinite; }
+.doodle-wave.is-complete .wave-dot-two.sketch-stroke { animation-delay: 1s; }
+.doodle-wave.is-complete .wave-spark.sketch-stroke { animation: inkFlicker 4s ease-in-out infinite; }
+.doodle-bulb.is-complete .bulb-glass.sketch-stroke { animation: bulbGlow 4.8s ease-in-out infinite; }
+.doodle-bulb.is-complete .bulb-rays.sketch-stroke { animation: inkFlicker 4.8s ease-in-out infinite; }
+.doodle-paper.is-complete { animation: paperSway 5.5s ease-in-out infinite; }
+.doodle-paper.is-complete .paper-line.sketch-stroke { animation: inkFlicker 5.5s ease-in-out infinite; }
+.doodle-paper.is-complete .paper-line-two.sketch-stroke { animation-delay: .35s; }
+.doodle-paper.is-complete .paper-line-three.sketch-stroke { animation-delay: .7s; }
+@keyframes sparkBreathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.12) rotate(4deg); } }
+@keyframes inkFlicker { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
+@keyframes nodePulse { 0%, 100% { transform: scale(1); } 48% { transform: scale(1.22); } }
+@keyframes barRise { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(.78); } }
+@keyframes arrowNudge { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+@keyframes waveFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-1.5px); } }
+@keyframes bulbGlow { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.065); } }
+@keyframes paperSway { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(1deg); } }
 
 .dnerf {
   font-variant: small-caps;
@@ -454,8 +480,8 @@ button, .button, .title, .subtitle, .publication-title, .publication-authors,
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .section-doodle, .section-doodle.is-complete:not(.doodle-building), .section-doodle .sketch-stroke {
-    animation: none;
+  .section-doodle, .section-doodle .sketch-stroke {
+    animation: none !important;
     transform: none;
     stroke-dashoffset: 0;
     opacity: 1;
@@ -498,30 +524,35 @@ button, .button, .title, .subtitle, .publication-title, .publication-authors,
 .citation-counter:focus-visible { outline: 2px solid #a53f52; outline-offset: 3px; }
 .citation-counter-label { font-size: .73rem; font-weight: 700; letter-spacing: .1em; line-height: 1.2; }
 .citation-counter-art { position: relative; display: grid; place-items: center; width: 5.65rem; height: 5.65rem; }
-.citation-counter-sketch { width: 100%; height: 100%; fill: none; overflow: visible; transition: transform .35s ease; }
-.citation-counter:hover .citation-counter-sketch { transform: scale(1.05); }
+.citation-counter-sketch { width: 100%; height: 100%; fill: none; overflow: visible; animation: citationBreathe 5.8s ease-in-out 1.3s infinite; }
+.citation-counter:hover .citation-counter-art { transform: scale(1.07); }
+.citation-counter-art { transition: transform .35s ease; }
 .citation-edge { fill: none; stroke: var(--edge-color); stroke-linecap: round; stroke-linejoin: round; }
 .citation-edge-main { stroke-width: 3.5; stroke-dasharray: 100; animation: citationSketch .55s cubic-bezier(.22,.61,.36,1) both; }
-.citation-edge-pencil { stroke-width: 1.5; opacity: .58; stroke-dasharray: 100; animation: citationSketch .55s cubic-bezier(.22,.61,.36,1) both; }
+.citation-edge-pencil { stroke-width: 1.5; opacity: .58; stroke-dasharray: 100; animation: citationSketch .55s cubic-bezier(.22,.61,.36,1) both, citationInk 5.8s ease-in-out 1.3s infinite; }
 .citation-edge-cyan { --edge-color: #4daabb; }
 .citation-edge-blue { --edge-color: #315aab; }
 .citation-edge-pink { --edge-color: #ce4c83; }
 .citation-edge-orange { --edge-color: #e79437; }
 .citation-edge-lime { --edge-color: #a8b63a; }
 .citation-edge-green { --edge-color: #68a96b; }
-.citation-edge-cyan path { animation-delay: .05s; }
-.citation-edge-blue path { animation-delay: .15s; }
-.citation-edge-pink path { animation-delay: .25s; }
-.citation-edge-orange path { animation-delay: .35s; }
-.citation-edge-lime path { animation-delay: .45s; }
-.citation-edge-green path { animation-delay: .55s; }
+.citation-edge-cyan path { animation-delay: .05s, 1.3s; }
+.citation-edge-blue path { animation-delay: .15s, 1.5s; }
+.citation-edge-pink path { animation-delay: .25s, 1.7s; }
+.citation-edge-orange path { animation-delay: .35s, 1.9s; }
+.citation-edge-lime path { animation-delay: .45s, 2.1s; }
+.citation-edge-green path { animation-delay: .55s, 2.3s; }
 .citation-counter strong { position: absolute; font-size: 1.45rem; line-height: 1; font-weight: 700; color: #403a35; font-variant-numeric: tabular-nums; }
+.citation-counter.has-count strong { animation: citationCountIn .45s cubic-bezier(.2,.8,.3,1) both; }
 .citation-counter-source { color: #766b63; font-size: .69rem; line-height: 1.2; }
 .citation-counter:hover .citation-counter-source { color: #8d3041; }
 @keyframes citationSketch { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }
+@keyframes citationBreathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.035); } }
+@keyframes citationInk { 0%, 100% { opacity: .58; } 50% { opacity: .9; } }
+@keyframes citationCountIn { from { opacity: .3; transform: scale(.7); } to { opacity: 1; transform: scale(1); } }
 @media (prefers-reduced-motion: reduce) {
-  .citation-counter, .citation-counter-sketch { transition: none; }
-  .citation-edge path { animation: none; }
+  .citation-counter, .citation-counter-art { transition: none; }
+  .citation-counter-sketch, .citation-edge path, .citation-counter.has-count strong { animation: none !important; }
 }
 
 .venue-badge {
