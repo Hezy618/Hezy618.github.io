@@ -50,37 +50,84 @@ document.addEventListener('DOMContentLoaded', function () {
     pagination: true
   };
 
-  const copyButton = document.getElementById('copy-bibtex');
   const bibtex = document.getElementById('bibtex-code');
   const copyStatus = document.getElementById('copy-status');
+  const citationLabels = { bibtex: 'BibTeX', acl: 'ACL', informal: 'Informal', markdown: 'Markdown', mods: 'MODS XML', endnote: 'Endnote', bibkey: 'Bibkey' };
+  let citationData;
   let statusTimer;
-  if (copyButton && bibtex && copyStatus) {
-    copyButton.addEventListener('click', async function () {
-      const text = bibtex.textContent.trim();
-      try {
-        if (navigator.clipboard && window.isSecureContext) {
-          await navigator.clipboard.writeText(text);
-        } else {
-          const selection = window.getSelection();
-          const range = document.createRange();
-          range.selectNodeContents(bibtex);
-          selection.removeAllRanges();
-          selection.addRange(range);
-          if (!document.execCommand('copy')) throw new Error('Copy unavailable');
-          selection.removeAllRanges();
-        }
-        copyButton.querySelector('span').textContent = 'Copied!';
-        copyStatus.textContent = 'BibTeX copied to clipboard.';
-      } catch (error) {
-        copyStatus.textContent = 'Copy failed. Please select the BibTeX text manually.';
-      }
-      clearTimeout(statusTimer);
-      statusTimer = setTimeout(function () {
-        copyButton.querySelector('span').textContent = 'Copy BibTeX';
-        copyStatus.textContent = '';
-      }, 2600);
-    });
+  let activeButton;
+  function citationText(format) {
+    if (format === 'bibtex') return Promise.resolve(bibtex.textContent.trim());
+    if (!citationData) {
+      citationData = fetch('static/citations/2026.emnlp-main.192.json')
+        .then(function (response) {
+          if (!response.ok) throw new Error('Citation formats unavailable');
+          return response.json();
+        })
+        .catch(function (error) { citationData = null; throw error; });
+    }
+    return citationData.then(function (data) { return data[format]; });
   }
+  async function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+    const field = document.createElement('textarea');
+    field.value = text;
+    field.style.position = 'fixed';
+    field.style.opacity = '0';
+    document.body.appendChild(field);
+    field.select();
+    const copied = document.execCommand('copy');
+    field.remove();
+    if (!copied) throw new Error('Copy unavailable');
+  }
+  function resetCopyState() {
+    if (activeButton) activeButton.classList.remove('is-copied');
+    activeButton = null;
+    if (copyStatus) copyStatus.textContent = '';
+  }
+  document.querySelectorAll('[data-citation-format]').forEach(function (button) {
+    button.addEventListener('click', async function () {
+      const format = button.dataset.citationFormat;
+      clearTimeout(statusTimer);
+      resetCopyState();
+      try {
+        const value = await citationText(format);
+        if (!value) throw new Error('Citation format missing');
+        await copyText(value);
+        button.classList.add('is-copied');
+        activeButton = button;
+        if (copyStatus) copyStatus.textContent = `${citationLabels[format]} copied`;
+      } catch (error) {
+        if (copyStatus) copyStatus.textContent = 'Copy failed. Please try again.';
+      }
+      statusTimer = setTimeout(resetCopyState, 2600);
+    });
+  });
+  const downloads = {
+    bibtex: ['2026.emnlp-main.192.bib', 'text/plain'],
+    mods: ['2026.emnlp-main.192.xml', 'application/xml'],
+    endnote: ['2026.emnlp-main.192.endf', 'text/plain']
+  };
+  document.querySelectorAll('[data-citation-download]').forEach(function (button) {
+    button.addEventListener('click', async function () {
+      const format = button.dataset.citationDownload;
+      try {
+        const value = await citationText(format);
+        if (!value) throw new Error('Citation format missing');
+        const blob = new Blob([value + '\n'], { type: downloads[format][1] + ';charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = downloads[format][0];
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+      } catch (error) {
+        if (copyStatus) copyStatus.textContent = 'Download failed. Please try again.';
+      }
+    });
+  });
 
   if (typeof bulmaCarousel !== 'undefined') {
     bulmaCarousel.attach('.carousel', options);
