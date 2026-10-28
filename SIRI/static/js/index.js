@@ -134,8 +134,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
   doodles.forEach(function (svg) { if (!svg.classList.contains('doodle-building')) prepareMorph(svg); });
-  const citationSketch = document.querySelector('.citation-counter-sketch');
-  if (citationSketch) prepareMorph(citationSketch);
 
   // Morph one continuous drawing: the roof opens while the facade folds into two walls.
   const building = document.querySelector('.doodle-building');

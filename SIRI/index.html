@@ -48,10 +48,10 @@
   <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
   <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
   <link rel="stylesheet" href="static/css/academicons.min.css">
-  <link rel="stylesheet" href="static/css/index.css?v=15">
+  <link rel="stylesheet" href="static/css/index.css?v=16">
 
   <script defer src="static/js/bulma-carousel.min.js"></script>
-  <script defer src="static/js/index.js?v=10"></script>
+  <script defer src="static/js/index.js?v=11"></script>
 </head>
 <body>
 
@@ -115,35 +115,38 @@
               <span class="citation-counter-label">CITATIONS</span>
               <span class="citation-counter-art">
                 <svg class="citation-counter-sketch" viewBox="0 0 92 92" aria-hidden="true" focusable="false">
+                  <defs>
+                    <filter id="citation-pencil-texture" x="-10%" y="-10%" width="120%" height="120%">
+                      <feTurbulence type="fractalNoise" baseFrequency=".075" numOctaves="2" seed="7" result="paper-grain"/>
+                      <feDisplacementMap in="SourceGraphic" in2="paper-grain" scale="1.35" xChannelSelector="R" yChannelSelector="G"/>
+                    </filter>
+                  </defs>
+                  <g filter="url(#citation-pencil-texture)">
                   <g class="citation-edge citation-edge-cyan">
-                    <path class="citation-edge-main" d="M46 7 Q30 15 15 25"/>
-                    <path class="citation-edge-pencil" d="M44 11 Q29 18 19 29"/>
+                    <path class="citation-edge-main" d="M46 7 C40 10 35 12 31 15 S20 22 15 25"/>
+                    <path class="citation-edge-ink" d="M42 6 Q29 11 17 22"/>
                   </g>
                   <g class="citation-edge citation-edge-blue">
-                    <path class="citation-edge-main" d="M46 7 Q62 15 77 25"/>
-                    <path class="citation-edge-pencil" d="M48 11 Q63 18 73 29"/>
+                    <path class="citation-edge-main" d="M46 7 C52 10 57 12 61 15 S72 22 77 25"/>
+                    <path class="citation-edge-ink" d="M50 6 Q63 11 75 22"/>
                   </g>
                   <g class="citation-edge citation-edge-pink">
-                    <path class="citation-edge-main" d="M77 25 Q79 46 77 67"/>
-                    <path class="citation-edge-pencil" d="M73 29 Q74 46 73 63"/>
+                    <path class="citation-edge-main" d="M77 25 C78 33 78 40 77 46 C78 53 78 60 77 67"/>
+                    <path class="citation-edge-ink" d="M80 32 Q81 47 79 61"/>
                   </g>
                   <g class="citation-edge citation-edge-orange">
-                    <path class="citation-edge-main" d="M77 67 Q62 76 46 85"/>
-                    <path class="citation-edge-pencil" d="M73 63 Q62 72 48 81"/>
+                    <path class="citation-edge-main" d="M77 67 C72 71 65 74 60 77 S51 82 46 85"/>
+                    <path class="citation-edge-ink" d="M75 72 Q62 82 50 86"/>
                   </g>
                   <g class="citation-edge citation-edge-lime">
-                    <path class="citation-edge-main" d="M46 85 Q30 76 15 67"/>
-                    <path class="citation-edge-pencil" d="M44 81 Q30 72 19 63"/>
+                    <path class="citation-edge-main" d="M46 85 C41 82 36 79 32 77 S20 71 15 67"/>
+                    <path class="citation-edge-ink" d="M42 86 Q30 82 17 72"/>
                   </g>
                   <g class="citation-edge citation-edge-green">
-                    <path class="citation-edge-main" d="M15 67 Q13 46 15 25"/>
-                    <path class="citation-edge-pencil" d="M19 63 Q18 46 19 29"/>
+                    <path class="citation-edge-main" d="M15 67 C14 60 14 53 15 46 C14 40 14 33 15 25"/>
+                    <path class="citation-edge-ink" d="M12 61 Q11 47 13 32"/>
                   </g>
-                  <path class="citation-facet citation-facet-blue" data-start=".12" data-end=".66" data-morph-from="M15 25 Q15 25 15 25" d="M15 25 Q34 19 57 15"/>
-                  <path class="citation-facet citation-facet-cyan" data-start=".25" data-end=".77" data-morph-from="M15 25 Q15 25 15 25 L15 25" d="M15 25 Q25 39 28 54 L15 67"/>
-                  <path class="citation-facet citation-facet-pink" data-start=".28" data-end=".81" data-morph-from="M77 25 Q77 25 77 25 L77 25" d="M77 25 Q69 38 70 53 L77 67"/>
-                  <path class="citation-facet citation-facet-lime" data-start=".42" data-end=".94" data-morph-from="M15 67 Q15 67 15 67 L15 67" d="M15 67 Q28 63 34 67 L46 85"/>
-                  <path class="citation-facet citation-facet-orange" data-start=".45" data-end=".96" data-morph-from="M77 67 Q77 67 77 67 L77 67" d="M77 67 Q63 62 58 66 L46 85"/>
+                  </g>
                 </svg>
                 <strong id="citation-count" aria-live="polite">—</strong>
               </span>
