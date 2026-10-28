@@ -1,4 +1,46 @@
 document.addEventListener('DOMContentLoaded', function () {
+  const citationCounter = document.getElementById('citation-counter');
+  const citationCount = document.getElementById('citation-count');
+  let citationLoading = false;
+  let citationLastChecked = 0;
+  async function refreshCitationCount() {
+    if (!citationCounter || !citationCount || citationLoading) return;
+    citationLoading = true;
+    const controller = new AbortController();
+    const timeout = setTimeout(function () { controller.abort(); }, 8000);
+    try {
+      const response = await fetch('https://api.openalex.org/works/W7163219078?select=display_name,cited_by_count,ids', {
+        signal: controller.signal,
+        cache: 'no-store'
+      });
+      if (!response.ok) throw new Error('Citation service unavailable');
+      const work = await response.json();
+      if (work.ids?.doi?.toLowerCase() !== 'https://doi.org/10.48550/arxiv.2606.02355'
+          || !Number.isInteger(work.cited_by_count) || work.cited_by_count < 0) {
+        throw new Error('Citation record mismatch');
+      }
+      const count = work.cited_by_count.toLocaleString('en-US');
+      citationCount.textContent = count;
+      citationCounter.setAttribute('aria-label', `${count} citations indexed by OpenAlex; open source record`);
+      citationCounter.title = `OpenAlex citation count · checked ${new Date().toLocaleString()}`;
+      citationCounter.removeAttribute('data-unavailable');
+    } catch (error) {
+      citationCount.textContent = '—';
+      citationCounter.dataset.unavailable = 'true';
+      citationCounter.setAttribute('aria-label', 'OpenAlex citation count is temporarily unavailable; open source record');
+      citationCounter.title = 'OpenAlex citation count is temporarily unavailable';
+    } finally {
+      clearTimeout(timeout);
+      citationLastChecked = Date.now();
+      citationLoading = false;
+    }
+  }
+  refreshCitationCount();
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden && Date.now() - citationLastChecked > 15 * 60 * 1000) refreshCitationCount();
+  });
+  setInterval(function () { if (!document.hidden) refreshCitationCount(); }, 15 * 60 * 1000);
+
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const doodles = document.querySelectorAll('.section-doodle');
   doodles.forEach(function (svg) {

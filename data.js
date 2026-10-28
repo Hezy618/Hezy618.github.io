@@ -88,7 +88,7 @@ const SITE = {
       extraLevels: ["CORE A*", "TH-CPL A"],   // EMNLP: CORE2023 起 A*，清华 TH-CPL A 类
       keywords: ["LLM Agents", "Agentic RL", "SKILL", "Self-Distillation"],
       links: {
-        PDF: "https://aclanthology.org/2026.emnlp-main.192.pdf",
+        "ACL Anthology": "https://aclanthology.org/2026.emnlp-main.192/",
         Homepage: "https://hezy618.github.io/SIRI",
       },
     },

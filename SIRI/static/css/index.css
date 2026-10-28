@@ -479,6 +479,28 @@ button, .button, .title, .subtitle, .publication-title, .publication-authors,
   color: #666;
   font-size: 0.9rem;
 }
+.citation-counter {
+  display: inline-flex;
+  align-items: center;
+  gap: .48rem;
+  min-height: 2.3rem;
+  margin-top: .65rem;
+  padding: .33rem .8rem;
+  border: 1px solid #e6d6cd;
+  border-radius: 999px;
+  background: #fffaf7;
+  color: #514340;
+  box-shadow: 0 2px 0 rgba(118, 73, 61, .06);
+  font-size: .85rem;
+  line-height: 1;
+  text-decoration: none;
+  transition: border-color .2s ease, background-color .2s ease, transform .2s ease;
+}
+.citation-counter:hover { color: #713e42; border-color: #c79f96; background: #fff3ed; transform: translateY(-1px); }
+.citation-counter:focus-visible { outline: 2px solid #a53f52; outline-offset: 3px; }
+.citation-counter svg { width: 1.05rem; height: 1.05rem; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.citation-counter strong { color: #8d3041; font-size: 1.16rem; font-variant-numeric: tabular-nums; }
+.citation-counter small { margin-left: .22rem; padding-left: .65rem; border-left: 1px solid #e0cfc8; color: #88706a; font-size: .7rem; }
 
 .venue-badge {
   display: inline-block;
