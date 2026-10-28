@@ -59,52 +59,83 @@ document.addEventListener('DOMContentLoaded', function () {
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const doodles = document.querySelectorAll('.section-doodle');
-  doodles.forEach(function (svg) {
+  const numberPattern = /[-+]?(?:\d*\.\d+|\d+\.?\d*)/g;
+  const morphStates = [];
+  function prepareMorph(svg) {
     const reference = svg.querySelector('use');
     const symbol = reference && document.querySelector(reference.getAttribute('href'));
-    if (!symbol) return;
-    svg.classList.add(symbol.id);
-    svg.setAttribute('viewBox', symbol.getAttribute('viewBox'));
-    reference.remove();
-    const guide = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-    guide.classList.add('doodle-guide');
-    [...symbol.children].forEach(function (source) { guide.appendChild(source.cloneNode(true)); });
-    svg.appendChild(guide);
-    [...symbol.children].forEach(function (source) {
-      const stroke = source.cloneNode(true);
-      stroke.classList.add('sketch-stroke');
-      svg.appendChild(stroke);
-      const length = Math.ceil(stroke.getTotalLength() + 2);
-      stroke.style.setProperty('--stroke-length', `${length}px`);
-    });
-  });
-
-  function finishDoodle(svg) {
-    svg.querySelectorAll('.sketch-stroke').forEach(function (stroke) {
-      stroke.getAnimations().forEach(function (animation) { animation.cancel(); });
-      stroke.style.strokeDashoffset = '0px';
-      stroke.style.opacity = '1';
-    });
-    svg.classList.add('is-complete');
-  }
-  function revealDoodle(svg) {
-    if (svg.dataset.drawStarted) return;
-    svg.dataset.drawStarted = 'true';
-    const strokes = [...svg.querySelectorAll('.sketch-stroke')];
-    if (reducedMotion.matches || !Element.prototype.animate) {
-      finishDoodle(svg);
-      return;
+    if (symbol) {
+      svg.classList.add(symbol.id);
+      svg.setAttribute('viewBox', symbol.getAttribute('viewBox'));
+      reference.remove();
+      [...symbol.children].forEach(function (source) { svg.appendChild(source.cloneNode(true)); });
     }
-    const animations = strokes.map(function (stroke, index) {
-      const length = stroke.style.getPropertyValue('--stroke-length');
-      const animation = stroke.animate([
-        { strokeDashoffset: length, opacity: .18 },
-        { strokeDashoffset: '0px', opacity: 1 }
-      ], { duration: 620, delay: index * 150, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'forwards' });
-      return animation.finished.catch(function () {});
-    });
-    Promise.all(animations).then(function () { finishDoodle(svg); });
+    const parts = [...svg.querySelectorAll('[data-morph-from], [data-from-cx], [data-appear]')].map(function (element) {
+      const from = element.dataset.morphFrom;
+      const to = element.getAttribute('d');
+      const fromNumbers = from && from.match(numberPattern)?.map(Number);
+      const toNumbers = from && to.match(numberPattern)?.map(Number);
+      if (from && fromNumbers.length !== toNumbers.length) {
+        console.warn('Skipping incompatible doodle path', element);
+        return null;
+      }
+      const pathParts = from && to.split(numberPattern);
+      const circle = element.hasAttribute('data-from-cx') && ['cx', 'cy', 'r'].map(function (attr) {
+        return [attr, Number(element.dataset[`from${attr[0].toUpperCase()}${attr.slice(1)}`]), Number(element.getAttribute(attr))];
+      });
+      return { element, fromNumbers, toNumbers, pathParts, circle,
+        appear: element.dataset.appear === undefined ? null : Number(element.dataset.appear),
+        start: Number(element.dataset.start || 0), end: Number(element.dataset.end || 1) };
+    }).filter(Boolean);
+    const state = { svg, parts, visible: false, active: false, elapsed: 0, start: 0,
+      duration: svg.classList.contains('doodle-sprout') ? 7600 : 6400 };
+    morphStates.push(state);
+    drawMorph(state, reducedMotion.matches ? 1 : 0);
+    return state;
   }
+  function drawMorph(state, depth) {
+    state.parts.forEach(function (part) {
+      const t = ease(Math.max(0, Math.min(1, (depth - part.start) / (part.end - part.start))));
+      if (part.fromNumbers) {
+        const values = part.fromNumbers.map(function (value, i) { return +(value + (part.toNumbers[i] - value) * t).toFixed(2); });
+        part.element.setAttribute('d', part.pathParts.map(function (text, i) { return text + (values[i] ?? ''); }).join(''));
+      }
+      if (part.circle) part.circle.forEach(function ([attr, from, to]) {
+        part.element.setAttribute(attr, +(from + (to - from) * t).toFixed(2));
+      });
+      if (part.appear !== null) part.element.style.opacity = ease(Math.max(0, Math.min(1, (depth - part.appear) / (1 - part.appear))));
+    });
+  }
+  function morphDepth(phase) {
+    if (phase < .07) return 0;
+    if (phase < .42) return ease((phase - .07) / .35);
+    if (phase < .73) return 1;
+    if (phase < .95) return 1 - ease((phase - .73) / .22);
+    return 0;
+  }
+  let morphFrame = 0;
+  function morphTick(now) {
+    morphFrame = 0;
+    morphStates.forEach(function (state) {
+      if (!state.active) return;
+      drawMorph(state, morphDepth(((now - state.start) % state.duration) / state.duration));
+    });
+    if (morphStates.some(function (state) { return state.active; })) morphFrame = requestAnimationFrame(morphTick);
+  }
+  function setMorphActive(state, active) {
+    if (state.active === active) return;
+    state.active = active;
+    if (active) state.start = performance.now() - state.elapsed;
+    else state.elapsed = (performance.now() - state.start) % state.duration;
+    if (active && !morphFrame) morphFrame = requestAnimationFrame(morphTick);
+    if (!active && morphFrame && !morphStates.some(function (item) { return item.active; })) {
+      cancelAnimationFrame(morphFrame);
+      morphFrame = 0;
+    }
+  }
+  doodles.forEach(function (svg) { if (!svg.classList.contains('doodle-building')) prepareMorph(svg); });
+  const citationSketch = document.querySelector('.citation-counter-sketch');
+  if (citationSketch) prepareMorph(citationSketch);
 
   // Morph one continuous drawing: the roof opens while the facade folds into two walls.
   const building = document.querySelector('.doodle-building');
@@ -166,30 +197,39 @@ document.addEventListener('DOMContentLoaded', function () {
         if (entry.target === building) {
           buildingVisible = entry.isIntersecting;
           setBuildingActive(buildingVisible && !document.hidden && !reducedMotion.matches);
-        } else if (entry.isIntersecting) {
-          revealDoodle(entry.target);
-          doodleObserver.unobserve(entry.target);
+        } else {
+          const state = morphStates.find(function (item) { return item.svg === entry.target; });
+          if (!state) return;
+          state.visible = entry.isIntersecting;
+          setMorphActive(state, state.visible && !document.hidden && !reducedMotion.matches);
         }
       });
     }, { rootMargin: '40px 0px' });
-    doodles.forEach(function (svg) { doodleObserver.observe(svg); });
+    if (building) doodleObserver.observe(building);
+    morphStates.forEach(function (state) { doodleObserver.observe(state.svg); });
   } else {
-    doodles.forEach(function (svg) { if (svg !== building) revealDoodle(svg); });
+    morphStates.forEach(function (state) { state.visible = true; setMorphActive(state, !reducedMotion.matches); });
     buildingVisible = true;
     setBuildingActive(!reducedMotion.matches);
   }
   document.addEventListener('visibilitychange', function () {
     setBuildingActive(buildingVisible && !document.hidden && !reducedMotion.matches);
+    morphStates.forEach(function (state) { setMorphActive(state, state.visible && !document.hidden && !reducedMotion.matches); });
   });
   reducedMotion.addEventListener('change', function () {
     if (reducedMotion.matches) {
       setBuildingActive(false);
       drawBuilding(1);
-      doodles.forEach(function (svg) { if (svg !== building) finishDoodle(svg); });
+      morphStates.forEach(function (state) { setMorphActive(state, false); drawMorph(state, 1); });
     } else {
       buildingElapsed = 0;
       drawBuilding(0);
       setBuildingActive(buildingVisible && !document.hidden);
+      morphStates.forEach(function (state) {
+        state.elapsed = 0;
+        drawMorph(state, 0);
+        setMorphActive(state, state.visible && !document.hidden);
+      });
     }
   });
 
