@@ -48,7 +48,7 @@
   <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
   <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
   <link rel="stylesheet" href="static/css/academicons.min.css">
-  <link rel="stylesheet" href="static/css/index.css?v=17">
+  <link rel="stylesheet" href="static/css/index.css?v=18">
 
   <script defer src="static/js/bulma-carousel.min.js"></script>
   <script defer src="static/js/index.js?v=11"></script>
@@ -550,7 +550,10 @@
       <div class="columns is-centered">
         <div class="column is-half">
           <div class="skill-card">
-            <p class="skill-card-title">Skill Example — ALFWorld</p>
+            <div class="window-toolbar skill-card-toolbar">
+              <span class="window-lights" aria-hidden="true"><span></span><span></span><span></span></span>
+              <p class="skill-card-title">Skill Example — ALFWorld</p>
+            </div>
             <div class="skill-card-body">
               <p><b>When to apply:</b> When the required object is not found at the initial search location and must be located to proceed with the task.</p>
               <p><b>Strategy:</b> Evaluate the current observation to confirm the object's absence, then systematically navigate to the next most logical storage receptacle based on the object's typical context.</p>
@@ -560,7 +563,10 @@
         </div>
         <div class="column is-half">
           <div class="skill-card">
-            <p class="skill-card-title">Skill Example — WebShop</p>
+            <div class="window-toolbar skill-card-toolbar">
+              <span class="window-lights" aria-hidden="true"><span></span><span></span><span></span></span>
+              <p class="skill-card-title">Skill Example — WebShop</p>
+            </div>
             <div class="skill-card-body">
               <p><b>When to apply:</b> When a product page is open and specific attribute variations must be chosen to match task requirements.</p>
               <p><b>Strategy:</b> Configure the product by selecting all required options, confirm that constraints like price remain satisfied, and finalize the transaction.</p>
@@ -594,11 +600,13 @@
       <button class="citation-format-button" type="button" data-citation-format="endnote">Endnote</button>
       <button class="citation-format-button" type="button" data-citation-format="bibkey">Bibkey</button>
     </div>
-    <div class="citation-code-heading">
-      <h3 class="title is-5">BibTeX</h3>
-      <div class="citation-code-actions"><span class="citation-copy-status" id="copy-status" role="status" aria-live="polite"></span><button class="citation-copy" id="copy-bibtex" type="button" data-citation-format="bibtex" aria-label="Copy BibTeX citation"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="6" y="5" width="10" height="12" rx="1.4"/><path d="M13 5V3.5A1.5 1.5 0 0 0 11.5 2h-7A1.5 1.5 0 0 0 3 3.5v9A1.5 1.5 0 0 0 4.5 14H6"/></svg><span>Copy</span></button></div>
-    </div>
-    <pre class="citation-code"><code id="bibtex-code">@inproceedings{he-etal-2026-siri,
+    <div class="citation-window">
+      <div class="window-toolbar citation-code-heading">
+        <span class="window-lights" aria-hidden="true"><span></span><span></span><span></span></span>
+        <h3 class="title is-5">BibTeX</h3>
+        <div class="citation-code-actions"><span class="citation-copy-status" id="copy-status" role="status" aria-live="polite"></span><button class="citation-copy" id="copy-bibtex" type="button" data-citation-format="bibtex" aria-label="Copy BibTeX citation"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="6" y="5" width="10" height="12" rx="1.4"/><path d="M13 5V3.5A1.5 1.5 0 0 0 11.5 2h-7A1.5 1.5 0 0 0 3 3.5v9A1.5 1.5 0 0 0 4.5 14H6"/></svg><span>Copy</span></button></div>
+      </div>
+      <pre class="citation-code"><code id="bibtex-code">@inproceedings{he-etal-2026-siri,
     title = "{SIRI}: Self-Internalizing Reinforcement Learning with Intrinsic Skills for {LLM} Agent Training",
     author = "He, Zhongyu  and
       Li, Yuanfan  and
@@ -626,11 +634,12 @@
     ISBN = "979-8-89176-459-0",
     abstract = "Long-horizon LLM agents can benefit from reusable skills, yet existing skill-based methods often rely on external skill generators during training or persistent skill retrieval at inference, increasing engineering complexity, context length, and deployment latency. We propose Self-Internalizing Reinforcement learning with Intrinsic skills (SIRI), a three-phase framework that enables agents to discover, validate, and internalize skills without external skill generators or inference-time skill banks. SIRI first warms up the policy with GiGPO to acquire basic interaction ability and collect successful skill-free trajectories. It then performs self-skill mining, where the current policy summarizes compact skills from its own successful plain rollouts and validates them through paired skill-augmented and skill-free rollouts. Finally, SIRI distills only beneficial skill-guided action tokens into the plain policy using trajectory-level utility and action-level advantage. At inference, the agent runs with the original prompt only. On ALFWorld and WebShop with Qwen2.5-7B-Instruct, SIRI improves GiGPO from 0.908 to 0.930 on ALFWorld and from 0.728 to 0.813 on WebShop, outperforming prompt-based, RL-based, and memory-augmented baselines. Further analysis shows that our self-mining strategy can achieve performance comparable to distillation with closed-source large model."
 }</code></pre>
-    <div class="citation-downloads" aria-label="Download citation files">
-      <span>Download</span>
-      <button type="button" data-citation-download="bibtex">BibTeX .bib</button>
-      <button type="button" data-citation-download="mods">MODS .xml</button>
-      <button type="button" data-citation-download="endnote">Endnote .endf</button>
+      <div class="citation-downloads" aria-label="Download citation files">
+        <span>Download</span>
+        <button type="button" data-citation-download="bibtex">BibTeX .bib</button>
+        <button type="button" data-citation-download="mods">MODS .xml</button>
+        <button type="button" data-citation-download="endnote">Endnote .endf</button>
+      </div>
     </div>
   </div>
 </section>
