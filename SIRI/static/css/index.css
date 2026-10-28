@@ -57,41 +57,16 @@ button, .button, .title, .subtitle, .publication-title, .publication-authors,
   transform: rotate(-3deg);
 }
 .section-heading-small .section-doodle { width: 1.2em; height: 1.2em; }
-.section-doodle.is-drawing { animation: sketchNudge 5.4s ease-in-out infinite; }
-.doodle-building.is-drawing { animation-duration: 6.6s; }
+.section-doodle.is-complete:not(.doodle-building) { animation: sketchNudge 6s ease-in-out infinite; }
 .section-doodle .sketch-stroke {
   stroke-dasharray: var(--stroke-length, 160);
   stroke-dashoffset: var(--stroke-length, 160);
 }
-.section-doodle .doodle-guide { opacity: .16; }
-.section-doodle.is-drawing .sketch-stroke {
-  animation: sketchLine 5.4s ease-in-out var(--draw-delay, 0ms) infinite;
-}
-.doodle-building .building-frame { opacity: 0; }
-.doodle-building .building-frame-one { opacity: 1; }
-.doodle-building.is-drawing .building-frame-one { animation: buildingOne 6.6s ease-in-out infinite; }
-.doodle-building.is-drawing .building-frame-two { animation: buildingTwo 6.6s ease-in-out infinite; }
-.doodle-building.is-drawing .building-frame-three { animation: buildingThree 6.6s ease-in-out infinite; }
-@keyframes buildingOne {
-  0%, 20%, 94%, 100% { opacity: 1; }
-  26%, 88% { opacity: 0; }
-}
-@keyframes buildingTwo {
-  0%, 19%, 52%, 100% { opacity: 0; }
-  26%, 45% { opacity: 1; }
-}
-@keyframes buildingThree {
-  0%, 44%, 94%, 100% { opacity: 0; }
-  52%, 88% { opacity: 1; }
-}
-@keyframes sketchLine {
-  0%, 4% { stroke-dashoffset: var(--stroke-length, 160); opacity: .15; }
-  27%, 74% { stroke-dashoffset: 0; opacity: 1; }
-  94%, 100% { stroke-dashoffset: var(--stroke-length, 160); opacity: .15; }
-}
+.section-doodle .doodle-guide { opacity: .16; transition: opacity .35s ease; }
+.section-doodle.is-complete .doodle-guide { opacity: 0; }
 @keyframes sketchNudge {
-  0%, 100% { transform: rotate(-3deg) translateY(1px); }
-  42%, 72% { transform: rotate(2deg) translateY(-2px); }
+  0%, 100% { transform: rotate(-3deg) translateY(0); }
+  50% { transform: rotate(-1deg) translateY(-1px); }
 }
 
 .dnerf {
@@ -479,16 +454,13 @@ button, .button, .title, .subtitle, .publication-title, .publication-authors,
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .section-doodle, .section-doodle.is-drawing, .section-doodle .sketch-stroke {
+  .section-doodle, .section-doodle.is-complete:not(.doodle-building), .section-doodle .sketch-stroke {
     animation: none;
     transform: none;
     stroke-dashoffset: 0;
     opacity: 1;
   }
-  .doodle-building .building-frame,
-  .doodle-building.is-drawing .building-frame { animation: none; opacity: 0; }
-  .doodle-building .building-frame-three,
-  .doodle-building.is-drawing .building-frame-three { opacity: 1; }
+  .section-doodle .doodle-guide { opacity: 0; transition: none; }
   .publication-links .external-link.button.is-dark { transition: none; }
 }
 
