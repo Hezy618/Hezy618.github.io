@@ -1,6 +1,11 @@
 body {
-  font-family: 'Noto Sans', sans-serif;
+  font-family: 'Comic Sans MS', 'Comic Neue', cursive;
 }
+button, .button, .title, .subtitle, .publication-title, .publication-authors,
+.venue-badge, .citation-facts, .results-table, .skill-card {
+  font-family: 'Comic Sans MS', 'Comic Neue', cursive;
+}
+#BibTeX pre, #BibTeX code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 
 
 .footer .icon-link {
@@ -41,21 +46,34 @@ body {
   flex-wrap: wrap;
 }
 .section-doodle {
-  width: 1.2em;
-  height: 1.2em;
+  width: 1.35em;
+  height: 1.35em;
   flex: 0 0 auto;
   fill: none;
-  stroke: #bb6d68;
-  stroke-width: 2;
+  stroke: #413a36;
+  stroke-width: 1.7;
   stroke-linecap: round;
   stroke-linejoin: round;
-  animation: doodleFloat 5s ease-in-out infinite;
+  transform: rotate(-3deg);
 }
-.section-heading-small .section-doodle { width: 1.1em; height: 1.1em; }
-.section-heading:nth-of-type(even) .section-doodle { animation-delay: -2s; }
-@keyframes doodleFloat {
-  0%, 100% { transform: rotate(-4deg) translateY(0); }
-  50% { transform: rotate(5deg) translateY(-3px); }
+.section-heading-small .section-doodle { width: 1.2em; height: 1.2em; }
+.section-doodle.is-drawing { animation: sketchNudge 5.4s ease-in-out infinite; }
+.section-doodle .sketch-stroke {
+  stroke-dasharray: var(--stroke-length, 160);
+  stroke-dashoffset: var(--stroke-length, 160);
+}
+.section-doodle .doodle-guide { opacity: .16; }
+.section-doodle.is-drawing .sketch-stroke {
+  animation: sketchLine 5.4s ease-in-out var(--draw-delay, 0ms) infinite;
+}
+@keyframes sketchLine {
+  0%, 4% { stroke-dashoffset: var(--stroke-length, 160); opacity: .15; }
+  27%, 74% { stroke-dashoffset: 0; opacity: 1; }
+  94%, 100% { stroke-dashoffset: var(--stroke-length, 160); opacity: .15; }
+}
+@keyframes sketchNudge {
+  0%, 100% { transform: rotate(-3deg) translateY(1px); }
+  42%, 72% { transform: rotate(2deg) translateY(-2px); }
 }
 
 .dnerf {
@@ -69,7 +87,7 @@ body {
 }
 
 .teaser {
-  font-family: 'Google Sans', sans-serif;
+  font-family: 'Comic Sans MS', 'Comic Neue', cursive;
 }
 
 
@@ -93,11 +111,11 @@ body {
 }
 
 .publication-title {
-    font-family: 'Google Sans', sans-serif;
+    font-family: 'Comic Sans MS', 'Comic Neue', cursive;
 }
 
 .publication-authors {
-    font-family: 'Google Sans', sans-serif;
+    font-family: 'Comic Sans MS', 'Comic Neue', cursive;
 }
 
 .publication-venue {
@@ -425,7 +443,12 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .section-doodle { animation: none; }
+  .section-doodle, .section-doodle.is-drawing, .section-doodle .sketch-stroke {
+    animation: none;
+    transform: none;
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
   .publication-links .external-link.button.is-dark { transition: none; }
 }
 
