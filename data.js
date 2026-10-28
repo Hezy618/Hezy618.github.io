@@ -83,12 +83,12 @@ const SITE = {
       authors: ["Zhongyu He*", "Yuanfan Li*", "Fei Huang", "Tianyu Chen", "Siyuan Chen", "Xingyang Li", "Meng Hsuan Yu", "Xiangrong Liu", "Leyi Wei", "Lu Pan", "Ke Zeng", "Xunliang Cai"],   // * 共同一作
       venue: "EMNLP (Main Conference)",
       year: 2026,
-      status: "Accepted",
+      status: "Published",
       level: "CCF-B",
       extraLevels: ["CORE A*", "TH-CPL A"],   // EMNLP: CORE2023 起 A*，清华 TH-CPL A 类
       keywords: ["LLM Agents", "Agentic RL", "SKILL", "Self-Distillation"],
       links: {
-        PDF: "https://arxiv.org/pdf/2606.02355",
+        PDF: "https://aclanthology.org/2026.emnlp-main.192.pdf",
         Homepage: "https://hezy618.github.io/SIRI",
       },
     },
