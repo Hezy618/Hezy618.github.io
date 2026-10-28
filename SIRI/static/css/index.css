@@ -501,6 +501,12 @@ button, .button, .title, .subtitle, .publication-title, .publication-authors,
 .citation-edge-orange { --edge-color: #e79437; }
 .citation-edge-lime { --edge-color: #a8b63a; }
 .citation-edge-green { --edge-color: #68a96b; }
+.citation-fold { fill: none; stroke-linecap: round; stroke-linejoin: round; opacity: .8; }
+.citation-fold-blue { stroke: #315aab; stroke-width: 2.1; }
+.citation-fold-cyan { stroke: #4daabb; stroke-width: 2.15; }
+.citation-fold-pink { stroke: #ce4c83; stroke-width: 1.95; }
+.citation-fold-lime { stroke: #a8b63a; stroke-width: 2.25; }
+.citation-fold-orange { stroke: #e79437; stroke-width: 2.05; }
 .citation-counter strong { position: absolute; font-size: 1.45rem; line-height: 1; font-weight: 700; color: #403a35; font-variant-numeric: tabular-nums; }
 .citation-counter.has-count strong { animation: citationCountIn .45s cubic-bezier(.2,.8,.3,1) both; }
 .citation-counter-source { color: #766b63; font-size: .69rem; line-height: 1.2; }
