@@ -74,91 +74,14 @@ button, .button, .title, .subtitle, .publication-title, .publication-authors,
   font-family: 'Comic Sans MS', 'Comic Neue', cursive;
 }
 
-/* The motivation sketch lives directly on the page, like the heading doodles. */
-.motivation-heading { margin: .2rem auto .75rem; }
-.motivation-story { width: min(100%, 960px); margin: 0 auto; }
-.motivation-story svg { display: block; width: 100%; height: auto; }
-.story-sketch { stroke-linecap: round; stroke-linejoin: round; }
-.story-labels { fill: #5b5149; font-size: 13px; font-weight: 700; letter-spacing: 1px; }
-.story-bottom-labels { fill: #8b8075; font-size: 12px; }
-.story-trail { stroke-dasharray: 6 8; opacity: .5; }
-.story-agent-motion { animation: storyAgent 13s cubic-bezier(.38,.02,.26,.99) infinite; }
-.story-agent { animation: storyAgentBreath 1.8s ease-in-out infinite; }
-.story-world { animation: storyWorld 13s ease-in-out infinite; }
-.story-bump { animation: storyBump 13s ease-in-out infinite; }
-.story-false-route { animation: storyFalseRoute 13s ease-in-out infinite; }
-.story-success { animation: storySuccess 13s ease-in-out infinite; }
-.story-note { transform-box: fill-box; transform-origin: center; animation: storyNote 13s ease-in-out infinite; }
-.story-note-route { stroke-dasharray: 125; animation: storyNoteRoute 13s ease-in-out infinite; }
-.story-check { animation: storyCheck 13s ease-in-out infinite; }
-.story-memory { animation: storyMemory 13s ease-in-out infinite; }
-.story-final-world { animation: storyFinalWorld 13s ease-in-out infinite; }
-.story-final-route { stroke-dasharray: 155; animation: storyFinalRoute 13s ease-in-out infinite; }
-.story-final-spark { transform-box: fill-box; transform-origin: center; animation: storyFinalSpark 13s ease-in-out infinite; }
-.story-labels text:nth-child(1), .story-bottom-labels text:nth-child(1) { animation: storyLabelOne 13s ease-in-out infinite; }
-.story-labels text:nth-child(2), .story-bottom-labels text:nth-child(2) { animation: storyLabelTwo 13s ease-in-out infinite; }
-.story-labels text:nth-child(3), .story-bottom-labels text:nth-child(3) { animation: storyLabelThree 13s ease-in-out infinite; }
-.motivation-caption { max-width: 730px; margin: 1rem auto .3rem; text-align: center; color: #6f655e; font-size: .89rem; line-height: 1.6; }
-.motivation-original { width: fit-content; max-width: 100%; margin: .45rem auto 0; text-align: center; color: #8c7669; font-size: .8rem; }
-.motivation-original summary { cursor: pointer; text-decoration: underline; text-decoration-color: #c8b8aa; text-underline-offset: 3px; }
-.motivation-original img { display: block; width: min(100%, 760px); margin: 1rem auto 0; border-radius: 12px; }
-
-@keyframes storyAgent {
-  0%, 4% { transform: translate(0,0); opacity: 0; }
-  8% { transform: translate(0,0); opacity: 1; }
-  17% { transform: translate(151px,0); }
-  19% { transform: translate(159px,0); }
-  22% { transform: translate(143px,0); }
-  30% { transform: translate(235px,-27px); }
-  38%, 58% { transform: translate(340px,20px); opacity: 1; }
-  76%, 91% { transform: translate(635px,0); opacity: 1; }
-  97%, 100% { transform: translate(635px,0); opacity: 0; }
-}
-@keyframes storyAgentBreath { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
-@keyframes storyWorld { 0%, 5% { opacity: .35; } 12%, 38% { opacity: 1; } 50%, 100% { opacity: .4; } }
-@keyframes storyBump { 0%, 15%, 23%, 100% { opacity: 0; } 18%, 20% { opacity: 1; } }
-@keyframes storyFalseRoute { 0%, 13%, 29%, 100% { opacity: 0; } 20% { opacity: 1; } }
-@keyframes storySuccess { 0%, 29%, 43%, 100% { opacity: 0; } 34%, 38% { opacity: 1; } }
-@keyframes storyNote {
-  0%, 32% { opacity: 0; transform: translate(-105px,80px) rotate(-8deg) scale(.18); }
-  41%, 61% { opacity: 1; transform: translate(0,0) rotate(-2deg) scale(1); }
-  69% { opacity: 1; transform: translate(124px,79px) rotate(7deg) scale(.35); }
-  76%, 100% { opacity: 0; transform: translate(175px,90px) rotate(8deg) scale(.08); }
-}
-@keyframes storyNoteRoute { 0%, 36% { stroke-dashoffset: 125; } 47%, 100% { stroke-dashoffset: 0; } }
-@keyframes storyCheck { 0%, 44%, 62%, 100% { opacity: 0; transform: translateY(5px); } 50%, 57% { opacity: 1; transform: translateY(0); } }
-@keyframes storyMemory { 0%, 67% { opacity: 0; stroke-dasharray: 80; stroke-dashoffset: 80; } 78%, 92% { opacity: 1; stroke-dashoffset: 0; } 100% { opacity: 0; } }
-@keyframes storyFinalWorld { 0%, 69%, 96%, 100% { opacity: 0; } 77%, 91% { opacity: 1; } }
-@keyframes storyFinalRoute { 0%, 75% { stroke-dashoffset: 155; } 89%, 100% { stroke-dashoffset: 0; } }
-@keyframes storyFinalSpark { 0%, 83%, 97%, 100% { opacity: 0; transform: scale(.3) rotate(-18deg); } 89%, 92% { opacity: 1; transform: scale(1) rotate(5deg); } }
-@keyframes storyLabelOne { 0%, 7%, 37%, 100% { opacity: .42; } 12%, 29% { opacity: 1; } }
-@keyframes storyLabelTwo { 0%, 36%, 71%, 100% { opacity: .42; } 43%, 63% { opacity: 1; } }
-@keyframes storyLabelThree { 0%, 70%, 100% { opacity: .42; } 78%, 93% { opacity: 1; } }
-
+/* Keep the full paper figure below the compact title-row sketch. */
+.motivation-figure { text-align: center; }
+.motivation-figure img { display: block; width: min(75%, 760px); height: auto; margin: 0 auto; }
+.motivation-figure figcaption { margin: .9rem auto 0; max-width: 770px; }
 @media screen and (max-width: 640px) {
-  .motivation-story { overflow: hidden; }
-  .motivation-story svg { width: 180%; max-width: none; animation: storyMobilePan 13s ease-in-out infinite, storyMobileFade 13s ease-in-out infinite; }
-  .story-labels, .story-bottom-labels { display: none; }
-  .motivation-caption { padding: 0 .6rem; font-size: .82rem; }
+  .motivation-figure img { width: 100%; }
+  .motivation-figure figcaption { font-size: .9rem; }
 }
-@keyframes storyMobilePan {
-  0%, 27% { transform: translateX(0); }
-  40%, 61% { transform: translateX(-20%); }
-  77%, 100% { transform: translateX(-44.5%); }
-}
-@keyframes storyMobileFade {
-  0%, 5%, 95%, 100% { opacity: 0; }
-  10%, 91% { opacity: 1; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .motivation-story * { animation: none !important; }
-  .motivation-story svg { transform: translateX(-44.5%); opacity: 1; }
-  .story-agent-motion { transform: translate(635px,0); }
-  .story-world, .story-note, .story-check, .story-bump, .story-false-route, .story-success { opacity: 0; }
-  .story-final-world, .story-memory { opacity: 1; }
-  .story-final-route { stroke-dashoffset: 0; }
-}
-
 
 .publication-title {
 }
@@ -581,6 +504,85 @@ button, .button, .title, .subtitle, .publication-title, .publication-authors,
   margin-top: 0.55rem;
   color: #666;
   font-size: 0.9rem;
+}
+.hero-miniatures { display: flex; justify-content: center; align-items: flex-start; gap: .3rem; }
+.motivation-mini {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .08rem;
+  min-width: 8.75rem;
+  margin-top: .55rem;
+  padding: .35rem .8rem .45rem;
+  border-radius: 12px;
+  color: #3f3733;
+  font-family: 'Comic Sans MS', 'Comic Neue', cursive;
+  text-decoration: none;
+  transition: background-color .25s ease, transform .25s ease;
+}
+.motivation-mini:hover { color: #3f3733; background: #fff8f2; transform: translateY(-2px); }
+.motivation-mini:focus-visible { outline: 2px solid #a53f52; outline-offset: 3px; }
+.motivation-mini-art { display: block; width: 6.35rem; height: 6.35rem; overflow: visible; }
+.motivation-mini-art .mini-agent { transform-box: fill-box; transform-origin: center; animation: miniAgent 10s ease-in-out infinite; }
+.mini-antenna { animation: miniAntenna 10s ease-in-out infinite; }
+.mini-head { animation: miniHead 10s ease-in-out infinite; }
+.mini-eyes { animation: miniEyes 10s ease-in-out infinite; }
+.mini-mouth { animation: miniMouth 10s ease-in-out infinite; }
+.mini-explore { animation: miniExplore 10s ease-in-out infinite; }
+.mini-bump { animation: miniBump 10s ease-in-out infinite; }
+.mini-discover { animation: miniDiscover 10s ease-in-out infinite; }
+.mini-discover-path { stroke-dasharray: 110; animation: miniDraw 10s ease-in-out infinite; }
+.mini-skill { transform-box: fill-box; transform-origin: center; animation: miniSkill 10s ease-in-out infinite; }
+.mini-verify { animation: miniVerify 10s ease-in-out infinite; }
+.mini-memory { stroke-dasharray: 42; animation: miniMemory 10s ease-in-out infinite; }
+.mini-act { animation: miniAct 10s ease-in-out infinite; }
+.mini-act-path { stroke-dasharray: 55; animation: miniActDraw 10s ease-in-out infinite; }
+@keyframes miniAgent { 0%, 13%, 24%, 100% { transform: rotate(0) scale(1); } 17% { transform: rotate(-6deg) scale(1.04,.94); } 20% { transform: rotate(3deg) scale(.98,1.03); } }
+@keyframes miniAntenna {
+  0%, 11%, 28%, 100% { d: path('M50 29 V22 M45 21 Q50 17 55 21 Q55 25 50 26'); }
+  17% { d: path('M50 29 V24 M43 23 Q46 18 52 20 Q55 24 50 26'); }
+  45%, 65% { d: path('M50 29 V19 M45 18 Q50 13 55 18 Q55 23 50 23'); }
+  80%, 94% { d: path('M50 29 V20 M45 19 Q50 14 55 19 Q55 24 50 24'); }
+}
+@keyframes miniHead {
+  0%, 11%, 28%, 100% { d: path('M36 41 Q36 34 43 34 H57 Q64 34 64 41 V66 Q64 72 57 72 H43 Q36 72 36 66 Z'); }
+  17% { d: path('M38 43 Q38 37 44 37 H56 Q62 37 62 43 V64 Q62 69 56 69 H44 Q38 69 38 64 Z'); }
+  45%, 64% { d: path('M34 40 Q34 32 43 32 H57 Q66 32 66 40 V67 Q66 74 57 74 H43 Q34 74 34 67 Z'); }
+  80%, 94% { d: path('M35 40 Q35 33 43 33 H57 Q65 33 65 40 V67 Q65 73 57 73 H43 Q35 73 35 67 Z'); }
+}
+@keyframes miniEyes {
+  0%, 27%, 100% { d: path('M43 49 V54 M56 49 V54'); }
+  8% { d: path('M45 49 V54 M58 49 V54'); }
+  17% { d: path('M43 52 V53 M56 52 V53'); }
+  45%, 64% { d: path('M42 47 V55 M57 47 V55'); }
+  80%, 94% { d: path('M44 49 V54 M56 49 V54'); }
+}
+@keyframes miniMouth {
+  0%, 11%, 28%, 100% { d: path('M44 62 Q50 63 56 62'); }
+  17% { d: path('M47 62 Q50 57 53 62'); }
+  45%, 64% { d: path('M43 62 Q50 69 57 62'); }
+  80%, 94% { d: path('M43 62 Q50 68 57 62'); }
+}
+@keyframes miniExplore { 0%, 26% { opacity: 1; } 35%, 91% { opacity: 0; } 100% { opacity: 1; } }
+@keyframes miniBump { 0%, 12%, 22%, 100% { opacity: 0; } 17%, 19% { opacity: 1; } }
+@keyframes miniDiscover { 0%, 20%, 53%, 100% { opacity: 0; } 27%, 46% { opacity: 1; } }
+@keyframes miniDraw { 0%, 20% { stroke-dashoffset: 110; } 38%, 100% { stroke-dashoffset: 0; } }
+@keyframes miniSkill {
+  0%, 32% { opacity: 0; transform: translate(-19px,37px) rotate(-11deg) scale(.08); }
+  43%, 64% { opacity: 1; transform: translate(0,0) rotate(-2deg) scale(1); }
+  75% { opacity: 0; transform: translate(-25px,15px) rotate(8deg) scale(.1); }
+  100% { opacity: 0; transform: translate(-25px,15px) rotate(8deg) scale(.1); }
+}
+@keyframes miniVerify { 0%, 47%, 68%, 100% { opacity: 0; } 55%, 63% { opacity: 1; } }
+@keyframes miniMemory { 0%, 65% { opacity: 0; stroke-dashoffset: 42; } 78%, 94% { opacity: 1; stroke-dashoffset: 0; } 100% { opacity: 0; stroke-dashoffset: 0; } }
+@keyframes miniAct { 0%, 74%, 100% { opacity: 0; } 83%, 95% { opacity: 1; } }
+@keyframes miniActDraw { 0%, 75% { stroke-dashoffset: 55; } 91%, 100% { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .motivation-mini, .motivation-mini-art * { animation: none !important; transition: none !important; }
+  .mini-explore, .mini-discover, .mini-skill, .mini-verify { opacity: 0; }
+  .mini-memory, .mini-act { opacity: 1; }
+  .mini-act-path { stroke-dashoffset: 0; }
 }
 .citation-counter {
   display: inline-flex;

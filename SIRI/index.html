@@ -48,7 +48,7 @@
   <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
   <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
   <link rel="stylesheet" href="static/css/academicons.min.css">
-  <link rel="stylesheet" href="static/css/index.css?v=20">
+  <link rel="stylesheet" href="static/css/index.css?v=21">
 
   <script defer src="static/js/bulma-carousel.min.js"></script>
   <script defer src="static/js/index.js?v=11"></script>
@@ -111,6 +111,7 @@
           <div class="venue-line">
             <span class="venue-badge"><img src="static/images/emnlp-icon.png" alt="EMNLP 2026 logo" class="venue-logo">EMNLP 2026 Main Conference</span>
             <p class="publication-detail">Proceedings of EMNLP 2026 · Budapest, Hungary · pp. 4402–4416</p>
+            <div class="hero-miniatures">
             <a class="citation-counter" id="citation-counter" href="https://scholar.google.com/scholar?oi=bibs&amp;hl=en&amp;cites=1735397926281978849" target="_blank" rel="noopener noreferrer" aria-label="Google Scholar citation count, loading" title="Google Scholar citation count; updated automatically">
               <span class="citation-counter-label">CITATIONS</span>
               <span class="citation-counter-art">
@@ -157,6 +158,29 @@
               </span>
               <span class="citation-counter-source">Google Scholar <span aria-hidden="true">↗</span></span>
             </a>
+            <a class="motivation-mini" href="#motivation-figure" aria-label="SIRI motivation animation: the agent explores, mines and checks a useful skill, internalizes it, then acts without retrieval. Jump to the full motivation figure.">
+              <span class="citation-counter-label">MOTIVATION</span>
+              <svg class="motivation-mini-art" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                <defs><filter id="mini-pencil" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency=".065" numOctaves="2" seed="4" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale=".85"/></filter></defs>
+                <g fill="none" stroke="#554b44" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" filter="url(#mini-pencil)">
+                  <g class="mini-explore"><path d="M68 66 Q72 62 77 66 V83 M77 66 Q81 63 86 67 V83"/><path class="mini-bump" d="m66 49 4-5m-1 10 6-1m-6 7 5 3" stroke="#be7965"/></g>
+                  <g class="mini-discover"><path class="mini-discover-path" d="M21 78 Q28 69 36 75 Q46 83 54 72 Q62 63 71 65 Q79 68 85 58" stroke="#a66f55"/><path d="m83 58 2-2 1 4" stroke="#a66f55"/></g>
+                  <g class="mini-skill"><path d="M65 21 Q75 19 85 22 L88 25 V48 Q78 50 66 47 Z"/><path d="m84 22 1 4 3-1 M69 31 Q75 29 82 31 M69 37 Q76 36 82 37" stroke-width="1.4"/></g>
+                  <g class="mini-verify"><path d="m74 55 4 4 8-9" stroke="#71906f" stroke-width="2.8"/><path d="M68 62 Q77 64 88 61" stroke="#baa99a" stroke-width="1.4"/></g>
+                  <g class="mini-act"><path class="mini-act-path" d="M64 77 Q71 68 77 73 Q83 77 89 66" stroke="#81916d"/><path d="m87 64 3-4 2 5 5 1-5 3-1 5-4-3-4 2 1-5-3-3z" stroke="#bc945e" stroke-width="1.7"/></g>
+                  <g class="mini-agent">
+                    <path class="mini-antenna" d="M50 29 V22 M45 21 Q50 17 55 21 Q55 25 50 26"/>
+                    <path class="mini-head" d="M36 41 Q36 34 43 34 H57 Q64 34 64 41 V66 Q64 72 57 72 H43 Q36 72 36 66 Z"/>
+                    <path d="M35 45 Q31 44 31 49 V57 Q31 62 35 61 M65 45 Q69 44 69 49 V57 Q69 62 65 61"/>
+                    <path class="mini-eyes" d="M43 49 V54 M56 49 V54"/>
+                    <path class="mini-mouth" d="M44 62 Q50 65 56 62"/>
+                    <path class="mini-memory" d="M44 40 Q49 37 55 41 Q49 43 52 46" stroke="#81916d" stroke-width="1.8"/>
+                  </g>
+                </g>
+              </svg>
+              <span class="citation-counter-source">Explore · learn · act <span aria-hidden="true">↓</span></span>
+            </a>
+            </div>
           </div>
           <div class="is-size-5 publication-authors">
             <span class="author-block">
@@ -244,72 +268,17 @@
 </div>
 </section>
 
-<!-- Animated motivation: one continuous hand-drawn journey from exploration to internalization. -->
-<section class="hero teaser">
+<!-- The original paper figure remains the full explanation of the motivation. -->
+<section class="hero teaser" id="motivation-figure">
   <div class="container is-max-desktop">
     <div class="hero-body">
-      <h2 class="title is-3 section-heading motivation-heading"><svg class="section-doodle" aria-hidden="true"><use href="#doodle-spark"></use></svg>Motivation</h2>
-      <figure class="motivation-story" role="img" aria-label="Animated SIRI motivation: a line-drawn agent explores an environment, learns from a successful trajectory, checks that its self-mined skill helps, internalizes the useful behavior, and acts without a skill bank at inference.">
-        <svg viewBox="0 0 960 350" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-          <defs>
-            <filter id="story-ink" x="-4%" y="-8%" width="108%" height="116%"><feTurbulence type="fractalNoise" baseFrequency=".018 .028" numOctaves="2" seed="8" result="grain"/><feDisplacementMap in="SourceGraphic" in2="grain" scale="1.6"/></filter>
-          </defs>
-          <g class="story-sketch" fill="none" stroke="#51463e" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" filter="url(#story-ink)">
-            <path class="story-ground" d="M49 257 Q202 254 342 257 T633 257 Q778 254 910 257" stroke="#c9bdb1" stroke-width="2"/>
-            <path class="story-trail" d="M112 235 Q178 229 225 236 Q249 242 255 223 Q258 203 285 197 Q335 178 387 219 Q443 250 500 230 Q564 209 632 232 Q703 252 770 226 Q830 208 873 223" stroke="#ad7259" stroke-width="2.8" stroke-dasharray="6 8"/>
-            <g class="story-world">
-              <path d="M221 213 Q232 208 241 213 L241 256 M241 212 Q257 209 268 216 L268 256 M242 222 Q254 219 267 223"/>
-              <path d="M324 195 Q335 188 345 195 L345 256 M345 194 Q358 192 367 199 L367 256"/>
-              <path class="story-false-route" d="M180 214 Q209 195 238 205" stroke="#b8afa7" stroke-width="2"/>
-              <path class="story-bump" d="m205 186 8-8m-4 15 13-3m-2 12 8 4" stroke="#c47b64"/>
-              <path class="story-success" d="m377 177 6 11 12 2-9 8 2 12-11-6-11 6 2-12-9-8 12-2z" stroke="#bd985b"/>
-            </g>
-            <g class="story-note">
-              <path d="M475 94 Q521 90 573 95 L582 102 L580 208 Q527 213 478 207 Z" fill="#fffdfa"/>
-              <path d="M572 95 L572 105 L582 102 M489 119 Q522 115 560 120 M489 132 Q525 129 562 133" stroke="#c8b8a9" stroke-width="1.7"/>
-              <path class="story-note-route" d="M495 183 Q508 177 518 182 Q525 185 530 170 Q536 154 551 156 Q562 154 567 147" stroke="#a66e54"/>
-              <circle cx="495" cy="183" r="2.5" fill="#a66e54" stroke="none"/>
-              <path d="m563 145 4 2-1 4" stroke="#a66e54" stroke-width="1.8"/>
-              <path d="M487 196 Q521 198 568 195" stroke="#d3c7bc" stroke-width="1.3"/>
-            </g>
-            <g class="story-check">
-              <path d="M603 136 Q635 130 666 136 M603 167 Q635 161 666 166" stroke="#c7bcb2" stroke-width="2"/>
-              <path d="M606 144 Q628 146 653 145 M606 175 Q625 177 654 174" stroke="#b2a69c" stroke-width="1.4"/>
-              <path d="m662 153 5 5 10-13" stroke="#729071" stroke-width="3"/>
-              <path d="m661 182 5-2" stroke="#a9a29a" stroke-width="2"/>
-            </g>
-            <g class="story-final-world">
-              <path d="M799 208 Q812 201 825 209 L825 255 M825 209 Q837 203 848 209 L848 255"/>
-              <path class="story-final-route" d="M771 225 Q789 195 810 194 Q836 186 855 211 Q864 222 876 220" stroke="#8a9872" stroke-width="3"/>
-              <path class="story-final-spark" d="m873 182 5-11 5 11 11 4-11 4-5 11-5-11-11-4z" stroke="#ba9257"/>
-            </g>
-            <g class="story-agent-motion">
-              <g transform="translate(73 150)"><g class="story-agent">
-                <path d="M40 12 V3 M32 3 Q40-3 48 3 Q48 9 40 10"/>
-                <path d="M10 31 Q10 19 22 19 L59 19 Q71 20 71 32 L71 68 Q70 80 59 80 L22 80 Q10 79 10 68 Z"/>
-                <path d="M9 39 Q1 37 1 45 L1 59 Q1 67 9 66 M72 39 Q80 37 80 45 L80 59 Q80 67 72 66"/>
-                <path d="M27 47 Q29 44 31 47 L31 54 Q29 57 27 54 Z M50 47 Q52 44 54 47 L54 54 Q52 57 50 54 Z"/>
-                <path d="M29 65 Q40 73 52 64"/>
-                <path class="story-memory" d="M34 31 Q40 26 47 32 Q39 34 43 40 M38 38 Q43 42 49 37" stroke="#8a9872" stroke-width="2.3"/>
-              </g></g>
-            </g>
-          </g>
-          <g class="story-labels" font-family="'Comic Sans MS','Comic Neue',cursive" text-anchor="middle">
-            <text x="162" y="70">01  EXPLORE</text><text x="536" y="70">02  MINE &amp; VERIFY</text><text x="800" y="70">03  INTERNALIZE</text>
-          </g>
-          <g class="story-bottom-labels" font-family="'Comic Sans MS','Comic Neue',cursive" text-anchor="middle">
-            <text x="234" y="306">learn from successful trajectories</text>
-            <text x="559" y="306">keep only useful skills</text>
-            <text x="802" y="306">act without retrieval</text>
-          </g>
-        </svg>
+      <figure class="motivation-figure">
+        <img src="static/images/motivation.png?v=2" alt="Motivation: comparison between skill-augmentation methods and SIRI" class="teaser-image" width="75%" loading="lazy">
+        <figcaption class="subtitle has-text-centered">Conceptual comparison between (a) traditional skill-augmentation frameworks and (b) our <span class="methodname">S<span class="mn-small">IRI</span></span>.</figcaption>
       </figure>
-      <p class="motivation-caption">The agent mines skills from its own successful rollouts, validates their benefit, and internalizes useful actions. At inference, it uses the original prompt alone.</p>
-      <details class="motivation-original"><summary>View the original motivation figure</summary><img src="static/images/motivation.png?v=2" alt="Original paper figure comparing skill-augmentation methods and SIRI" loading="lazy"></details>
     </div>
   </div>
 </section>
-<!-- End animated motivation -->
 
 <!-- Paper abstract -->
 <section class="section hero is-light">
