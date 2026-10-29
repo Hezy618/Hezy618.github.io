@@ -74,6 +74,91 @@ button, .button, .title, .subtitle, .publication-title, .publication-authors,
   font-family: 'Comic Sans MS', 'Comic Neue', cursive;
 }
 
+/* The motivation sketch lives directly on the page, like the heading doodles. */
+.motivation-heading { margin: .2rem auto .75rem; }
+.motivation-story { width: min(100%, 960px); margin: 0 auto; }
+.motivation-story svg { display: block; width: 100%; height: auto; }
+.story-sketch { stroke-linecap: round; stroke-linejoin: round; }
+.story-labels { fill: #5b5149; font-size: 13px; font-weight: 700; letter-spacing: 1px; }
+.story-bottom-labels { fill: #8b8075; font-size: 12px; }
+.story-trail { stroke-dasharray: 6 8; opacity: .5; }
+.story-agent-motion { animation: storyAgent 13s cubic-bezier(.38,.02,.26,.99) infinite; }
+.story-agent { animation: storyAgentBreath 1.8s ease-in-out infinite; }
+.story-world { animation: storyWorld 13s ease-in-out infinite; }
+.story-bump { animation: storyBump 13s ease-in-out infinite; }
+.story-false-route { animation: storyFalseRoute 13s ease-in-out infinite; }
+.story-success { animation: storySuccess 13s ease-in-out infinite; }
+.story-note { transform-box: fill-box; transform-origin: center; animation: storyNote 13s ease-in-out infinite; }
+.story-note-route { stroke-dasharray: 125; animation: storyNoteRoute 13s ease-in-out infinite; }
+.story-check { animation: storyCheck 13s ease-in-out infinite; }
+.story-memory { animation: storyMemory 13s ease-in-out infinite; }
+.story-final-world { animation: storyFinalWorld 13s ease-in-out infinite; }
+.story-final-route { stroke-dasharray: 155; animation: storyFinalRoute 13s ease-in-out infinite; }
+.story-final-spark { transform-box: fill-box; transform-origin: center; animation: storyFinalSpark 13s ease-in-out infinite; }
+.story-labels text:nth-child(1), .story-bottom-labels text:nth-child(1) { animation: storyLabelOne 13s ease-in-out infinite; }
+.story-labels text:nth-child(2), .story-bottom-labels text:nth-child(2) { animation: storyLabelTwo 13s ease-in-out infinite; }
+.story-labels text:nth-child(3), .story-bottom-labels text:nth-child(3) { animation: storyLabelThree 13s ease-in-out infinite; }
+.motivation-caption { max-width: 730px; margin: 1rem auto .3rem; text-align: center; color: #6f655e; font-size: .89rem; line-height: 1.6; }
+.motivation-original { width: fit-content; max-width: 100%; margin: .45rem auto 0; text-align: center; color: #8c7669; font-size: .8rem; }
+.motivation-original summary { cursor: pointer; text-decoration: underline; text-decoration-color: #c8b8aa; text-underline-offset: 3px; }
+.motivation-original img { display: block; width: min(100%, 760px); margin: 1rem auto 0; border-radius: 12px; }
+
+@keyframes storyAgent {
+  0%, 4% { transform: translate(0,0); opacity: 0; }
+  8% { transform: translate(0,0); opacity: 1; }
+  17% { transform: translate(151px,0); }
+  19% { transform: translate(159px,0); }
+  22% { transform: translate(143px,0); }
+  30% { transform: translate(235px,-27px); }
+  38%, 58% { transform: translate(340px,20px); opacity: 1; }
+  76%, 91% { transform: translate(635px,0); opacity: 1; }
+  97%, 100% { transform: translate(635px,0); opacity: 0; }
+}
+@keyframes storyAgentBreath { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+@keyframes storyWorld { 0%, 5% { opacity: .35; } 12%, 38% { opacity: 1; } 50%, 100% { opacity: .4; } }
+@keyframes storyBump { 0%, 15%, 23%, 100% { opacity: 0; } 18%, 20% { opacity: 1; } }
+@keyframes storyFalseRoute { 0%, 13%, 29%, 100% { opacity: 0; } 20% { opacity: 1; } }
+@keyframes storySuccess { 0%, 29%, 43%, 100% { opacity: 0; } 34%, 38% { opacity: 1; } }
+@keyframes storyNote {
+  0%, 32% { opacity: 0; transform: translate(-105px,80px) rotate(-8deg) scale(.18); }
+  41%, 61% { opacity: 1; transform: translate(0,0) rotate(-2deg) scale(1); }
+  69% { opacity: 1; transform: translate(124px,79px) rotate(7deg) scale(.35); }
+  76%, 100% { opacity: 0; transform: translate(175px,90px) rotate(8deg) scale(.08); }
+}
+@keyframes storyNoteRoute { 0%, 36% { stroke-dashoffset: 125; } 47%, 100% { stroke-dashoffset: 0; } }
+@keyframes storyCheck { 0%, 44%, 62%, 100% { opacity: 0; transform: translateY(5px); } 50%, 57% { opacity: 1; transform: translateY(0); } }
+@keyframes storyMemory { 0%, 67% { opacity: 0; stroke-dasharray: 80; stroke-dashoffset: 80; } 78%, 92% { opacity: 1; stroke-dashoffset: 0; } 100% { opacity: 0; } }
+@keyframes storyFinalWorld { 0%, 69%, 96%, 100% { opacity: 0; } 77%, 91% { opacity: 1; } }
+@keyframes storyFinalRoute { 0%, 75% { stroke-dashoffset: 155; } 89%, 100% { stroke-dashoffset: 0; } }
+@keyframes storyFinalSpark { 0%, 83%, 97%, 100% { opacity: 0; transform: scale(.3) rotate(-18deg); } 89%, 92% { opacity: 1; transform: scale(1) rotate(5deg); } }
+@keyframes storyLabelOne { 0%, 7%, 37%, 100% { opacity: .42; } 12%, 29% { opacity: 1; } }
+@keyframes storyLabelTwo { 0%, 36%, 71%, 100% { opacity: .42; } 43%, 63% { opacity: 1; } }
+@keyframes storyLabelThree { 0%, 70%, 100% { opacity: .42; } 78%, 93% { opacity: 1; } }
+
+@media screen and (max-width: 640px) {
+  .motivation-story { overflow: hidden; }
+  .motivation-story svg { width: 180%; max-width: none; animation: storyMobilePan 13s ease-in-out infinite, storyMobileFade 13s ease-in-out infinite; }
+  .story-labels, .story-bottom-labels { display: none; }
+  .motivation-caption { padding: 0 .6rem; font-size: .82rem; }
+}
+@keyframes storyMobilePan {
+  0%, 27% { transform: translateX(0); }
+  40%, 61% { transform: translateX(-20%); }
+  77%, 100% { transform: translateX(-44.5%); }
+}
+@keyframes storyMobileFade {
+  0%, 5%, 95%, 100% { opacity: 0; }
+  10%, 91% { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .motivation-story * { animation: none !important; }
+  .motivation-story svg { transform: translateX(-44.5%); opacity: 1; }
+  .story-agent-motion { transform: translate(635px,0); }
+  .story-world, .story-note, .story-check, .story-bump, .story-false-route, .story-success { opacity: 0; }
+  .story-final-world, .story-memory { opacity: 1; }
+  .story-final-route { stroke-dashoffset: 0; }
+}
+
 
 .publication-title {
 }
