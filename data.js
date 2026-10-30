@@ -127,9 +127,9 @@ const SITE = {
       authors: ["Fei Huang", "Tianyu Chen", "Zhongyu He", "Yuanfan Li", "Meng Hsuan Yu", "Xingyang Li", "Lu Pan", "Ke Zeng", "Xunliang Cai"],
       venue: "Findings of EMNLP",
       year: 2026,
-      status: "Accepted",
+      status: "Published",
       keywords: ["LLM Agents", "Agentic RL", "SKILL"],
-      links: {},                                                        // TODO: 有公开链接后补上
+      links: { "ACL Anthology": "https://aclanthology.org/2026.findings-emnlp.136/" },
     },
     {
       title: "Knowledge Embedding-based Dynamic Hypergraph Neural Networks for Knowledge Graph Completion",
