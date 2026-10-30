@@ -1,244 +1,186 @@
-"""Render the SIRI agent as a transparent, seamless hand-drawn GIF.
+"""Build the transparent SIRI motivation GIF from a compact animated mascot.
 
 Run: python3 SIRI/tools/build_motivation_gif.py
-Requires Pillow. The transparent GIF is generated from vector-like line strokes;
-the contact sheet in /tmp is for checking every part of the loop before release.
+Requires Pillow. A contact sheet is written to /tmp for visual inspection.
 """
 
 from __future__ import annotations
-
 import math
 from pathlib import Path
+from PIL import Image, ImageDraw, ImageFont
 
-from PIL import Image, ImageDraw
+W,H,S,N=240,164,4,96
+ROOT=Path(__file__).resolve().parents[1]
+OUT=ROOT/'static/images/motivation-agent.gif'
+SHEET=Path('/tmp/siri-motivation-v2-contact.png')
+STILL=ROOT/'static/images/motivation-agent-still.png'
+NAVY=(53,82,100); BLUE=(230,247,249); EAR=(150,195,211)
+INK=(68,77,78); PAPER=(255,252,245); CORAL=(219,130,112)
+GOLD=(239,178,68); GREEN=(101,157,129); PALE=(237,242,229)
 
-
-ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "static/images/motivation-agent.gif"
-STILL = ROOT / "static/images/motivation-agent-still.png"
-CONTACT = Path("/tmp/siri-motivation-gif-contact.png")
-SIZE = 160
-SCALE = 4
-FRAMES = 72
-INK = (78, 69, 62)
-MUTED = (167, 151, 137)
-CORAL = (181, 111, 90)
-GREEN = (112, 137, 108)
-GOLD = (187, 147, 80)
-
-
-def smooth(a: float, b: float, t: float) -> float:
-    x = min(1, max(0, (t - a) / (b - a)))
-    return x * x * (3 - 2 * x)
-
-
-def window(t: float, start: float, rise: float, fall: float, end: float) -> float:
-    return smooth(start, rise, t) * (1 - smooth(fall, end, t))
-
-
-def mix(a: float, b: float, t: float) -> float:
-    return a + (b - a) * t
-
-
-def alpha(color: tuple[int, int, int], opacity: float) -> tuple[int, int, int, int]:
-    return (*color, round(255 * min(1, max(0, opacity))))
-
-
-def bezier(points: list[tuple[float, float]], steps: int = 12) -> list[tuple[float, float]]:
-    out = []
-    for i in range(steps + 1):
-        t = i / steps
-        a, b, c, d = points
-        x = (1 - t) ** 3 * a[0] + 3 * (1 - t) ** 2 * t * b[0] + 3 * (1 - t) * t * t * c[0] + t**3 * d[0]
-        y = (1 - t) ** 3 * a[1] + 3 * (1 - t) ** 2 * t * b[1] + 3 * (1 - t) * t * t * c[1] + t**3 * d[1]
-        out.append((x, y))
+def smooth(a,b,t):
+    q=max(0,min(1,(t-a)/(b-a)))
+    return q*q*(3-2*q)
+def win(t,a,b,c,d): return smooth(a,b,t)*(1-smooth(c,d,t))
+def mix(a,b,t): return a+(b-a)*t
+def bez(p,n=16):
+    a,b,c,d=p; out=[]
+    for i in range(n+1):
+        t=i/n; u=1-t
+        out.append((u**3*a[0]+3*u*u*t*b[0]+3*u*t*t*c[0]+t**3*d[0],u**3*a[1]+3*u*u*t*b[1]+3*u*t*t*c[1]+t**3*d[1]))
     return out
+def rgba(c,a=1): return (*c,round(255*max(0,min(1,a))))
 
+def frame(t):
+    im=Image.new('RGBA',(W*S,H*S),(0,0,0,0)); d=ImageDraw.Draw(im,'RGBA')
+    def pts(p): return [(round(x*S),round(y*S)) for x,y in p]
+    def line(p,c=INK,w=2,a=1):
+        if a<.01:return
+        q=pts(p); d.line(q,fill=rgba(c,a),width=max(1,round(w*S)),joint='curve')
+        r=max(1,round(w*S/2))
+        for x,y in (q[0],q[-1]): d.ellipse((x-r,y-r,x+r,y+r),fill=rgba(c,a))
+    def curve(p,c=INK,w=2,a=1): line(bez(p),c,w,a)
+    def ellipse(box,fill=None,outline=None,w=2,a=1):
+        d.ellipse(tuple(round(v*S) for v in box),fill=rgba(fill,a) if fill else None,outline=rgba(outline,a) if outline else None,width=round(w*S))
+    def rect(box,r,fill=None,outline=None,w=2,a=1):
+        d.rounded_rectangle(tuple(round(v*S) for v in box),radius=round(r*S),fill=rgba(fill,a) if fill else None,outline=rgba(outline,a) if outline else None,width=round(w*S))
+    def text(x,y,label,size,c=INK,a=1):
+        try: font=ImageFont.truetype('/System/Library/Fonts/Supplemental/Comic Sans MS.ttf',size*S)
+        except OSError: font=ImageFont.truetype('/System/Library/Fonts/Supplemental/Arial.ttf',size*S)
+        d.text((round(x*S),round(y*S)),label,font=font,fill=rgba(c,a))
 
-def draw_frame(t: float) -> Image.Image:
-    im = Image.new("RGBA", (SIZE * SCALE, SIZE * SCALE), (0, 0, 0, 0))
-    d = ImageDraw.Draw(im, "RGBA")
+    explore=1-smooth(.23,.32,t)+smooth(.93,1,t)
+    eureka=win(t,.22,.28,.38,.45)
+    record=win(t,.37,.43,.55,.63)
+    absorb=win(t,.57,.63,.72,.78)
+    recall=win(t,.70,.77,.91,.98)
+    think=win(t,.68,.75,.85,.92)
+    answer=win(t,.81,.86,.94,.98)
+    breath=math.sin(2*math.pi*t*3)*1.3
 
-    def xy(points):
-        return [(round(x * SCALE), round(y * SCALE)) for x, y in points]
+    # A practice sheet never becomes an external skill bank. It is an environment task.
+    sheet=1-max(record*.65,absorb*.75)
+    rect((170,105,225,157),5,PAPER,INK,1.7,sheet)
+    line([(177,116),(216,116)],EAR,1.4,sheet)
+    text(178,117,'2 + 3 = ?',13,INK,sheet)
+    line([(179,143),(207,143)],EAR,1.4,sheet)
+    if explore>.01:
+        line([(179,136),(187+4*math.sin(2*math.pi*t*12),136)],CORAL,2,explore*.9)
+    if answer>.01:
+        text(179,132,'5',17,GREEN,answer)
+        line([(199,136),(204,141),(216,127)],GREEN,2.4,answer)
 
-    def stroke(points, color=INK, width=2.3, opacity=1):
-        if opacity <= .01:
-            return
-        pts = xy(points)
-        d.line(pts, fill=alpha(color, opacity), width=max(1, round(width * SCALE)), joint="curve")
-        radius = max(1, round(width * SCALE / 2))
-        for p in (pts[0], pts[-1]):
-            d.ellipse((p[0] - radius, p[1] - radius, p[0] + radius, p[1] + radius), fill=alpha(color, opacity))
+    # The notebook is first physical, then its marked pages feed an inner trace.
+    nx=168-24*absorb; ny=50+17*absorb; scale=1-.62*absorb
+    def np(x,y):return(nx+(x-168)*scale,ny+(y-50)*scale)
+    note=win(t,.38,.45,.67,.76)
+    if note>.01:
+        line([np(164,53),np(164,106),np(216,106),np(216,51),np(164,53)],INK,2,note)
+        rect((nx-7*scale,ny-2*scale,nx+45*scale,ny+56*scale),3,PAPER,None,1,note)
+        line([np(164,53),np(164,106),np(216,106),np(216,51),np(164,53)],INK,1.8,note)
+        for yy in (62,73,84,95): line([np(174,yy),np(207 if yy!=95 else 195,yy-1)],EAR,1.5,note)
+        for yy in (59,70,81,92,103):ellipse((np(161,yy)[0]-2*scale,np(161,yy)[1]-2*scale,np(161,yy)[0]+2*scale,np(161,yy)[1]+2*scale),fill=CORAL,a=note)
+        scribble=smooth(.45,.56,t)*record
+        curve([np(177,84),np(187,80),np(189,94),np(201,80)],CORAL,2,scribble)
+    if absorb>.01:
+        curve([(mix(163,143,absorb),mix(72,67,absorb)),(150,60),(142,49),(119,56)],GREEN,2.5,absorb)
 
-    def curve(a, b, c, e, color=INK, width=2.3, opacity=1):
-        stroke(bezier([a, b, c, e]), color, width, opacity)
+    # Recall is drawn as a transparent thought bubble with a visibly turning page.
+    if think>.01:
+        ellipse((158,5,224,68),PAPER,INK,1.7,think)
+        ellipse((152,70,157,75),PAPER,INK,1.3,think)
+        ellipse((146,77,149,80),PAPER,INK,1.1,think)
+        line([(168,29),(182,26),(191,29),(191,53),(178,50),(168,53),(168,29)],NAVY,1.8,think)
+        flip=math.sin(2*math.pi*(t-.75)*14)*5
+        line([(191,29),(204+flip,26),(214,29),(214,52),(201,50),(191,53)],NAVY,1.8,think)
+        line([(191,29),(191,53)],NAVY,1.2,think)
+        for yy in (35,41,47):
+            line([(173,yy),(185,yy-1)],EAR,1.2,think)
+            line([(199,yy),(209+flip*.5,yy-1)],EAR,1.2,think)
+    # Small bulb answers the agent's own discovery, not an external generator.
+    if eureka>.01:
+        ellipse((177,18,207,48),GOLD,INK,1.7,eureka)
+        line([(186,48),(198,48),(197,54),(187,54)],INK,1.7,eureka)
+        line([(188,56),(196,56)],INK,1.5,eureka)
+        for a,b in [((192,10),(192,4)),((173,19),(168,15)),((211,19),(216,15)),((216,39),(222,40))]:line([a,b],GOLD,2,eureka)
 
-    def circle(box, color=INK, width=2.2, opacity=1):
-        d.ellipse(tuple(round(v * SCALE) for v in box), outline=alpha(color, opacity), width=round(width * SCALE))
+    # One compact mascot: the original round-square head and antenna, with
+    # only a writing hand added for the story. The face carries each phase.
+    bob=breath+1.5*eureka-1.2*record
+    tilt=-.055*eureka+.025*record-.02*think
+    def hp(x,y):
+        x0=x-103;y0=y-74
+        return(103+x0*math.cos(tilt)-y0*math.sin(tilt),74+x0*math.sin(tilt)+y0*math.cos(tilt)+bob)
+    # A single flexible arm reaches the exercise and the notebook.
+    handx=mix(174,180,record); handy=mix(149,95,record)
+    handx=mix(handx,147,eureka); handy=mix(handy,69,eureka)
+    handx=mix(handx,147,absorb); handy=mix(handy,96,absorb)
+    handx=mix(handx,176,recall); handy=mix(handy,149,recall)
+    handx+=1.5*math.sin(2*math.pi*t*14)*(explore+record+answer)
+    line([(133,104+bob),(143,112+bob),(handx-3,handy+4)],NAVY,3.2)
+    ellipse((handx-5,handy+1,handx+4,handy+9),BLUE,NAVY,1.6)
+    if explore+record+answer>.05:
+        line([(handx,handy+5),(handx+5,handy-10)],CORAL,3,min(1,explore+record+answer))
+        line([(handx+5,handy-10),(handx+6,handy-13)],GOLD,2,min(1,explore+record+answer))
 
-    # The same robot remains centered. Its outline and face carry the narrative.
-    impact = window(t, .16, .20, .245, .30)
-    discovery = window(t, .29, .34, .47, .53)
-    checking = window(t, .49, .54, .65, .70)
-    learning = window(t, .66, .72, .83, .88)
-    acting = window(t, .77, .83, .91, .96)
-    exploring = (1 - smooth(.28, .36, t)) * smooth(.0, .07, t) + smooth(.93, 1, t)
+    # Ears and rounded, asymmetrical head keep the original favicon lineage.
+    sx=1+.08*eureka+.025*absorb; sy=1-.045*record+.055*eureka
+    def f(x,y):
+        x=103+(x-103)*sx; y=76+(y-76)*sy
+        return hp(x,y)
+    line([f(69,61),f(61,60),f(60,72),f(61,91),f(69,92)],NAVY,2.6)
+    line([f(136,61),f(143,60),f(145,72),f(144,91),f(136,92)],NAVY,2.6)
+    headpath=[]
+    segments=[[(81,43),(93,40),(117,41),(128,45)],[(128,45),(136,48),(138,55),(138,64)],[(138,64),(139,77),(138,95),(137,103)],[(137,103),(135,112),(128,116),(119,117)],[(119,117),(107,119),(88,118),(80,116)],[(80,116),(72,114),(69,108),(69,101)],[(69,101),(68,87),(69,65),(69,58)],[(69,58),(70,49),(74,45),(81,43)]]
+    for seg in segments:headpath.extend(bez([f(*p) for p in seg],9)[1:] if headpath else bez([f(*p) for p in seg],9))
+    d.polygon(pts(headpath),fill=rgba(BLUE,1))
+    line(headpath,NAVY,2.7)
+    curve([f(77,47),f(86,44),f(100,44),f(106,45)],EAR,1.2,.65)
+    # Antenna's copper tip springs up with the idea.
+    tipx=103+5*eureka;tipy=24-7*eureka
+    line([f(103,42),(tipx,tipy+10+bob)],NAVY,2.4)
+    ellipse((tipx-6,tipy+bob,tipx+6,tipy+12+bob),GOLD if eureka>.15 else EAR,NAVY,2)
 
-    # Hand-drawn environment: small marks appear and transform in place.
-    wall = window(t, .03, .09, .26, .34)
-    stroke([(121, 111), (122, 93), (129, 91), (135, 94), (135, 111)], MUTED, 1.7, wall)
-    stroke([(119, 111), (138, 111)], MUTED, 1.4, wall)
-    for a, b in [((122, 79), (126, 75)), ((129, 82), (136, 80)), ((130, 89), (137, 92))]:
-        stroke([a, b], CORAL, 1.8, impact)
+    # Eyes look down at the exercise, glow when insight arrives, then look up
+    # into the remembered notebook before the confident final answer.
+    eyeup=-2*eureka-3*think; pupilx=3*explore-2*think
+    for x in (88,118):
+        center=f(x,76+eyeup)
+        ellipse((center[0]-5.5,center[1]-6,center[0]+5.5,center[1]+6),PAPER,NAVY,1.8)
+        ellipse((center[0]-1.5+pupilx,center[1]-2,center[0]+2.5+pupilx,center[1]+2.5),fill=NAVY)
+        if eureka>.05:
+            line([(center[0]-8,center[1]-8),(center[0]-11,center[1]-11)],GOLD,1.8,eureka)
+            line([(center[0]+8,center[1]-8),(center[0]+11,center[1]-11)],GOLD,1.8,eureka)
+    if eureka>.2:
+        ellipse((f(99,96)[0]-5,f(99,96)[1]-4,f(99,96)[0]+5,f(99,96)[1]+5),PAPER,NAVY,2,eureka)
+    smile=max(record,absorb,recall)
+    curve([f(91,100),f(98,103+4*smile),f(108,103+4*smile),f(116,99)],NAVY,2.1,1-eureka*.8)
+    if absorb+recall>.02:
+        curve([f(91,55),f(97,48),f(110,49),f(115,56)],GREEN,2.3,max(absorb,recall))
+        line([f(100,55),f(105,51),f(110,56)],GREEN,1.6,max(absorb,recall))
+    return im.resize((W,H),Image.Resampling.LANCZOS)
 
-    route = window(t, .26, .33, .45, .53)
-    start = (119, 112)
-    success_path = bezier([start, (128, 106), (126, 88), (138, 85)], 16)
-    shown = max(2, round(len(success_path) * smooth(.29, .40, t)))
-    stroke(success_path[:shown], CORAL, 2.1, route)
-    stroke([(135, 83), (138, 85), (140, 82)], CORAL, 1.6, route)
+def save(frames):
+    cols=12; rows=(len(frames)+cols-1)//cols
+    montage=Image.new('RGB',(W*cols,H*rows),'white')
+    for i,fr in enumerate(frames):
+        white=Image.new('RGB',(W,H),'white');white.paste(fr,mask=fr.getchannel('A'))
+        montage.paste(white,((i%cols)*W,(i//cols)*H))
+    pal=montage.quantize(colors=120,method=Image.Quantize.MEDIANCUT)
+    colors=pal.getpalette()[:360];full=[0,0,0]+colors+[255,255,255]*(255-120)
+    indexed=[]
+    for fr in frames:
+        white=Image.new('RGB',(W,H),'white');white.paste(fr,mask=fr.getchannel('A'))
+        q=white.quantize(palette=pal,dither=Image.Dither.NONE);values=bytearray(q.tobytes())
+        mask=fr.getchannel('A').tobytes()
+        for j,a in enumerate(mask):values[j]=values[j]+1 if a>=12 else 0
+        out=Image.frombytes('P',(W,H),bytes(values));out.putpalette(full);out.info['transparency']=0;indexed.append(out)
+    indexed[0].save(OUT,save_all=True,append_images=indexed[1:],duration=83,loop=0,disposal=2,transparency=0,optimize=False)
+    frames[86].save(STILL)
+    ids=[0,16,31,42,55,66,76,87]
+    sheet=Image.new('RGB',(W*4,H*2),'#f3f1eb')
+    for i,n in enumerate(ids):sheet.paste(frames[n],((i%4)*W,(i//4)*H),frames[n])
+    sheet.save(SHEET)
+    print(OUT,OUT.stat().st_size,SHEET)
 
-    # The successful route becomes a small skill note, which is checked then
-    # curls back into the agent. All strokes are transparent outside the icon.
-    note = window(t, .39, .46, .64, .76)
-    fold = smooth(.64, .78, t)
-    note_scale = mix(1, .16, fold)
-    nx = mix(132, 91, fold)
-    ny = mix(61, 68, fold)
-
-    def note_point(x, y):
-        return (nx + (x - 132) * note_scale, ny + (y - 61) * note_scale)
-
-    note_points = [note_point(x, y) for x, y in [(119, 44), (141, 43), (145, 47), (145, 78), (120, 79), (119, 44)]]
-    stroke(note_points, INK, 1.9, note)
-    stroke([note_point(141, 43), note_point(141, 48), note_point(145, 47)], INK, 1.2, note)
-    for y in (54, 61, 68):
-        stroke([note_point(124, y), note_point(138 if y != 68 else 133, y - 1)], MUTED, 1.3, note)
-    check_draw = checking * note
-    stroke([note_point(128, 69), note_point(132, 73), note_point(140, 64)], GREEN, 2, check_draw)
-
-    # The note's ink moves into the forehead instead of a hard replacement.
-    internal_line = window(t, .65, .70, .80, .86)
-    travel = smooth(.66, .80, t)
-    curve((mix(121, 107, travel), mix(76, 65, travel)),
-          (mix(112, 105, travel), mix(80, 61, travel)),
-          (mix(105, 96, travel), mix(68, 54, travel)),
-          (mix(88, 88, travel), mix(53, 51, travel)), GREEN, 1.8, internal_line)
-
-    # Robot shape morphs: compression at impact and expansion while learning.
-    sx = 1 + .075 * impact + .04 * (discovery + learning)
-    sy = 1 - .13 * impact + .05 * (discovery + learning)
-    lean = .035 * math.sin(2 * math.pi * t) - .075 * impact
-
-    def face(x, y):
-        x, y = 84 + (x - 84) * sx, 81 + (y - 81) * sy
-        return (x + (y - 81) * lean, y)
-
-    # Ears, helmet, and wobbling antenna preserve the supplied agent icon.
-    stroke([face(55, 69), face(49, 67), face(47, 72), face(47, 91), face(50, 96), face(55, 94)], INK, 2.2)
-    stroke([face(113, 68), face(119, 67), face(121, 73), face(121, 90), face(119, 96), face(113, 94)], INK, 2.2)
-
-    outline = []
-    for p in [
-        [(67, 52), (74, 49), (94, 50), (104, 52)],
-        [(104, 52), (112, 54), (114, 62), (114, 68)],
-        [(114, 68), (115, 80), (114, 99), (114, 105)],
-        [(114, 105), (113, 114), (107, 120), (98, 120)],
-        [(98, 120), (90, 121), (72, 120), (66, 120)],
-        [(66, 120), (57, 119), (54, 113), (54, 104)],
-        [(54, 104), (53, 93), (54, 73), (54, 67)],
-        [(54, 67), (54, 60), (59, 54), (67, 52)],
-    ]:
-        outline.extend(bezier([face(*a) for a in p], 9)[1:] if outline else bezier([face(*a) for a in p], 9))
-    stroke(outline, INK, 2.7)
-    stroke([face(62, 54), face(69, 51), face(78, 51)], MUTED, .9, .45)
-
-    antenna_tip_x = mix(84, 76, impact) + 2 * discovery - 2 * learning
-    stroke([face(84, 51), face(84, 40), (antenna_tip_x, 35)], INK, 2.2)
-    circle((antenna_tip_x - 5, 27, antenna_tip_x + 5, 36), INK, 2.0)
-    for a, b in [((84, 18), (84, 13)), ((72, 27), (67, 25)), ((96, 27), (101, 25))]:
-        stroke([a, b], GOLD, 1.7, discovery)
-
-    # Eyes scan, squeeze shut on impact, widen for a discovered skill, then
-    # settle into a confident expression after internalization.
-    scan = 2.1 * math.sin(2 * math.pi * t * 2) * exploring
-    eye_open = mix(1, .25, impact)
-    eye_open = mix(eye_open, 1.32, discovery)
-    for ex in (70, 98):
-        x = ex + scan
-        a = face(x, 77 - 3 * (eye_open - 1))
-        b = face(x, 85 + 3 * (eye_open - 1))
-        stroke([a, b], INK, 2.4, 1 - impact)
-        stroke([face(ex - 4, 80), face(ex, 78), face(ex + 4, 81)], INK, 2.2, impact)
-    mouth_smile = max(discovery, checking, learning, acting)
-    mouth_y = 99 - 2 * impact
-    mouth_left = mix(70, 75, impact)
-    mouth_right = mix(99, 94, impact)
-    mouth_depth = 1 + 10 * mouth_smile - 10 * impact
-    mouth = bezier([face(mouth_left, mouth_y), face(78, mouth_y + mouth_depth),
-                    face(90, mouth_y + mouth_depth), face(mouth_right, mouth_y)], 18)
-    stroke(mouth, INK, 2.25)
-    for a, b in [((61, 93), (65, 95)), ((103, 95), (107, 93))]:
-        stroke([face(*a), face(*b)], CORAL, 1.45, discovery * .65 + learning * .35)
-
-    # A line is now part of the agent, rather than a paper carried at inference.
-    memory = max(learning, acting)
-    spiral = bezier([face(76, 62), face(80, 56), face(92, 58), face(91, 66)], 12)
-    spiral += bezier([face(91, 66), face(86, 66), face(84, 63), face(87, 61)], 8)[1:]
-    stroke(spiral, GREEN, 1.55, memory)
-    circle((89, 60, 92, 63), GREEN, 1.2, memory)
-
-    # At inference the same Agent acts without a visible skill note.
-    act_curve = bezier([(116, 106), (125, 100), (132, 98), (143, 94)], 14)
-    act_shown = max(2, round(len(act_curve) * smooth(.82, .92, t)))
-    stroke(act_curve[:act_shown], GREEN, 2.0, acting)
-    cx, cy = 145, 91
-    star = [(cx, cy - 7), (cx + 2, cy - 2), (cx + 8, cy), (cx + 2, cy + 2),
-            (cx, cy + 8), (cx - 2, cy + 2), (cx - 7, cy), (cx - 2, cy - 2), (cx, cy - 7)]
-    stroke(star, GOLD, 1.6, window(t, .85, .89, .92, .96))
-
-    return im.resize((SIZE, SIZE), Image.Resampling.LANCZOS)
-
-
-def save_gif(frames: list[Image.Image]) -> None:
-    # One palette for all frames prevents color flicker. Index zero is reserved
-    # for transparency; visible edge pixels are matted to the white hero page.
-    montage = Image.new("RGB", (SIZE * 12, SIZE * 6), "white")
-    for i, frame in enumerate(frames):
-        base = Image.new("RGB", frame.size, "white")
-        base.paste(frame, mask=frame.getchannel("A"))
-        montage.paste(base, ((i % 12) * SIZE, (i // 12) * SIZE))
-    palette = montage.quantize(colors=120, method=Image.Quantize.MEDIANCUT)
-    source_colors = palette.getpalette()[:120 * 3]
-    full_palette = [0, 0, 0] + source_colors + [255, 255, 255] * (255 - 120)
-    indexed = []
-    for frame in frames:
-        white = Image.new("RGB", frame.size, "white")
-        white.paste(frame, mask=frame.getchannel("A"))
-        q = white.quantize(palette=palette, dither=Image.Dither.NONE)
-        values = bytearray(q.tobytes())
-        mask = frame.getchannel("A").tobytes()
-        for j, a in enumerate(mask):
-            values[j] = values[j] + 1 if a >= 12 else 0
-        out = Image.frombytes("P", frame.size, bytes(values))
-        out.putpalette(full_palette)
-        out.info["transparency"] = 0
-        indexed.append(out)
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    indexed[0].save(OUT, save_all=True, append_images=indexed[1:], duration=83,
-                    loop=0, disposal=2, transparency=0, optimize=False)
-    frames[63].save(STILL)
-
-    selected = [0, 12, 16, 26, 36, 47, 57, 66]
-    sheet = Image.new("RGB", (SIZE * 4, SIZE * 2), "#f7f7f7")
-    for i, n in enumerate(selected):
-        sheet.paste(frames[n], ((i % 4) * SIZE, (i // 4) * SIZE), frames[n])
-    sheet.save(CONTACT)
-    print(f"GIF: {OUT} ({OUT.stat().st_size:,} bytes, {len(indexed)} frames)")
-    print(f"Reduced-motion still: {STILL}")
-    print(f"Contact sheet: {CONTACT}")
-
-
-if __name__ == "__main__":
-    save_gif([draw_frame(i / (FRAMES - 1)) for i in range(FRAMES)])
+if __name__=='__main__':save([frame(i/(N-1)) for i in range(N)])

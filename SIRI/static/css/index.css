@@ -512,7 +512,7 @@ button, .button, .title, .subtitle, .publication-title, .publication-authors,
   align-items: center;
   justify-content: center;
   gap: .08rem;
-  min-width: 8.75rem;
+  min-width: 10rem;
   margin-top: .55rem;
   padding: .35rem .8rem .45rem;
   border-radius: 12px;
@@ -523,7 +523,7 @@ button, .button, .title, .subtitle, .publication-title, .publication-authors,
 }
 .motivation-gif-link:hover { color: #3f3733; background: #fff8f2; transform: translateY(-2px); }
 .motivation-gif-link:focus-visible { outline: 2px solid #a53f52; outline-offset: 3px; }
-.motivation-gif-art { display: block; width: 6.35rem; height: 6.35rem; }
+.motivation-gif-art { display: block; width: 9.25rem; height: 6.35rem; }
 .motivation-gif-art img { display: block; width: 100%; height: 100%; object-fit: contain; }
 @media (prefers-reduced-motion: reduce) { .motivation-gif-link { transition: none; } }
 .citation-counter {
