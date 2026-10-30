@@ -505,6 +505,27 @@ button, .button, .title, .subtitle, .publication-title, .publication-authors,
   color: #666;
   font-size: 0.9rem;
 }
+.hero-miniatures { display: flex; justify-content: center; align-items: flex-start; gap: .3rem; }
+.motivation-gif-link {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .08rem;
+  min-width: 8.75rem;
+  margin-top: .55rem;
+  padding: .35rem .8rem .45rem;
+  border-radius: 12px;
+  color: #3f3733;
+  font-family: 'Comic Sans MS', 'Comic Neue', cursive;
+  text-decoration: none;
+  transition: background-color .25s ease, transform .25s ease;
+}
+.motivation-gif-link:hover { color: #3f3733; background: #fff8f2; transform: translateY(-2px); }
+.motivation-gif-link:focus-visible { outline: 2px solid #a53f52; outline-offset: 3px; }
+.motivation-gif-art { display: block; width: 6.35rem; height: 6.35rem; }
+.motivation-gif-art img { display: block; width: 100%; height: 100%; object-fit: contain; }
+@media (prefers-reduced-motion: reduce) { .motivation-gif-link { transition: none; } }
 .citation-counter {
   display: inline-flex;
   flex-direction: column;
