@@ -52,19 +52,8 @@
       ctx.globalAlpha=alpha; ctx.fillRect(x,y,1.65,1.65);
     }
     ctx.globalAlpha=1;
-    if(pointer && strength>.01 && !reduced.matches) {
-      ctx.save(); ctx.globalAlpha=strength*.7;
-      const r=35+pulse*12;
-      const light=ctx.createLinearGradient(pointer.x-r,pointer.y-r,pointer.x+r,pointer.y+r);
-      light.addColorStop(0,'transparent');
-      light.addColorStop(.32,day?'#758d7e':'#d8e8de');
-      light.addColorStop(.65,day?'#758d7e22':'#d8e8de22');
-      light.addColorStop(1,'transparent');
-      ctx.strokeStyle=light;ctx.lineWidth=1.2;
-      ctx.beginPath();ctx.arc(pointer.x,pointer.y,r,0,Math.PI*2);ctx.stroke();
-      ctx.restore();
-    }
   }
+
   function tick(time) {
     raf=0;
     if(!visible || document.hidden || reduced.matches) { strength=0; draw(); return; }

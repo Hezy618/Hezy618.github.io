@@ -1132,39 +1132,62 @@ html.day .badge.status.review { color: #77608f; background: #f1edf7; border-colo
 .pub-links a, html.day .pub-links a { font-weight: 500; font-size: 11px; color: var(--cyan); padding: 5px 2px; border: 0; border-bottom: 1px solid var(--line); }
 .pub-keywords .kw, html.day .pub-keywords .kw { border: 0; border-radius: 3px; color: var(--dim); background: #87bcb714; padding: 4px 7px; }
 .pub-keywords .kw:hover { color: var(--cyan); background: #87bcb72a; }
-/* Separate body, face, gaze and tail layers prevent competing transforms. */
-.cat.companion { position: absolute; z-index: 6; display: block; width: 70px; height: 70px; top: -61px; right: 25px; left: auto; bottom: auto; pointer-events: auto; opacity: 1; filter: none; transform: none; animation: none; cursor: pointer; --shell: #e3e9f4; --rim: #829bb8; --eye: #99d9ed; }
-.companion-rose { --shell: #f1dfd9 !important; --rim: #c28b98 !important; --eye: #f2b5cf !important; }
-.companion-mint { --shell: #d9ede1 !important; --rim: #77aa9f !important; --eye: #8ce4d1 !important; }
-.companion-gold { --shell: #f4e5c6 !important; --rim: #c29c65 !important; --eye: #f5cd7d !important; }
-.companion-lilac { --shell: #e6def4 !important; --rim: #9d8abf !important; --eye: #cfb4f3 !important; }
+/* One simple cat silhouette, with a different resting activity per section. */
+.cat.companion { position: absolute; z-index: 6; display: block; width: 70px; height: 70px; top: -61px; right: 25px; pointer-events: auto; opacity: 1; filter: none; transform: none; cursor: pointer;
+  --cat-fur:#191b26; --cat-line:#768095; --cat-face:#e2e3dc; --cat-prop:#252d40; --cat-accent:#bca878; }
+html.day .cat.companion { --cat-fur:#f2ecdf; --cat-line:#b1a89a; --cat-face:#55514a; --cat-prop:#e5e9e5; --cat-accent:#b28c49; }
 .companion svg { width: 100%; height: 100%; overflow: visible; }
-.companion-shell { fill: var(--shell); stroke: var(--rim); stroke-width: 1.25; }
-.companion-ear { fill: var(--rim); opacity: .55; }
-.companion-highlight { stroke: #fff; opacity: .8; }
-.companion-visor { fill: #27394a; }
-.companion-open { fill: var(--eye); }
-.companion-happy { stroke: var(--eye); }
-.companion-cheek { fill: #ee9baf; opacity: calc(.3 + var(--joy,0)*.5); }
-.companion-paw { fill: var(--shell); stroke: var(--rim); stroke-width: 1; }
-.companion-tail { stroke: var(--rim); transform-origin: 63px 65px; }
-.companion-head, .companion-breathe { transform-origin: 43px 70px; }
-.companion-hands { transform-origin: 43px 67px; }
-.companion-shadow { fill: var(--cyan); opacity: .12; }
-.companion-blink { transform-origin: 43px 47px; }
-.companion-breathe { animation: companionBreathe 4.2s ease-in-out infinite; animation-delay: var(--idle-delay); animation-play-state: paused; }
-.companion-blink { animation: companionBlink 5.7s linear infinite; animation-delay: var(--idle-delay); animation-play-state: paused; }
-.companion.is-visible .companion-breathe, .companion.is-visible .companion-blink { animation-play-state: running; }
-.companion:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; border-radius: 14px; }
-.companion-bubble { position: absolute; top: 0; right: -12px; color: var(--pink); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 3px 6px; font: 12px/1.4 monospace; opacity: 0; pointer-events: none; }
-.companion.static-happy .companion-open { opacity: 0 !important; }
-.companion.static-happy .companion-happy, .companion.static-happy .companion-bubble { opacity: 1 !important; }
-@keyframes companionBreathe { 0%,100% { transform: translateY(0) scale(1,1); } 50% { transform: translateY(-1.6px) scale(1.015,1.025); } }
-@keyframes companionBlink { 0%,42%,47%,100% { transform: scaleY(1); } 44%,45% { transform: scaleY(.1); } }
-@media (max-width: 640px) { .cat.companion { width: 55px; height: 55px; top: -48px; right: 12px; } }
+.companion-shell { fill:var(--cat-fur); stroke:var(--cat-line); stroke-width:.8; }
+.companion-open { fill:var(--cat-face); color:var(--cat-face); }
+.companion-happy, .cat-mouth { stroke:var(--cat-face); }
+.cat-nose { fill:var(--cat-face); opacity:.65; }
+.companion-paw { fill:var(--cat-fur); stroke:var(--cat-line); stroke-width:.65; }
+.companion-tail { stroke:var(--cat-fur); transform-origin:63px 65px; }
+.companion-head, .companion-breathe { transform-origin:43px 74px; }
+.companion-hands { transform-origin:43px 67px; }
+.companion-shadow { fill:var(--cat-line); opacity:.13; }
+.companion-blink { transform-origin:43px 45px; }
+.companion-breathe { animation:companionBreathe 4.2s ease-in-out infinite; }
+.companion-blink { animation:companionBlink 5.7s linear infinite; }
+.companion-breathe, .companion-blink, .cat-star { animation-delay:var(--idle-delay); animation-play-state:paused; }
+.companion.is-visible .companion-breathe, .companion.is-visible .companion-blink, .companion.is-visible .cat-star { animation-play-state:running; }
+.companion:focus-visible { outline:1px solid var(--cyan); outline-offset:3px; border-radius:50%; }
+.companion-bubble { position:absolute; top:0; right:-10px; color:var(--gold); font:13px/1.4 monospace; opacity:0; pointer-events:none; }
+.companion.static-happy .companion-open { opacity:0 !important; }
+.companion.static-happy .companion-happy, .companion.static-happy .companion-bubble { opacity:1 !important; }
+.companion-code .companion-breathe { animation-name:catWorking; }
+.companion-curious .companion-breathe { animation-name:catReading; animation-duration:6s; }
+.companion-music .companion-breathe { animation-name:catSleeping; animation-duration:5.5s; }
+.companion-music .companion-blink { animation:none; }
+.companion-celebrate .cat-star { animation:catStar 3.5s ease-in-out infinite paused; transform-origin:70px 14px; }
+@keyframes companionBreathe { 0%,100% { transform:translateY(0) scale(1); } 50% { transform:translateY(-1.5px) scale(1.015,1.025); } }
+@keyframes companionBlink { 0%,42%,47%,100% { transform:scaleY(1); } 44%,45% { transform:scaleY(.1); } }
+@keyframes catWorking { 0%,100% { transform:translateY(0) rotate(-1deg); } 50% { transform:translateY(1px) rotate(1deg); } }
+@keyframes catReading { 0%,100% { transform:rotate(-2deg); } 50% { transform:rotate(2deg); } }
+@keyframes catSleeping { 0%,100% { transform:translateY(2px) scale(1.06,.88); } 50% { transform:translateY(1px) scale(1.07,.92); } }
+@keyframes catStar { 0%,100% { opacity:.35; transform:scale(.8) rotate(-8deg); } 50% { opacity:.9; transform:scale(1) rotate(8deg); } }
+@media(max-width:640px) { .cat.companion { width:55px; height:55px; top:-48px; right:12px; } }
 .panel { scroll-margin-top: 150px; }
 
 .pub-badges .badge { box-shadow: none; }
 @media (max-width: 640px) {
   .moon-wrap { transform: scale(.24) !important; transform-origin: top left; }
 }
+/* A travelling crescent along the photograph's edge; the centre stays untouched. */
+@property --portrait-phase { syntax:'<angle>'; initial-value:0deg; inherits:false; }
+.tarot-tilt::after {
+  content:''; position:absolute; inset:-3px; border-radius:2px; padding:1px;
+  background:conic-gradient(from var(--portrait-phase),transparent 0deg,transparent 225deg,#83cec933 265deg,#a7d8d2 295deg,#f3d9ab 315deg,transparent 345deg);
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor; mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);mask-composite:exclude;
+  pointer-events:none; animation:portraitOrbit 9s linear infinite;
+}
+html.day .tarot-tilt::after { background:conic-gradient(from var(--portrait-phase),transparent 0deg,transparent 225deg,#337b8522 265deg,#488f91 295deg,#bf9555 315deg,transparent 345deg); }
+@keyframes portraitOrbit { to { --portrait-phase:360deg; } }
+.cursor-lens { position:fixed; top:0; left:0; width:66px; height:66px; z-index:10000; border-radius:50%; pointer-events:none; opacity:0; transition:opacity .2s;
+  background:conic-gradient(from 35deg,transparent 0deg,transparent 90deg,#b4d7d233 180deg,#e4eee2bb 245deg,transparent 305deg);
+  -webkit-mask:radial-gradient(transparent 66%,#000 68%,#000 70%,transparent 73%);mask:radial-gradient(transparent 66%,#000 68%,#000 70%,transparent 73%);
+}
+.cursor-lens.visible { opacity:.8; }
+html.day .cursor-lens { background:conic-gradient(from 35deg,transparent 0deg,transparent 90deg,#4c8a8733 180deg,#407d7ca0 245deg,transparent 305deg); }
+@media(prefers-reduced-motion:reduce) { .cursor-lens { display:none; } .tarot-tilt::after { animation:none; } }

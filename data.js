@@ -146,7 +146,7 @@ const SITE = {
   /* ---------- 荣誉奖项 ---------- */
   awards: [
     "2026 · Graduate National Scholarship (China) · Xiamen University",
-    "2021–2024 · 武汉科技大学校级一等奖学金",
+    "2021–2024 · First-Class University Scholarship · Wuhan University of Science and Technology",
   ],
 
   /* ---------- 个人爱好 ----------  TODO: 换成你的真实爱好

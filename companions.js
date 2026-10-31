@@ -2,11 +2,11 @@
 (() => {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const personalities = {
-    catAbout: {color:'rose',symbol:'♥',label:'Pet the cat',mode:'love'},
-    catType: {color:'blue',symbol:'</>',label:'Say hello to the coding cat',mode:'code'},
-    catPatrol: {color:'mint',symbol:'✦',label:'Greet the curious research cat',mode:'curious'},
-    catFirework: {color:'gold',symbol:'✧',label:'Celebrate with the cat',mode:'celebrate'},
-    catSit: {color:'lilac',symbol:'♪',label:'Play with the music cat',mode:'music'},
+    catAbout: {symbol:'♥',label:'Pet the cat',mode:'love'},
+    catType: {symbol:'</>',label:'Say hello to the coding cat',mode:'code'},
+    catPatrol: {symbol:'✦',label:'Greet the reading cat',mode:'curious'},
+    catFirework: {symbol:'✧',label:'Celebrate with the cat',mode:'celebrate'},
+    catSit: {symbol:'♪',label:'Wake the resting cat',mode:'music'},
   };
   const states=[];
   let raf=0,last=0;
@@ -54,23 +54,31 @@
   },{rootMargin:'40px'});
   for(const [id,p] of Object.entries(personalities)){
     const node=document.getElementById(id);if(!node)continue;
-    node.className=`cat companion companion-${p.color}`;
+    node.className=`cat companion companion-${p.mode}`;
     node.setAttribute('aria-label',p.label);node.title=p.label;
+    const eyes=p.mode==='music'
+      ? '<path d="M30 46 Q34 49 38 46 M49 46 Q53 49 57 46" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>'
+      : '<ellipse cx="34" cy="45" rx="2" ry="3.3"/><ellipse cx="53" cy="45" rx="2" ry="3.3"/>';
+    const prop=p.mode==='code'
+      ? '<g class="cat-prop"><path d="M23 60H63L59 74H27Z" fill="var(--cat-prop)" stroke="var(--cat-line)" stroke-width="1"/><path d="M19 75H66" stroke="var(--cat-line)" stroke-linecap="round"/><path d="M40 65L37 67L40 69M47 65L50 67L47 69" fill="none" stroke="var(--cat-accent)" stroke-width="1"/></g>'
+      : p.mode==='curious'
+      ? '<g class="cat-prop" fill="var(--cat-prop)" stroke="var(--cat-line)" stroke-width="1"><path d="M22 61Q33 58 43 63V76Q32 71 22 74ZM43 63Q54 58 65 61V74Q54 71 43 76Z"/><path d="M27 65L37 66M49 66L59 65M27 69L37 70M49 70L59 69" opacity=".5"/></g>'
+      : p.mode==='celebrate'
+      ? '<path class="cat-star" d="M70 7L72 12L77 14L72 16L70 21L68 16L63 14L68 12Z" fill="var(--cat-accent)"/>' : '';
     node.innerHTML=`<svg viewBox="0 0 84 84" aria-hidden="true" focusable="false">
-      <ellipse class="companion-shadow" cx="43" cy="75" rx="23" ry="3"/>
+      <ellipse class="companion-shadow" cx="43" cy="76" rx="23" ry="2"/>
       <g class="companion-breathe">
-        <path class="companion-tail" d="M63 65 Q82 66 76 49" fill="none" stroke-width="6" stroke-linecap="round"/>
+        <path class="companion-tail" d="M62 67C80 74 80 53 73 56" fill="none" stroke-width="5" stroke-linecap="round"/>
         <g class="companion-head">
-          <path class="companion-shell" d="M18 32 L18 16 Q18 11 23 15 L34 23 Q42 21 50 23 L61 15 Q66 11 66 17 L66 32 C80 51 70 73 43 73 C15 73 5 52 18 32Z"/>
-          <path class="companion-ear" d="M22 20 L22 31 L31 26Z M62 20 L54 26 L62 31Z"/>
-          <path class="companion-highlight" d="M22 36 Q28 27 40 28" fill="none" stroke-width="2" stroke-linecap="round"/>
-          <rect class="companion-visor" x="20" y="36" width="47" height="23" rx="11.5"/>
+          <path class="companion-shell" d="M17 35L18 16Q18 12 22 16L33 25Q43 22 53 25L64 16Q68 12 68 17L68 36C80 55 69 75 43 75C17 75 6 55 17 35Z"/>
           <g class="companion-gaze">
-            <g class="companion-open"><g class="companion-blink"><rect x="31" y="42" width="4" height="10" rx="2"/><rect x="51" y="42" width="4" height="10" rx="2"/></g></g>
-            <g class="companion-happy" opacity="0" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M29 48 Q33 42 37 48 M49 48 Q53 42 57 48"/></g>
+            <g class="companion-open"><g class="companion-blink">${eyes}</g></g>
+            <g class="companion-happy" opacity="0" fill="none" stroke-width="1.8" stroke-linecap="round"><path d="M30 46Q34 41 38 46M49 46Q53 41 57 46"/></g>
+            <path class="cat-nose" d="M41 51L45 51L43 53Z"/>
+            <path class="cat-mouth" d="M43 53V55Q40 59 38 55M43 55Q46 59 48 55" fill="none" stroke-width="1" stroke-linecap="round"/>
           </g>
-          <circle class="companion-cheek" cx="26" cy="54" r="2"/><circle class="companion-cheek" cx="61" cy="54" r="2"/>
-          <g class="companion-hands"><ellipse class="companion-paw" cx="27" cy="68" rx="7" ry="4"/><ellipse class="companion-paw" cx="59" cy="68" rx="7" ry="4"/></g>
+          <g class="companion-hands"><ellipse class="companion-paw" cx="29" cy="69" rx="6" ry="4"/><ellipse class="companion-paw" cx="58" cy="69" rx="6" ry="4"/></g>
+          ${prop}
         </g>
       </g>
     </svg><span class="companion-bubble" aria-hidden="true">${p.symbol}</span>`;
