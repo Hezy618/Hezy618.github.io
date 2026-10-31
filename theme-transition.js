@@ -11,10 +11,17 @@
       const w=innerWidth,h=innerHeight,dpr=Math.min(devicePixelRatio||1,1.5);
       canvas.width=w*dpr;canvas.height=h*dpr;
       const ctx=canvas.getContext('2d');
-      let changed=false,done=false,raf=0,timer;
+      let changed=false,done=false,raf=0,timer,transition=null;
       const root=document.documentElement,toNight=root.classList.contains('day');
       const swap=()=>{if(!changed){changed=true;changeTheme();}};
-      const finish=()=>{if(done)return;done=true;clearTimeout(timer);cancelAnimationFrame(raf);canvas.remove();root.classList.remove('pixel-transition-active');root.style.removeProperty('--theme-mask');running=false;resolve();};
+      const finish=async()=>{
+        if(done)return;done=true;clearTimeout(timer);cancelAnimationFrame(raf);
+        root.style.setProperty('--theme-mask','inset(0)');
+        // Keep the reveal rules alive until the browser has released both snapshots.
+        if(transition){await transition.ready.catch(()=>{});await transition.finished.catch(()=>{});}
+        canvas.remove();root.classList.remove('pixel-transition-active');root.style.removeProperty('--theme-mask');
+        window.dispatchEvent(new Event('cosmic-transition-end'));running=false;resolve();
+      };
       if(!ctx){swap();finish();return;}
       ctx.setTransform(dpr,0,0,dpr,0,0);ctx.font=`${w<700?11:12}px monospace`;ctx.textBaseline='top';
       document.body.append(canvas);try{canvas.showPopover?.();}catch{}
@@ -32,8 +39,9 @@
         cells.push({x,y,seed,luminance,char:glyphs[Math.floor(seed*glyphs.length)]});
       }
       root.classList.add('pixel-transition-active');
+      window.dispatchEvent(new Event('cosmic-transition-start'));
       const start=performance.now(),duration=1550;
-      timer=setTimeout(()=>{swap();finish();},2300);
+      timer=setTimeout(()=>{swap();transition?.skipTransition();finish();},2300);
       const ridge=(x,p)=>Math.sin(x/w*5.8+p*2.1)*h*.045+Math.sin(x*.018+p)*12;
       const render=now=>{
         if(done)return;
@@ -68,7 +76,7 @@
         }
         ctx.globalAlpha=1;
         if(p>=.22&&!changed){
-          if(document.startViewTransition){try{const t=document.startViewTransition(swap);t.finished.catch(()=>{});}catch{swap();}}else swap();
+          if(document.startViewTransition){try{transition=document.startViewTransition(swap);transition.finished.catch(()=>{});}catch{swap();}}else swap();
         }
         if(p<1)raf=requestAnimationFrame(render);else{swap();finish();}
       };

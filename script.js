@@ -167,14 +167,19 @@
       badges.appendChild(badgeEl(lv, "alt")));
     const links = el("span", "pub-links");
     Object.entries(pub.links || {}).forEach(([label, url]) => {
-      const a = el("a", null, `[${esc(label)}]`);
+      const icon = /pdf/i.test(label)
+        ? '<path d="M7 3h7l4 4v14H7zM14 3v5h4M10 13h5M10 16h5"/>'
+        : /anthology/i.test(label)
+        ? '<path d="M3 5q5-2 9 1q4-3 9-1v14q-5-2-9 1q-4-3-9-1zM12 6v14"/>'
+        : '<path d="M4 11l8-7l8 7M6 10v10h12V10M10 20v-6h4v6"/>';
+      const a = el("a", null, `<svg viewBox="0 0 24 24" aria-hidden="true">${icon}</svg><span>${esc(label)}</span><span class="resource-arrow" aria-hidden="true">↗</span>`);
       a.href = url;
       a.target = "_blank";
       a.rel = "noopener";
       links.appendChild(a);
     });
-    badges.appendChild(links);
     card.appendChild(badges);
+    if (links.childElementCount) card.appendChild(links);
     if ((pub.keywords || []).length) {
       card.appendChild(el("p", "pub-keywords",
         pub.keywords.map((k) => `<span class="kw">${esc(k)}</span>`).join("")));

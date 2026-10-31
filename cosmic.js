@@ -7,7 +7,7 @@
   const bayer=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
   const hash=(x,y)=>{let s=Math.imul(x+73,374761393)^Math.imul(y+31,668265263);s=Math.imul(s^(s>>>13),1274126177);return((s^(s>>>16))>>>0)/4294967296;};
   const craters=[[-.35,-.40,.85,.20],[.40,-.15,.90,.25],[-.12,.45,.88,.16],[.24,-.65,.72,.13],[-.65,.1,.75,.18],[.52,.48,.70,.11]].map(([x,y,z,r])=>{const n=Math.hypot(x,y,z);return{x:x/n,y:y/n,z:z/n,inner:Math.cos(r),outer:Math.cos(r+.035)};});
-  let w=0,h=0,day=true,stars=[],planets=[],hole=[],frame=0,last=0,time=0,then=0,small=false;
+  let w=0,h=0,day=true,stars=[],planets=[],hole=[],frame=0,last=0,time=0,then=0,small=false,transitioning=false;
   const palettes={night:['#171b2c','#26364b','#3b5368','#587787','#8aa5ac','#c2c3ad'],day:['#9aaab7','#b3bec5','#cad0cc','#dcd7c9','#e9dfcb','#f5ead7']};
   function sphere(cx,cy,r,variant){
     const points=[],step=small?5:5;
@@ -117,16 +117,18 @@
     ctx.globalAlpha=1;
   }
   function tick(now){
-    frame=0;if(document.hidden||reduced.matches)return;
+    frame=0;if(document.hidden||reduced.matches||transitioning)return;
     const interval=small?83:50;
     if(now-last>=interval){time+=Math.min((now-then)/1000||0,.12);then=now;last=now;draw();}
     frame=requestAnimationFrame(tick);
   }
-  function start(){if(!frame&&!document.hidden&&!reduced.matches){then=performance.now();frame=requestAnimationFrame(tick);}}
+  function start(){if(!frame&&!document.hidden&&!reduced.matches&&!transitioning){then=performance.now();frame=requestAnimationFrame(tick);}}
   let resizeFrame=0;
   window.addEventListener('resize',()=>{cancelAnimationFrame(resizeFrame);resizeFrame=requestAnimationFrame(resize);});
   new MutationObserver(()=>{const next=document.documentElement.classList.contains('day');if(next!==day){bake();draw();}}).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
   document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelAnimationFrame(frame);frame=0;}else start();});
   reduced.addEventListener('change',()=>{cancelAnimationFrame(frame);frame=0;draw();start();});
+  window.addEventListener('cosmic-transition-start',()=>{transitioning=true;cancelAnimationFrame(frame);frame=0;});
+  window.addEventListener('cosmic-transition-end',()=>{transitioning=false;start();});
   resize();document.documentElement.classList.add('cosmic-ready');start();
 })();
