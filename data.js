@@ -24,6 +24,7 @@ const SITE = {
   /* ---------- 外部链接（没有就删掉那一行） ---------- */
   links: {
     "Google Scholar": "https://scholar.google.com/citations?user=O-E3TdAAAAAJ&hl=zh-CN&authuser=1",
+    "ACL Anthology": "https://aclanthology.org/people/zhongyu-he/",
     "GitHub": "https://github.com/Hezy618",
     "X": "https://x.com/hezzzyu",
   },

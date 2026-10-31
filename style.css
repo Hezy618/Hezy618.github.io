@@ -1017,7 +1017,7 @@ html.day .tarot-scene .tarot-face, html.day .tarot-scene:hover .tarot-face {
 .tarot-scene .tarot-back, html.day .tarot-scene .tarot-back { background: transparent; }
 .tarot-back-quote { line-height: 1.7; font-size: 18px; }
 .tarot-scene:focus-visible { outline: 1px solid var(--cyan); outline-offset: 6px; }
-.portrait-links { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 21px; position: relative; }
+.portrait-links { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:3px 12px; margin-top:18px; position:relative; }
 .portrait-links a { display: inline-flex; align-items: center; min-height: 32px; color: var(--dim); text-decoration: none; font: 11px/1.5 var(--font-body); white-space: nowrap; border-bottom: 1px solid transparent; transition: color .2s,border-color .2s; }
 .portrait-links a:hover, .portrait-links a:focus-visible { color: var(--cream); border-bottom-color: var(--gold); }
 .portrait-links .lico { width: 12px; height: 12px; margin-right: 5px; }
@@ -1222,3 +1222,14 @@ html.day .pub-card .pub-links a:hover { background:#dfede7; border-color:#77a59f
 @keyframes catStride { 0%,100% { transform:translate(-2px,0); } 50% { transform:translate(2px,-3px); } }
 @keyframes catBall { to { transform:rotate(360deg); } }
 @keyframes catTailWave { 0%,100% { rotate:-5deg; } 50% { rotate:12deg; } }
+
+/* Official ACL mark; alpha masking keeps it legible in both themes. */
+.portrait-links a { min-width:0; min-height:34px; padding:4px 0; }
+.portrait-links .lico { width:14px; height:14px; margin-right:7px; }
+.lico-acl { display:inline-block; background:currentColor; -webkit-mask:url("assets/acl-logo.svg") center/contain no-repeat; mask:url("assets/acl-logo.svg") center/contain no-repeat; }
+.companion-sport { --cat-band:#d89a80; }
+html.day .companion-sport { --cat-band:#b96f5d; }
+.cat-band-ribbons { transform-origin:66px 37px; animation:headbandFlutter 1.1s ease-in-out infinite paused; }
+.companion.is-visible .cat-band-ribbons { animation-play-state:running; }
+@keyframes headbandFlutter { 0%,100% { transform:rotate(-7deg) scaleX(.95); } 50% { transform:rotate(7deg) scaleX(1.04); } }
+.portrait-links .lico-acl { width:18px; margin-right:5px; }

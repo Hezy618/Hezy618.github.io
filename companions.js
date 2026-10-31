@@ -73,6 +73,7 @@
         <path class="companion-tail" d="M62 67C80 74 80 53 73 56" fill="none" stroke-width="5" stroke-linecap="round"/>
         <g class="companion-head">
           <path class="companion-shell" d="M18 37Q17 31 21 25Q23 22 26 25L34 30Q43 27 52 30L60 25Q64 22 66 26Q69 32 68 38C79 56 69 75 43 75C17 75 7 56 18 37Z"/>
+          ${p.mode==='sport' ? '<g class="cat-headband"><path d="M19 36Q43 30 68 36L67 41Q43 35 19 41Z" fill="var(--cat-band)"/><path d="M21 38Q43 33 65 38" fill="none" stroke="var(--cat-fur)" stroke-width=".8" opacity=".7"/><g class="cat-band-ribbons" fill="var(--cat-band)"><path d="M66 36Q74 30 79 34L75 38Q70 35 66 38ZM66 37Q73 37 77 43L72 44Q70 39 66 39Z"/><circle cx="66" cy="37" r="2.5"/></g></g>' : ''}
           <g class="companion-gaze">
             <g class="companion-open"><g class="companion-blink">${eyes}</g></g>
             <g class="companion-happy" opacity="0" fill="none" stroke-width="1.8" stroke-linecap="round"><path d="M30 46Q34 41 38 46M49 46Q53 41 57 46"/></g>
