@@ -44,7 +44,7 @@
           points.push(`${i*5}% ${Math.max(0,Math.min(h,front+wave))}px`);
         }
         document.documentElement.style.setProperty('--theme-mask',`polygon(${points.join(',')},100% 100%,0 100%)`);
-        ctx.fillStyle=toNight?'#9baea6':'#667d70';
+        ctx.fillStyle=toNight?'#9acfd6':'#628b8c';
         for(const c of cells){
           const wave=Math.sin(c.x/w*5.2+p*2.5)*32+Math.sin(c.x*.013)*9;
           const distance=c.y-front-wave;

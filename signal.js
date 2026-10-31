@@ -36,7 +36,10 @@
   function draw() {
     ctx.clearRect(0,0,w,h);
     const day = document.documentElement.classList.contains('day');
-    ctx.fillStyle = day ? '#2c433a' : '#dce6dc';
+    const nameInk=ctx.createLinearGradient(0,0,w,0);
+    nameInk.addColorStop(0,day?'#286e7c':'#f0d9a7');
+    nameInk.addColorStop(1,day?'#456e65':'#8dd9d2');
+    ctx.fillStyle=nameInk;
     for(const dot of dots) {
       let x=dot.x,y=dot.y,alpha=dot.a;
       if(pointer && strength>0 && !reduced.matches) {

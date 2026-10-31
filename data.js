@@ -83,7 +83,7 @@ const SITE = {
       authors: ["Zhongyu He*", "Yuanfan Li*", "Fei Huang", "Tianyu Chen", "Siyuan Chen", "Xingyang Li", "Meng Hsuan Yu", "Xiangrong Liu", "Leyi Wei", "Lu Pan", "Ke Zeng", "Xunliang Cai"],   // * 共同一作
       venue: "EMNLP (Main Conference)",
       year: 2026,
-      status: "Published",
+      status: "Accepted",
       level: "CCF-B",
       extraLevels: ["CORE A*", "TH-CPL A"],   // EMNLP: CORE2023 起 A*，清华 TH-CPL A 类
       keywords: ["LLM Agents", "Agentic RL", "SKILL", "Self-Distillation"],
@@ -127,7 +127,7 @@ const SITE = {
       authors: ["Fei Huang", "Tianyu Chen", "Zhongyu He", "Yuanfan Li", "Meng Hsuan Yu", "Xingyang Li", "Lu Pan", "Ke Zeng", "Xunliang Cai"],
       venue: "Findings of EMNLP",
       year: 2026,
-      status: "Published",
+      status: "Accepted",
       keywords: ["LLM Agents", "Agentic RL", "SKILL"],
       links: { "ACL Anthology": "https://aclanthology.org/2026.findings-emnlp.136/" },
     },
@@ -146,6 +146,7 @@ const SITE = {
   /* ---------- 荣誉奖项 ---------- */
   awards: [
     "2026 · Graduate National Scholarship (China) · Xiamen University",
+    "2021–2024 · 武汉科技大学校级一等奖学金",
   ],
 
   /* ---------- 个人爱好 ----------  TODO: 换成你的真实爱好
