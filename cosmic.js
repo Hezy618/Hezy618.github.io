@@ -35,7 +35,9 @@
   function drawHole(){
     for(const a of hole){
       if(a.rho<.305){
-        ctx.globalAlpha=day?.72:.98;ctx.fillStyle=day?'#6e7c85':'#080b17';
+        ctx.globalAlpha=day?1:.98;
+        // Daylight uses paper-like negative space, with only a faint inner rim.
+        ctx.fillStyle=day?(a.rho>.283?'#edf0e9':'#f5f5ef'):'#080b17';
       }else{
         const stream=.62+.22*Math.sin(a.theta*4-time*.42)+.12*Math.sin(a.theta*11-time*.83);
         const beam=.6+.4*Math.cos(a.theta+.7);
