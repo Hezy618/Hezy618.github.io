@@ -1173,24 +1173,19 @@ html.day .cat.companion { --cat-fur:#f2ecdf; --cat-line:#b1a89a; --cat-face:#555
 @media (max-width: 640px) {
   .moon-wrap { transform: scale(.24) !important; transform-origin: top left; }
 }
-/* A travelling crescent along the photograph's edge; the centre stays untouched. */
-@property --portrait-phase { syntax:'<angle>'; initial-value:0deg; inherits:false; }
-.tarot-tilt::after {
-  content:''; position:absolute; inset:-3px; border-radius:2px; padding:1px;
-  background:conic-gradient(from var(--portrait-phase),transparent 0deg,transparent 225deg,#83cec933 265deg,#a7d8d2 295deg,#f3d9ab 315deg,transparent 345deg);
-  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
-  -webkit-mask-composite:xor; mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);mask-composite:exclude;
-  pointer-events:none; animation:portraitOrbit 9s linear infinite;
-}
-html.day .tarot-tilt::after { background:conic-gradient(from var(--portrait-phase),transparent 0deg,transparent 225deg,#337b8522 265deg,#488f91 295deg,#bf9555 315deg,transparent 345deg); }
-@keyframes portraitOrbit { to { --portrait-phase:360deg; } }
+/* A tapered light trail: a broad warm head and a thin, fading cool tail. */
+.portrait-orbit { position:absolute; inset:-6px; width:calc(100% + 12px); height:calc(100% + 12px); overflow:visible; pointer-events:none; transform:translateZ(1px); --trail-color:#90d9dc; --trail-head:#f5d59d; filter:drop-shadow(0 0 3px #8dd6e640); }
+html.day .portrait-orbit { --trail-color:#428d98; --trail-head:#bd8c46; filter:drop-shadow(0 0 2px #497f8b25); }
+.portrait-orbit rect { fill:none; stroke:var(--trail-color); stroke-linecap:round; stroke-dasharray:8.5 991.5; stroke-dashoffset:var(--trail-start); animation:portraitTrail 9s linear infinite; }
+.portrait-orbit rect:nth-child(-n+3) { stroke:var(--trail-head); }
+@keyframes portraitTrail { from { stroke-dashoffset:var(--trail-start); } to { stroke-dashoffset:calc(var(--trail-start) - 1000px); } }
 .cursor-lens { position:fixed; top:0; left:0; width:66px; height:66px; z-index:10000; border-radius:50%; pointer-events:none; opacity:0; transition:opacity .2s;
   background:conic-gradient(from 35deg,transparent 0deg,transparent 90deg,#b4d7d233 180deg,#e4eee2bb 245deg,transparent 305deg);
   -webkit-mask:radial-gradient(transparent 66%,#000 68%,#000 70%,transparent 73%);mask:radial-gradient(transparent 66%,#000 68%,#000 70%,transparent 73%);
 }
 .cursor-lens.visible { opacity:.8; }
 html.day .cursor-lens { background:conic-gradient(from 35deg,transparent 0deg,transparent 90deg,#4c8a8733 180deg,#407d7ca0 245deg,transparent 305deg); }
-@media(prefers-reduced-motion:reduce) { .cursor-lens { display:none; } .tarot-tilt::after { animation:none; } }
+@media(prefers-reduced-motion:reduce) { .cursor-lens { display:none; } .portrait-orbit rect { animation:none; } }
 /* Astronomy occupies the margins; content remains on calm, opaque surfaces. */
 #cosmicCanvas { position:fixed; inset:0; width:100%; height:100%; z-index:-4; pointer-events:none; image-rendering:pixelated; }
 .cosmic-ready .cloud, .cosmic-ready .mountains, html.cosmic-ready .ink-geese { display:none; }
