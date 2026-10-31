@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="style.css?v=20260927g" />
+  <link rel="stylesheet" href="style.css?v=20261031a" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'><rect width='8' height='8' fill='%2307070f'/><rect x='3' y='1' width='2' height='2' fill='%23f3e9c8'/><rect x='1' y='3' width='6' height='2' fill='%23f3e9c8'/><rect x='3' y='5' width='2' height='2' fill='%23f3e9c8'/></svg>" />
 </head>
 <body>
@@ -49,7 +49,7 @@
     <header class="hero" id="about">
 
       <!-- 塔罗牌：悬停 3D 倾斜 + 流光，点击翻面 -->
-      <div class="tarot-scene" id="tarotScene" title="Click to flip">
+      <div class="tarot-scene" id="tarotScene" role="button" tabindex="0" aria-label="Flip portrait to read a personal note" aria-pressed="false" title="Click to flip">
         <div class="tarot-tilt" id="tarotTilt">
           <div class="tarot-card" id="tarotCard">
             <!-- 正面 -->
@@ -102,6 +102,12 @@
       </div>
     </header>
 
+    <div class="signal-studio">
+      <div class="signal-caption"><span>ZH / PERSONAL SIGNAL</span><span>MOVE TO EXPLORE · TAP TO PULSE</span></div>
+      <canvas id="signalCanvas" role="img" aria-label="Interactive pixel wordmark: Zhongyu He, surrounded by a dithered orbit"></canvas>
+      <p class="signal-footnote">EXPLORING INTELLIGENCE, ONE IDEA AT A TIME.</p>
+    </div>
+
     <!-- ===== About Me ===== -->
     <section class="panel reveal">
       <h2 class="section-title"><span class="glyph">✦</span> ABOUT ME <span class="rule"></span></h2>
@@ -152,6 +158,7 @@
   </main>
 
   <script src="data.js?v=20261030a"></script>
-  <script src="script.js?v=20260927e"></script>
+  <script src="script.js?v=20261031a"></script>
+  <script src="signal.js?v=20261031a"></script>
 </body>
 </html>

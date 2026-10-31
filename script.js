@@ -711,7 +711,7 @@
   const tilt = $("#tarotTilt");
   const card = $("#tarotCard");
   const glare = $("#tarotGlare");
-  const MAX_TILT = 16;
+  const MAX_TILT = 5;
 
   scene.addEventListener("mousemove", (e) => {
     const rect = scene.getBoundingClientRect();
@@ -724,7 +724,14 @@
   scene.addEventListener("mouseleave", () => {
     tilt.style.transform = "rotateY(0deg) rotateX(0deg) scale(1)";
   });
-  scene.addEventListener("click", () => card.classList.toggle("flipped"));
+  const flipPortrait = () => {
+    const flipped = card.classList.toggle("flipped");
+    scene.setAttribute("aria-pressed", String(flipped));
+  };
+  scene.addEventListener("click", (e) => { if (!e.target.closest("a, .cat")) flipPortrait(); });
+  scene.addEventListener("keydown", (e) => {
+    if (e.target === scene && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); flipPortrait(); }
+  });
 
   /* ==================== 鼠标星尘轨迹 ==================== */
   const dustBox = $("#stardust");
@@ -1128,18 +1135,18 @@
       const wipe = el("div", "theme-wipe");
       wipe.setAttribute("aria-hidden", "true");
       wipe.setAttribute("popover", "manual");
-      const width = 40;
+      const width = 18;
       const rows = Math.ceil(window.innerHeight / 24) * 2 + 8;
       const cols = Math.ceil(window.innerWidth / width);
       for (let i = 0; i < cols; i++) {
         const column = el("div", "bcol");
         column.textContent = Array.from({ length: rows }, () =>
-          Math.random() < .42 ? " " : Math.random() < .5 ? "0" : "1").join("\n");
+          Math.random() < .45 ? " " : "01XYZ:+.*"[Math.floor(Math.random() * 9)]).join("\n");
         column.style.left = `${i * width}px`;
         column.style.width = `${width}px`;
         column.style.setProperty("--wd", `${Math.random() * .16}s`);
         column.style.setProperty("--wt", `${1.1 + Math.random() * .12}s`);
-        column.style.setProperty("--code-color", toDay ? "#506b69" : "#8fd8e8");
+        column.style.setProperty("--code-color", toDay ? "#63716b" : "#a9b9b6");
         wipe.appendChild(column);
       }
       if (!document.startViewTransition) {
