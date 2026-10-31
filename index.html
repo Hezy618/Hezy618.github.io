@@ -13,13 +13,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="style.css?v=20261031d" />
+  <link rel="stylesheet" href="style.css?v=20261031e" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'><rect width='8' height='8' fill='%2307070f'/><rect x='3' y='1' width='2' height='2' fill='%23f3e9c8'/><rect x='1' y='3' width='6' height='2' fill='%23f3e9c8'/><rect x='3' y='5' width='2' height='2' fill='%23f3e9c8'/></svg>" />
 </head>
 <body>
 
   <!-- 夜空背景：星星 / 流星（JS）· 月亮 / 云 / 群山（CSS+JS）；月亮/太阳即主题开关 -->
   <div id="starfield" aria-hidden="true"></div>
+  <canvas id="cosmicCanvas" aria-hidden="true"></canvas>
   <div class="moon-wrap" role="button" tabindex="0" title="Switch theme" aria-label="Switch day and night theme"><div id="moon"></div><div id="sun"></div><div id="themeHint" class="theme-hint"></div></div>
   <div class="cloud cloud-1" aria-hidden="true"></div>
   <div class="cloud cloud-2" aria-hidden="true"></div>
@@ -158,11 +159,12 @@
 
   </main>
 
-  <script src="data.js?v=20261031d"></script>
-  <script src="script.js?v=20261031d"></script>
-  <script src="signal.js?v=20261031d"></script>
-  <script src="theme-transition.js?v=20261031d"></script>
-  <script src="companions.js?v=20261031d"></script>
-  <script src="cursor.js?v=20261031d"></script>
+  <script src="data.js?v=20261031e"></script>
+  <script src="cosmic.js?v=20261031e"></script>
+  <script src="script.js?v=20261031e"></script>
+  <script src="signal.js?v=20261031e"></script>
+  <script src="theme-transition.js?v=20261031e"></script>
+  <script src="companions.js?v=20261031e"></script>
+  <script src="cursor.js?v=20261031e"></script>
 </body>
 </html>

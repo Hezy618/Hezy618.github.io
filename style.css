@@ -1081,7 +1081,7 @@ html.day .moon-wrap { filter: grayscale(.8); }
 /* The arriving theme is revealed by the same wave that carries the glyphs. */
 html.pixel-transition-active::view-transition-old(root) { animation: none; mix-blend-mode: normal; }
 html.pixel-transition-active::view-transition-new(root) {
-  animation: holdThemeFrame .72s linear both;
+  animation: holdThemeFrame 1.24s linear both;
   clip-path: var(--theme-mask, inset(100% 0 0));
   mix-blend-mode: normal;
 }
@@ -1191,3 +1191,10 @@ html.day .tarot-tilt::after { background:conic-gradient(from var(--portrait-phas
 .cursor-lens.visible { opacity:.8; }
 html.day .cursor-lens { background:conic-gradient(from 35deg,transparent 0deg,transparent 90deg,#4c8a8733 180deg,#407d7ca0 245deg,transparent 305deg); }
 @media(prefers-reduced-motion:reduce) { .cursor-lens { display:none; } .tarot-tilt::after { animation:none; } }
+/* Astronomy occupies the margins; content remains on calm, opaque surfaces. */
+#cosmicCanvas { position:fixed; inset:0; width:100%; height:100%; z-index:-4; pointer-events:none; image-rendering:pixelated; }
+.cosmic-ready .cloud, .cosmic-ready .mountains, html.cosmic-ready .ink-geese { display:none; }
+html.cosmic-ready .moon-wrap { top:76px; right:35px; transform:scale(.6) !important; transform-origin:top right; animation:none; }
+html.cosmic-ready .panel { background:rgba(23,29,49,.94); }
+html.cosmic-ready.day .panel { background:rgba(255,253,247,.95); }
+@media(max-width:640px) { html.cosmic-ready .moon-wrap { top:3px; left:48px; right:auto; transform:scale(.24) !important; transform-origin:top left; } }

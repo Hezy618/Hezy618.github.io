@@ -219,30 +219,6 @@
     }
   })();
 
-  /* ==================== 星空 ==================== */
-  const field = $("#starfield");
-  const STAR_COUNT = Math.min(150, Math.floor(window.innerWidth / 9));
-  for (let s = 0; s < STAR_COUNT; s++) {
-    const star = el("div", "star" + (s % 11 === 0 ? " c" : s % 7 === 0 ? " y" : ""));
-    const size = s % 6 === 0 ? 3 : 2;
-    star.style.width = star.style.height = size + "px";
-    star.style.left = Math.random() * 100 + "%";
-    star.style.top = Math.random() * 100 + "%";
-    star.style.setProperty("--d", (1.6 + Math.random() * 3.2).toFixed(2) + "s");
-    star.style.animationDelay = (Math.random() * 4).toFixed(2) + "s";
-    field.appendChild(star);
-  }
-
-  /* 流星：每 6~11 秒一颗 */
-  (function spawnShooting() {
-    const s = el("div", "shooting");
-    s.style.top = (4 + Math.random() * 30) + "%";
-    s.style.left = (30 + Math.random() * 65) + "%";
-    document.body.appendChild(s);
-    setTimeout(() => s.remove(), 1500);
-    setTimeout(spawnShooting, 6000 + Math.random() * 5000);
-  })();
-
   /* ==================== 像素月亮 ==================== */
   /* 32×32 程序化生成（4px 粒度，比原 16 列手绘细腻得多）：
    * 光源在左上，按到圆心距离与光向连续计算明暗，映射到调色板；
@@ -294,18 +270,6 @@
 
   /* 月亮滚动视差 */
   const moonWrap = $(".moon-wrap");
-  let ticking = false;
-  window.addEventListener("scroll", () => {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(() => {
-      moonWrap.style.transform = window.matchMedia("(max-width: 640px)").matches
-        ? ""
-        : `translateY(${window.scrollY * 0.12}px)`;
-      ticking = false;
-    });
-  });
-
   /* Companions are drawn and animated in companions.js. */
   syncTarot(document.documentElement.classList.contains("day"));
 
