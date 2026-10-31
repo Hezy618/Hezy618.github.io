@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="style.css?v=20261031a" />
+  <link rel="stylesheet" href="style.css?v=20261031b" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'><rect width='8' height='8' fill='%2307070f'/><rect x='3' y='1' width='2' height='2' fill='%23f3e9c8'/><rect x='1' y='3' width='6' height='2' fill='%23f3e9c8'/><rect x='3' y='5' width='2' height='2' fill='%23f3e9c8'/></svg>" />
 </head>
 <body>
@@ -49,6 +49,7 @@
     <header class="hero" id="about">
 
       <!-- 塔罗牌：悬停 3D 倾斜 + 流光，点击翻面 -->
+      <div class="portrait-column">
       <div class="tarot-scene" id="tarotScene" role="button" tabindex="0" aria-label="Flip portrait to read a personal note" aria-pressed="false" title="Click to flip">
         <div class="tarot-tilt" id="tarotTilt">
           <div class="tarot-card" id="tarotCard">
@@ -66,7 +67,7 @@
                     <div class="tarot-glare" id="tarotGlare"></div>
                   </div>
                 </div>
-                <div class="tarot-links" id="tarot-links"><!-- JS 渲染：GitHub / Scholar / X 等外链 --></div>
+
                 <div class="tarot-deco">
                   <span class="tgly" data-night="☾">☾</span><span class="diamond"></span><span>✦</span><span class="diamond"></span><span class="tgly" data-night="☽">☽</span>
                 </div>
@@ -87,10 +88,16 @@
         <div class="cat cat-sleep" id="catSleep" role="button" tabindex="0" title="Boop!" aria-label="Sleeping pixel cat — click to startle it awake"></div>
       </div>
 
+      <nav class="portrait-links" id="tarot-links" aria-label="Social profiles"></nav>
+      </div>
+
       <!-- 角色信息 -->
       <div class="hero-info">
         <p class="hero-hello">RESEARCHER · ENGINEER</p>
-        <h1 id="profile-name" class="pixel-title">Zhongyu He</h1>
+        <div class="identity-wordmark">
+          <h1 id="profile-name" class="pixel-title">Zhongyu He</h1>
+          <canvas id="signalCanvas" aria-hidden="true"></canvas>
+        </div>
         <p class="tagline"><span id="typewriter"></span><span class="cursor">_</span></p>
         <p class="hero-summary" id="hero-summary"></p>
         <ul class="stat-list" id="stat-list"><!-- JS 渲染 --></ul>
@@ -101,12 +108,6 @@
         </div>
       </div>
     </header>
-
-    <div class="signal-studio">
-      <div class="signal-caption"><span>ZH / PERSONAL SIGNAL</span><span>MOVE TO EXPLORE · TAP TO PULSE</span></div>
-      <canvas id="signalCanvas" role="img" aria-label="Interactive pixel wordmark: Zhongyu He, surrounded by a dithered orbit"></canvas>
-      <p class="signal-footnote">EXPLORING INTELLIGENCE, ONE IDEA AT A TIME.</p>
-    </div>
 
     <!-- ===== About Me ===== -->
     <section class="panel reveal">
@@ -158,7 +159,8 @@
   </main>
 
   <script src="data.js?v=20261030a"></script>
-  <script src="script.js?v=20261031a"></script>
-  <script src="signal.js?v=20261031a"></script>
+  <script src="script.js?v=20261031b"></script>
+  <script src="signal.js?v=20261031b"></script>
+  <script src="theme-transition.js?v=20261031b"></script>
 </body>
 </html>

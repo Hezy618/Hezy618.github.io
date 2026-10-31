@@ -1132,40 +1132,12 @@
         return;
       }
 
-      const wipe = el("div", "theme-wipe");
-      wipe.setAttribute("aria-hidden", "true");
-      wipe.setAttribute("popover", "manual");
-      const width = 18;
-      const rows = Math.ceil(window.innerHeight / 24) * 2 + 8;
-      const cols = Math.ceil(window.innerWidth / width);
-      for (let i = 0; i < cols; i++) {
-        const column = el("div", "bcol");
-        column.textContent = Array.from({ length: rows }, () =>
-          Math.random() < .45 ? " " : "01XYZ:+.*"[Math.floor(Math.random() * 9)]).join("\n");
-        column.style.left = `${i * width}px`;
-        column.style.width = `${width}px`;
-        column.style.setProperty("--wd", `${Math.random() * .16}s`);
-        column.style.setProperty("--wt", `${1.1 + Math.random() * .12}s`);
-        column.style.setProperty("--code-color", toDay ? "#63716b" : "#a9b9b6");
-        wipe.appendChild(column);
-      }
-      if (!document.startViewTransition) {
-        syncTheme();
-        document.body.appendChild(wipe);
-        if (wipe.showPopover) wipe.showPopover();
-        setTimeout(() => { wipe.remove(); wiping = false; }, 1350);
-        return;
-      }
+      try {
+        if (window.runPixelTransition) {
+          Promise.resolve(window.runPixelTransition(syncTheme)).finally(() => { wiping = false; });
+        } else { syncTheme(); wiping = false; }
+      } catch { wiping = false; }
 
-      const transition = document.startViewTransition(syncTheme);
-      transition.ready.then(() => {
-        document.body.appendChild(wipe);
-        if (wipe.showPopover) wipe.showPopover();
-      }).catch(() => {});
-      const cleanup = () => {
-        setTimeout(() => { wipe.remove(); wiping = false; }, 550);
-      };
-      transition.finished.then(cleanup, cleanup);
     };
     moonWrap.addEventListener("click", wipeTheme);
     /* 月亮在背景层（z-index 低于正文），被正文透明区域盖住时点击/悬停无法直达。

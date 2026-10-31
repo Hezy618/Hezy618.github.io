@@ -1,71 +1,90 @@
-/* A local, deterministic dot field; no remote graphics or WebGL required. */
+/* The name remains an accessible h1; the canvas adds a local optical field. */
 (() => {
   const canvas = document.getElementById('signalCanvas');
   const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+  const holder = canvas.parentElement;
+  const title = document.getElementById('profile-name');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  let width = 0, height = 0, dots = [], frame = 0, visible = false;
-  let pointer = null, pulse = 0;
   const mask = document.createElement('canvas');
-  const ink = mask.getContext('2d', { willReadFrequently: true });
+  const ink = mask.getContext('2d', {willReadFrequently: true});
+  let w = 0, h = 0, dots = [], pointer = null, target = null, raf = 0, visible = true;
+  let lastTime = 0, strength = 0, pulse = 0;
+  const clamp = (v,a,b) => Math.min(b,Math.max(a,v));
   function resize() {
-    width = Math.round(canvas.clientWidth); height = Math.round(canvas.clientHeight);
-    const scale = Math.min(devicePixelRatio || 1, 2);
-    canvas.width = width * scale; canvas.height = height * scale;
-    ctx.setTransform(scale, 0, 0, scale, 0, 0);
-    mask.width = width; mask.height = height;
-    ink.font = `900 ${Math.min(width / 8.5, 108)}px monospace`;
-    ink.textAlign = 'center'; ink.textBaseline = 'middle';
-    ink.fillText('ZHONGYU HE', width / 2, height / 2);
-    const pixels = ink.getImageData(0, 0, width, height).data;
+    w = Math.round(canvas.clientWidth); h = Math.round(canvas.clientHeight);
+    if (!w || !h) return;
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    canvas.width = w*dpr; canvas.height = h*dpr; ctx.setTransform(dpr,0,0,dpr,0,0);
+    mask.width = w; mask.height = h;
+    const name = title.textContent;
+    let size = Math.min(44, w/(name.length*.98));
+    ink.font = `${size}px "Press Start 2P", monospace`;
+    const measured = ink.measureText(name).width;
+    if (measured > w-12) { size *= (w-12)/measured; ink.font = `${size}px "Press Start 2P", monospace`; }
+    ink.textBaseline = 'middle'; ink.fillStyle = '#fff';
+    ink.fillText(name, 1, h*.52);
+    const pixels = ink.getImageData(0,0,w,h).data;
     dots = [];
-    for (let y = 2; y < height; y += 4) for (let x = 2; x < width; x += 4) {
-      const word = pixels[(y * width + x) * 4 + 3] > 100;
-      const dx = (x - width * .5) / (width * .43), dy = (y - height * .5) / (height * .42);
-      const orbit = Math.abs(dx * dx + dy * dy - 1) < .18;
-      const hash = ((x * 137 + y * 79) % 101) / 101;
-      if (word || (orbit && hash > .38)) dots.push({x,y,word,a: word ? .8 : .1 + hash * .18});
+    // Fine screen-door sampling preserves the solid silhouette at reading distance.
+    const step = w < 400 ? 1.75 : 2.2;
+    for(let y=0;y<h;y+=step) for(let x=0;x<w;x+=step) {
+      if(pixels[(Math.floor(y)*w+Math.floor(x))*4+3]>90) dots.push({x,y,a:.83+((Math.floor(x)*13+Math.floor(y)*7)%17)/100});
     }
-    draw();
+    holder.classList.add('ready'); draw();
   }
   function draw() {
-    ctx.clearRect(0,0,width,height);
+    ctx.clearRect(0,0,w,h);
     const day = document.documentElement.classList.contains('day');
-    ctx.fillStyle = day ? '#354f4a' : '#c7d6cf';
-    for (const dot of dots) {
-      let x = dot.x, y = dot.y, light = dot.a;
-      if (pointer && !reduced.matches) {
-        const dx = x - pointer.x, dy = y - pointer.y, distance = Math.hypot(dx,dy);
-        const force = Math.max(0, 1 - distance / 90);
-        x += dx * force * .3; y += dy * force * .45;
-        light = Math.min(1, light + force * .5);
+    ctx.fillStyle = day ? '#2c433a' : '#dce6dc';
+    for(const dot of dots) {
+      let x=dot.x,y=dot.y,alpha=dot.a;
+      if(pointer && strength>0 && !reduced.matches) {
+        const dx=x-pointer.x,dy=y-pointer.y,r=Math.hypot(dx,dy),radius=43+pulse*13;
+        const influence=Math.exp(-Math.pow(r/radius,2)*1.5)*strength;
+        // A continuous radial refraction, with horizontal scan-line displacement.
+        x+=dx*influence*.55 + Math.sin(y*.25)*influence*1.2;
+        y+=dy*influence*.26; alpha=clamp(alpha+influence*.16,0,1);
       }
-      ctx.globalAlpha = light;
-      ctx.fillRect(x,y, dot.word ? 2.6 : 2, dot.word ? 2.6 : 2);
+      ctx.globalAlpha=alpha; ctx.fillRect(x,y,1.65,1.65);
     }
-    ctx.globalAlpha = 1;
-    if (pointer && !reduced.matches) {
-      ctx.strokeStyle = day ? '#7a9185' : '#aac7be';
-      ctx.lineWidth = .7; ctx.beginPath();
-      ctx.arc(pointer.x,pointer.y,30 + pulse * 18,0,Math.PI * 2); ctx.stroke();
+    ctx.globalAlpha=1;
+    if(pointer && strength>.01 && !reduced.matches) {
+      ctx.save(); ctx.globalAlpha=strength*.7;
+      const r=35+pulse*12;
+      const light=ctx.createLinearGradient(pointer.x-r,pointer.y-r,pointer.x+r,pointer.y+r);
+      light.addColorStop(0,'transparent');
+      light.addColorStop(.32,day?'#758d7e':'#d8e8de');
+      light.addColorStop(.65,day?'#758d7e22':'#d8e8de22');
+      light.addColorStop(1,'transparent');
+      ctx.strokeStyle=light;ctx.lineWidth=1.2;
+      ctx.beginPath();ctx.arc(pointer.x,pointer.y,r,0,Math.PI*2);ctx.stroke();
+      ctx.restore();
     }
   }
-  function animate() {
-    frame = 0; if (!visible || document.hidden || reduced.matches) return;
-    pulse *= .93; draw();
-    if (pulse > .01) frame = requestAnimationFrame(animate);
+  function tick(time) {
+    raf=0;
+    if(!visible || document.hidden || reduced.matches) { strength=0; draw(); return; }
+    const dt=Math.min((time-lastTime)||16,40);lastTime=time;
+    const blend=1-Math.exp(-dt/65);
+    if(target) { if(!pointer) pointer={...target}; pointer.x+=(target.x-pointer.x)*blend;pointer.y+=(target.y-pointer.y)*blend; }
+    strength+=((target?1:0)-strength)*blend; pulse*=Math.exp(-dt/180);
+    draw();
+    const moving=target && (Math.abs(pointer.x-target.x)+Math.abs(pointer.y-target.y)>.1);
+    if(moving || Math.abs(strength-(target?1:0))>.005 || pulse>.005) raf=requestAnimationFrame(tick);
+    else if(!target) {strength=0;pointer=null;draw();}
   }
-  canvas.addEventListener('pointermove', e => {
-    const r = canvas.getBoundingClientRect(); pointer = {x:e.clientX-r.left,y:e.clientY-r.top}; draw();
-  });
-  canvas.addEventListener('pointerleave', () => { pointer = null; draw(); });
-  canvas.addEventListener('pointerdown', e => {
-    const r = canvas.getBoundingClientRect(); pointer = {x:e.clientX-r.left,y:e.clientY-r.top}; pulse = 1;
-    if (!frame) frame = requestAnimationFrame(animate);
-  });
-  canvas.addEventListener('pointerup', e => { if(e.pointerType !== 'mouse') { pointer=null; draw(); } });
+  function wake() { if(!raf) {lastTime=0;raf=requestAnimationFrame(tick);} }
+  function locate(e) { const r=canvas.getBoundingClientRect(); target={x:e.clientX-r.left,y:e.clientY-r.top};wake(); }
+  canvas.addEventListener('pointermove',locate);
+  canvas.addEventListener('pointerleave',()=>{target=null;wake();});
+  canvas.addEventListener('pointerdown',e=>{locate(e);pulse=1;wake();});
+  canvas.addEventListener('pointerup',e=>{if(e.pointerType!=='mouse'){target=null;wake();}});
+  canvas.addEventListener('pointercancel',()=>{target=null;wake();});
   new ResizeObserver(resize).observe(canvas);
   new MutationObserver(draw).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
-  new IntersectionObserver(entries => { visible=entries[0].isIntersecting; if(visible) draw(); }).observe(canvas);
-  reduced.addEventListener('change', draw);
+  new MutationObserver(resize).observe(title,{childList:true,characterData:true,subtree:true});
+  new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;if(visible)wake();}).observe(canvas);
+  reduced.addEventListener('change',()=>{strength=0;draw();});
   document.fonts.ready.then(resize);
 })();
