@@ -647,11 +647,11 @@ button, .button, .title, .subtitle, .publication-title, .publication-authors,
 .affiliation-xmu { justify-content:flex-end; }
 .affiliation-meituan { justify-content:flex-start; }
 .affiliation-xmu img { width:92px; }
-.affiliation-meituan img { width:220px; }
+.affiliation-meituan img { width:86px; }
 @media(max-width:480px) {
   .affiliation-citation-row { gap:8px; }
   .affiliation-xmu img { width:64px; }
-  .affiliation-meituan img { width:126px; }
+  .affiliation-meituan img { width:60px; }
   .affiliation-citation-row .citation-counter { min-width:90px; padding:.3rem 0; }
   .affiliation-citation-row .citation-counter-art { width:4.75rem; height:4.75rem; }
   .affiliation-citation-row .citation-counter-label { font-size:.62rem; }
