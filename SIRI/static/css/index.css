@@ -637,13 +637,15 @@ button, .button, .title, .subtitle, .publication-title, .publication-authors,
   }
 }
 
-/* Equal side columns keep the live citation mark centred between affiliations. */
+/* Keep citations centred; align each logo to its inner edge for equal visible gaps. */
 .affiliation-citation-row { display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); align-items:center; gap:24px; width:min(100%,620px); margin:.8rem auto 0; }
 .affiliation-citation-row .citation-counter { margin:0; }
 .affiliation-mark { display:flex; align-items:center; justify-content:center; min-width:0; transition:opacity .2s; }
 .affiliation-mark:hover { opacity:.8; }
 .affiliation-mark:focus-visible { outline:2px solid #a53f52; outline-offset:6px; border-radius:3px; }
 .affiliation-mark img { display:block; object-fit:contain; max-width:100%; height:auto; }
+.affiliation-xmu { justify-content:flex-end; }
+.affiliation-meituan { justify-content:flex-start; }
 .affiliation-xmu img { width:92px; }
 .affiliation-meituan img { width:220px; }
 @media(max-width:480px) {
