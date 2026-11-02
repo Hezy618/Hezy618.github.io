@@ -636,3 +636,23 @@ button, .button, .title, .subtitle, .publication-title, .publication-authors,
     height: 71px;
   }
 }
+
+/* Equal side columns keep the live citation mark centred between affiliations. */
+.affiliation-citation-row { display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); align-items:center; gap:24px; width:min(100%,620px); margin:.8rem auto 0; }
+.affiliation-citation-row .citation-counter { margin:0; }
+.affiliation-mark { display:flex; align-items:center; justify-content:center; min-width:0; transition:opacity .2s; }
+.affiliation-mark:hover { opacity:.8; }
+.affiliation-mark:focus-visible { outline:2px solid #a53f52; outline-offset:6px; border-radius:3px; }
+.affiliation-mark img { display:block; object-fit:contain; max-width:100%; height:auto; }
+.affiliation-xmu img { width:92px; }
+.affiliation-meituan img { width:220px; }
+@media(max-width:480px) {
+  .affiliation-citation-row { gap:8px; }
+  .affiliation-xmu img { width:64px; }
+  .affiliation-meituan img { width:126px; }
+  .affiliation-citation-row .citation-counter { min-width:90px; padding:.3rem 0; }
+  .affiliation-citation-row .citation-counter-art { width:4.75rem; height:4.75rem; }
+  .affiliation-citation-row .citation-counter-label { font-size:.62rem; }
+  .affiliation-citation-row .citation-counter-source { font-size:.55rem; }
+  .affiliation-citation-row .citation-counter strong { font-size:1.25rem; }
+}
