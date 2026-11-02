@@ -48,7 +48,7 @@
   <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
   <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
   <link rel="stylesheet" href="static/css/academicons.min.css">
-  <link rel="stylesheet" href="static/css/index.css?v=25">
+  <link rel="stylesheet" href="static/css/index.css?v=26">
 
   <script defer src="static/js/bulma-carousel.min.js"></script>
   <script defer src="static/js/index.js?v=11"></script>
@@ -58,6 +58,12 @@
 <!-- Small hand-drawn marks, shared by the section headings. -->
 <svg class="doodle-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
   <defs>
+    <symbol id="doodle-idea" viewBox="0 0 40 40">
+      <path class="idea-bulb" data-morph-from="M19 26 C19 23 18 21 18 16 C18 12 22 12 22 16 C22 21 21 23 21 26 Z" d="M15 26 C15 22 10 21 10 15 C10 3 30 3 30 15 C30 21 25 22 25 26 Z"/>
+      <path d="M15 29 Q20 30 25 29 M17 33 Q20 35 23 33"/>
+      <path class="idea-filament" data-start=".25" data-end=".8" data-morph-from="M20 26 L20 26 M20 26 L20 26 L20 26" d="M20 26 L20 18 M16 16 L20 19 L24 16"/>
+      <path class="idea-rays" data-appear=".6" d="M20 1 L20 3 M4 9 L7 11 M33 11 L36 9 M3 20 L6 19 M34 19 L37 20"/>
+    </symbol>
     <symbol id="doodle-spark" viewBox="0 0 40 40">
       <path class="spark-core" data-morph-from="M20 35 Q20 27 20 20 Q20 18 20 4 Q20 18 20 20 Q20 27 20 35 Z" d="M20 4 Q22 16 35 20 Q22 22 20 36 Q18 22 5 20 Q18 18 20 4 Z"/>
       <path class="spark-rays" data-appear=".62" d="m5 5 3 3m27-3-3 3M5 35l3-3m27 3-3-3"/>
@@ -245,9 +251,10 @@
 </section>
 
 <!-- The original paper figure remains the full explanation of the motivation. -->
-<section class="hero teaser" id="motivation-figure">
+<section class="hero teaser" id="motivation-figure" aria-labelledby="motivation-title">
   <div class="container is-max-desktop">
     <div class="hero-body">
+      <h2 id="motivation-title" class="title is-3 has-text-centered section-heading"><svg class="section-doodle" aria-hidden="true" focusable="false"><use href="#doodle-idea"></use></svg>Motivation</h2>
       <figure class="motivation-figure">
         <img src="static/images/motivation.png?v=2" alt="Motivation: comparison between skill-augmentation methods and SIRI" class="teaser-image" width="75%" loading="lazy">
         <figcaption class="subtitle has-text-centered">Conceptual comparison between (a) traditional skill-augmentation frameworks and (b) our <span class="methodname">S<span class="mn-small">IRI</span></span>.</figcaption>

@@ -57,6 +57,7 @@ button, .button, .title, .subtitle, .publication-title, .publication-authors,
   transform: rotate(-3deg);
 }
 .section-heading-small .section-doodle { width: 1.2em; height: 1.2em; }
+.doodle-idea .idea-rays { stroke: #aa834d; }
 .doodle-sprout .sprout-leaf { stroke: #526347; }
 .doodle-sprout .sprout-ground { stroke: #796d61; }
 
