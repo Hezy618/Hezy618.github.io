@@ -42,7 +42,7 @@
     ctx.fillStyle=nameInk;
     for(const dot of dots) {
       let x=dot.x,y=dot.y,alpha=dot.a;
-      if(pointer && strength>0 && !reduced.matches) {
+      if(pointer && strength>0 && !reduced.matches && !window.liquidBackdropActive) {
         const dx=x-pointer.x,dy=y-pointer.y,r=Math.hypot(dx,dy),radius=43+pulse*13;
         const influence=Math.exp(-Math.pow(r/radius,2)*1.5)*strength;
         // A continuous radial refraction, with horizontal scan-line displacement.

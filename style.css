@@ -1176,12 +1176,19 @@ html.day .portrait-orbit { --trail-color:#428d98; --trail-head:#bd8c46; filter:d
 .portrait-orbit rect { fill:none; stroke:var(--trail-color); stroke-linecap:round; stroke-dasharray:8.5 991.5; stroke-dashoffset:var(--trail-start); animation:portraitTrail 9s linear infinite; }
 .portrait-orbit rect:nth-child(-n+3) { stroke:var(--trail-head); }
 @keyframes portraitTrail { from { stroke-dashoffset:var(--trail-start); } to { stroke-dashoffset:calc(var(--trail-start) - 1000px); } }
-.cursor-lens { position:fixed; top:0; left:0; width:66px; height:66px; z-index:10000; border-radius:50%; pointer-events:none; opacity:0; transition:opacity .2s;
-  background:conic-gradient(from 35deg,transparent 0deg,transparent 90deg,#b4d7d233 180deg,#e4eee2bb 245deg,transparent 305deg);
-  -webkit-mask:radial-gradient(transparent 66%,#000 68%,#000 70%,transparent 73%);mask:radial-gradient(transparent 66%,#000 68%,#000 70%,transparent 73%);
+.cursor-lens { position:fixed; top:0; left:0; width:128px; height:128px; z-index:10000;
+  border-radius:50%; pointer-events:none; opacity:0; transition:opacity .22s;
+  backdrop-filter:url(#page-liquid-optics); -webkit-backdrop-filter:url(#page-liquid-optics);
+  background:radial-gradient(circle,transparent 56%,#a9dcd604 77%,#bde8df0a 95%,transparent 100%);
+  box-shadow:inset 0 0 0 .7px #b8dfdb40,0 0 12px #93c5c608;
 }
-.cursor-lens.visible { opacity:.8; }
-html.day .cursor-lens { background:conic-gradient(from 35deg,transparent 0deg,transparent 90deg,#4c8a8733 180deg,#407d7ca0 245deg,transparent 305deg); }
+.cursor-lens::after { content:''; position:absolute; inset:0; border-radius:50%;
+  background:conic-gradient(from 35deg,transparent 0deg,transparent 90deg,#b4d7d233 180deg,#e4eee2bb 245deg,transparent 305deg);
+  -webkit-mask:radial-gradient(transparent 68%,#000 69%,#000 70%,transparent 71%);mask:radial-gradient(transparent 68%,#000 69%,#000 70%,transparent 71%);
+}
+.cursor-lens.visible { opacity:1; }
+html.day .cursor-lens { box-shadow:inset 0 0 0 .7px #40858235,0 0 12px #497f8b08; }
+html.day .cursor-lens::after { background:conic-gradient(from 35deg,transparent 0deg,transparent 90deg,#4c8a8733 180deg,#407d7ca0 245deg,transparent 305deg); }
 @media(prefers-reduced-motion:reduce) { .cursor-lens { display:none; } .portrait-orbit rect { animation:none; } }
 /* Astronomy occupies the margins; content remains on calm, opaque surfaces. */
 #cosmicCanvas { position:fixed; inset:0; width:100%; height:100%; z-index:-4; pointer-events:none; image-rendering:pixelated; }
