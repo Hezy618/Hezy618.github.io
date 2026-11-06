@@ -1176,7 +1176,7 @@ html.day .portrait-orbit { --trail-color:#428d98; --trail-head:#bd8c46; filter:d
 .portrait-orbit rect { fill:none; stroke:var(--trail-color); stroke-linecap:round; stroke-dasharray:8.5 991.5; stroke-dashoffset:var(--trail-start); animation:portraitTrail 9s linear infinite; }
 .portrait-orbit rect:nth-child(-n+3) { stroke:var(--trail-head); }
 @keyframes portraitTrail { from { stroke-dashoffset:var(--trail-start); } to { stroke-dashoffset:calc(var(--trail-start) - 1000px); } }
-.cursor-lens { position:fixed; top:0; left:0; width:96px; height:96px; z-index:10000;
+.cursor-lens { position:fixed; top:0; left:0; width:64px; height:64px; z-index:10000;
   border-radius:50%; pointer-events:none; opacity:0; transition:opacity .22s;
   backdrop-filter:url(#page-liquid-optics); -webkit-backdrop-filter:url(#page-liquid-optics);
   background:radial-gradient(circle,transparent 56%,#a9dcd604 77%,#bde8df0a 95%,transparent 100%);
