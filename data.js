@@ -7,8 +7,10 @@ const SITE = {
 
   /* ---------- 基本信息 ---------- */
   name: "Zhongyu He",                      // 姓名（论文作者列表里同名会自动加粗）
-  tagline: "M.S. student @ Xiamen University · LLM Algorithm Engineer Intern @ Meituan",
-  photo: "assets/photo.svg",             // 你的照片路径：把照片放进 pic/ 文件夹，改成 "pic/你的照片.png"（当前为占位像素头像）
+  tagline: "LLM Agents · Reinforcement Learning · Post-training",
+  heroSummary: "",
+  featuredWork: { label: "Explore featured work: SIRI", url: "https://hezy618.github.io/SIRI/" }, // 可改为自己的项目；设为 null 可隐藏
+  photo: "assets/photo.svg",              // 替换为自己的照片，例如 pic/avatar.jpg
   university: "Xiamen University",
   school: "School of Informatics",         // 信息学院
   major: "Computer Science and Technology",
@@ -23,12 +25,14 @@ const SITE = {
   /* ---------- 外部链接（没有就删掉那一行） ---------- */
   links: {
     "Google Scholar": "https://scholar.google.com/citations?user=O-E3TdAAAAAJ&hl=zh-CN&authuser=1",
+    "ACL Anthology": "https://aclanthology.org/people/zhongyu-he/",
     "GitHub": "https://github.com/Hezy618",
+    "X": "https://x.com/hezzzyu",
   },
 
   /* ---------- 塔罗牌（左侧照片卡） ----------
    * numeral: 牌面顶部罗马数字；backQuote: 点击牌面翻面后背面显示的一句话；
-   * 牌面头像下方会自动显示上方 links 里的外链按钮（GitHub / Scholar 等）
+   * 牌面头像下方会自动显示上方 links 里的外链按钮（GitHub / Scholar / X 等）
    */
   tarot: {
     numeral: "",                            // 牌面顶部罗马数字（留空则整行隐藏）
@@ -38,8 +42,8 @@ const SITE = {
 
   /* ---------- About Me 简介（支持多段） ---------- */
   bio: [
-    "I am a Master's student at the School of Informatics, Xiamen University, majoring in Computer Science and Technology. My research interests include LLM agents, Agentic RL, knowledge distillation, hypergraphs, knowledge graphs, and bioinformatics.",
-    "Currently, I am an LLM Algorithm Engineer intern at Meituan (Core Local Commerce), focusing on post-training of the customer-service LLM — SFT, multi-turn dialogue Agent RL, and OPD.",
+    "I am a Master's student in Computer Science and Technology at Xiamen University. My research focuses on LLM agents, Agentic RL, knowledge distillation, hypergraphs, and bioinformatics.",
+    "I previously completed a six-month internship as an LLM Algorithm Engineer at Meituan, where I worked on SFT, multi-turn dialogue Agent RL, and OPD for a customer-service language model.",
   ],
 
   /* ---------- 实习 / 工作经历 ---------- */
@@ -85,7 +89,10 @@ const SITE = {
       level: "CCF-B",
       extraLevels: ["CORE A*", "TH-CPL A"],   // EMNLP: CORE2023 起 A*，清华 TH-CPL A 类
       keywords: ["LLM Agents", "Agentic RL", "SKILL", "Self-Distillation"],
-      links: { PDF: "https://arxiv.org/pdf/2606.02355" },
+      links: {
+        "ACL Anthology": "https://aclanthology.org/2026.emnlp-main.192/",
+        Homepage: "https://hezy618.github.io/SIRI",
+      },
     },
     {
       title: "HKD-CPI: High-Order Knowledge Distillation Enhanced Inductive Compound-Protein Interaction Prediction",
@@ -124,7 +131,7 @@ const SITE = {
       year: 2026,
       status: "Accepted",
       keywords: ["LLM Agents", "Agentic RL", "SKILL"],
-      links: {},                                                        // TODO: 有公开链接后补上
+      links: { "ACL Anthology": "https://aclanthology.org/2026.findings-emnlp.136/" },
     },
     {
       title: "Knowledge Embedding-based Dynamic Hypergraph Neural Networks for Knowledge Graph Completion",
@@ -138,19 +145,20 @@ const SITE = {
     },
   ],
 
-  /* ---------- 荣誉奖项（没有可留空数组 []） ----------  TODO */
+  /* ---------- 荣誉奖项 ---------- */
   awards: [
-    // "National Scholarship (Top 1%), 2025",
+    "2026 · Graduate National Scholarship (China) · Xiamen University",
+    "2021–2024 · First-Class University Scholarship · Wuhan University of Science and Technology",
   ],
 
   /* ---------- 个人爱好 ----------  TODO: 换成你的真实爱好
    * icon 可以是 emoji，也可以是 assets/ 下的图片路径（如 "assets/game.png"）
    */
   hobbies: [
-    { icon: "assets/clawd.svg", title: "Vibe Coding",        desc: "Heavy vibe coder — 10x-ing my research & work with Claude Code and other AI coding agents." },
+    { icon: "assets/clawd.svg", title: "AI-assisted Building", desc: "I use coding agents to prototype research ideas and build practical tools." },
     { icon: "📷", title: "Photography",        desc: "Experienced in portrait photography — capturing people at their best." },
-    { icon: "🏸", title: "Badminton & Running", desc: "Weekly badminton plus casual runs — sweating out the paper-rejection blues." },
-    { icon: "🎸", title: "Guitar & Singing",   desc: "Guitar strummer; can sing pretty much everything by Jay Chou, Wang Leehom, and JJ Lin." },
+    { icon: "🏸", title: "Badminton & Running", desc: "Regular badminton and running keep me active outside research." },
+    { icon: "🎸", title: "Guitar & Singing",   desc: "I enjoy playing guitar and singing songs by Jay Chou, Wang Leehom, and JJ Lin." },
   ],
 
   /* ---------- 页脚 ---------- */

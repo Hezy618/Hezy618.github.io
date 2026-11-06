@@ -23,15 +23,21 @@
     SITE.name.split(" ").map((w) => w[0]).join("").toUpperCase() || "PLAYER";
   $("#profile-name").textContent = SITE.name;
   $("#profile-photo").src = SITE.photo;
+  $("#hero-summary").textContent = SITE.heroSummary || "";
 
+  const contact = $("#nav-contact");
+  if (SITE.email) contact.href = `mailto:${SITE.email}`;
+  else contact.hidden = true;
+  const featured = $(".hero-action-primary");
+  if (SITE.featuredWork?.url) {
+    featured.href = SITE.featuredWork.url;
+    featured.firstChild.textContent = SITE.featuredWork.label + " ";
+  } else featured.remove();
+  const latestExperience = SITE.experience?.[0];
   const stats = [
-    ["UNIV", SITE.university],
-    ["SCHOOL", SITE.school],
-    ["MAJOR", SITE.major],
-    ["DEGREE", SITE.degree],
-    ["LOC", SITE.location],
-    ["MAIL", SITE.email && `<a href="mailto:${esc(SITE.email)}">${esc(SITE.email)}</a>`],
-    ["MAIL·QQ", SITE.emailAlt && `<a href="mailto:${esc(SITE.emailAlt)}">${esc(SITE.emailAlt)}</a>`],
+    ["CURRENT", `${SITE.degree} · ${SITE.university}`],
+    ["EXPERIENCE", latestExperience ? `${latestExperience.role} · ${latestExperience.org}` : ""],
+    ["BASED", SITE.location],
   ];
   const statList = $("#stat-list");
   stats.forEach(([k, v]) => {
@@ -42,15 +48,21 @@
 
   /* 研究方向 chips */
   const chipRow = $("#chip-row");
-  (SITE.research || []).forEach((r) => chipRow.appendChild(el("span", "chip", esc(r))));
+  (SITE.research || []).slice(0, 3).forEach((r) => chipRow.appendChild(el("span", "chip", esc(r))));
 
-  /* GitHub / Scholar 等外链：渲染进塔罗牌头像下方，点击不触发翻面 */
+  /* GitHub / Scholar / X 等外链：渲染进塔罗牌头像下方，点击不触发翻面 */
   /* 已识别链接名前拼官方 logo（内联 SVG，currentColor 跟随悬停反色） */
   const LINK_ICONS = {
     github: "M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12",
     scholar: "M5.242 13.769L0 9.5 12 0l12 9.5-5.242 4.269C17.548 11.249 14.978 9.5 12 9.5c-2.977 0-5.548 1.748-6.758 4.269zM12 10a7 7 0 1 0 0 14 7 7 0 0 0 0-14z",
+    x: "M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.45-6.231Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z",
   };
   const linkIcon = (label) => {
+    if (/acl/i.test(label)) {
+      const logo = el("span", "lico lico-acl");
+      logo.setAttribute("aria-hidden", "true");
+      return logo;
+    }
     const key = Object.keys(LINK_ICONS).find((k) => label.toLowerCase().includes(k));
     if (!key) return null;
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -86,7 +98,7 @@
     }
   }
   /* 塔罗牌元素联动昼夜：白天把月亮纹样（☾/☽）换成太阳（☀），背面座右铭换积极版。
-     与 syncCats 一起在主题翻转和页面初始化时调用。 */
+     在主题翻转和页面初始化时调用。 */
   const syncTarot = (day) => {
     document.querySelectorAll(".tgly").forEach((s) => {
       s.textContent = day ? "☀︎" : (s.dataset.night || "☾");   // ☀ + VS15：强制文字形态，避免渲染成彩色 emoji
@@ -154,10 +166,6 @@
     card.appendChild(el("h3", "pub-title", esc(pub.title)));
     card.appendChild(el("p", "pub-authors", authors));
     if (hasEqual) card.appendChild(el("p", "pub-note", "* Equal contribution"));
-    if ((pub.keywords || []).length) {
-      card.appendChild(el("p", "pub-keywords",
-        pub.keywords.map((k) => `<span class="kw">${esc(k)}</span>`).join("")));
-    }
     card.appendChild(el("p", "pub-venue", `${esc(pub.venue)}, ${esc(pub.year)}`));
 
     const badges = el("div", "pub-badges");
@@ -173,14 +181,23 @@
       badges.appendChild(badgeEl(lv, "alt")));
     const links = el("span", "pub-links");
     Object.entries(pub.links || {}).forEach(([label, url]) => {
-      const a = el("a", null, `[${esc(label)}]`);
+      const icon = /pdf/i.test(label)
+        ? '<path d="M7 3h7l4 4v14H7zM14 3v5h4M10 13h5M10 16h5"/>'
+        : /anthology/i.test(label)
+        ? '<path d="M3 5q5-2 9 1q4-3 9-1v14q-5-2-9 1q-4-3-9-1zM12 6v14"/>'
+        : '<path d="M4 11l8-7l8 7M6 10v10h12V10M10 20v-6h4v6"/>';
+      const a = el("a", null, `<svg viewBox="0 0 24 24" aria-hidden="true">${icon}</svg><span>${esc(label)}</span><span class="resource-arrow" aria-hidden="true">↗</span>`);
       a.href = url;
       a.target = "_blank";
       a.rel = "noopener";
       links.appendChild(a);
     });
-    badges.appendChild(links);
     card.appendChild(badges);
+    if (links.childElementCount) card.appendChild(links);
+    if ((pub.keywords || []).length) {
+      card.appendChild(el("p", "pub-keywords",
+        pub.keywords.map((k) => `<span class="kw">${esc(k)}</span>`).join("")));
+    }
     pubList.appendChild(card);
   });
   if (!(SITE.publications || []).length) $("#publications").style.display = "none";
@@ -219,30 +236,6 @@
       tw.textContent = text.slice(0, i++);
       setTimeout(type, 42);
     }
-  })();
-
-  /* ==================== 星空 ==================== */
-  const field = $("#starfield");
-  const STAR_COUNT = Math.min(150, Math.floor(window.innerWidth / 9));
-  for (let s = 0; s < STAR_COUNT; s++) {
-    const star = el("div", "star" + (s % 11 === 0 ? " c" : s % 7 === 0 ? " y" : ""));
-    const size = s % 6 === 0 ? 3 : 2;
-    star.style.width = star.style.height = size + "px";
-    star.style.left = Math.random() * 100 + "%";
-    star.style.top = Math.random() * 100 + "%";
-    star.style.setProperty("--d", (1.6 + Math.random() * 3.2).toFixed(2) + "s");
-    star.style.animationDelay = (Math.random() * 4).toFixed(2) + "s";
-    field.appendChild(star);
-  }
-
-  /* 流星：每 6~11 秒一颗 */
-  (function spawnShooting() {
-    const s = el("div", "shooting");
-    s.style.top = (4 + Math.random() * 30) + "%";
-    s.style.left = (30 + Math.random() * 65) + "%";
-    document.body.appendChild(s);
-    setTimeout(() => s.remove(), 1500);
-    setTimeout(spawnShooting, 6000 + Math.random() * 5000);
   })();
 
   /* ==================== 像素月亮 ==================== */
@@ -296,391 +289,15 @@
 
   /* 月亮滚动视差 */
   const moonWrap = $(".moon-wrap");
-  let ticking = false;
-  window.addEventListener("scroll", () => {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(() => {
-      moonWrap.style.transform = `translateY(${window.scrollY * 0.12}px)`;
-      ticking = false;
-    });
-  });
-
-  /* ==================== 像素猫 ==================== */
-  /* 字符表: t=透明 o=描边 c=奶油色 p=粉 s=阴影 */
-  const CAT_SLEEP = [
-    "tttttttttttttttt",
-    "ttootttoottttttt",
-    "toccotoccotttttt",
-    "toccccccccccottt",
-    "toccooccoocccott",
-    "toccccpccccccott",
-    "toccccccccccccot",
-    "tosccccccccccsot",
-    "ttoooooooooooott",
-  ];
-  /* 惊醒帧：瞪圆眼 + 张嘴，打盹猫被点醒的瞬间用 */
-  const CAT_STARTLE = [
-    "tttttttttttttttt",
-    "ttootttoottttttt",
-    "toccotoccotttttt",
-    "toccccccccccottt",
-    "toccocccoccccott",
-    "toccccpccccccott",
-    "tocccooccccccott",
-    "tosccccccccccsot",
-    "ttoooooooooooott",
-  ];
-  const CAT_WALK_A = [
-    "ootttttttttttttttt",
-    "ocottttttttttttttt",
-    "occotttttttottottt",
-    "occottttttocccccot",
-    "ttoccccccccccoccot",
-    "toccccccccccccccot",
-    "toccccccccccccccot",
-    "tttocttttttttocttt",
-    "tttocttttttttocttt",
-  ];
-  const CAT_WALK_B = [
-    "tttttttttttttttttt",
-    "ootttttttttttttttt",
-    "ocottttttttottottt",
-    "occottttttocccccot",
-    "ttoccccccccccoccot",
-    "toccccccccccccccot",
-    "toccccccccccccccot",
-    "ttttocttttttoctttt",
-    "ttttocttttttoctttt",
-  ];
-  const CAT_SIT = [
-    "ttoottttttootttt",
-    "toccottttoccottt",
-    "tocccccccccccott",
-    "toccocccccoccott",
-    "tocccccpcccccott",
-    "tocccccccccccott",
-    "tocccccccccccott",
-    "toscccccccccsott",
-    "ttoooooooooooott",
-  ];
-  const CAT_SIT_BLINK = CAT_SIT.map((r, i) => (i === 3 ? "tocccccccccccott" : r));
-
-  /* 笑脸帧：眯眯眼（∩∩）+ 张嘴笑（含舌头），用于 About Me 互动猫 */
-  const CAT_HAPPY = [
-    "ttoottttttootttt",
-    "toccottttoccottt",
-    "toccocccccoccott",
-    "tocococccococott",
-    "tocccccpcccccott",
-    "toccccooocccott",
-    "toccccopocccott",
-    "toscccccccccsott",
-    "ttoooooooooooott",
-  ];
-
-  /* 打字猫：趴在笔记本电脑前（g=机身，粉色爱心贴纸），用于 EXPERIENCE 板块 */
-  const CAT_TYPE = [
-    "ttoottttttootttt",
-    "toccottttoccottt",
-    "tocccccccccccott",
-    "toccocccccoccott",
-    "tocccccpcccccott",
-    "tocccccccccccott",
-    "togggggggggggott",
-    "togggggpgggggott",
-    "ttoooooooooooott",
-  ];
-  const CAT_TYPE_BLINK = CAT_TYPE.map((r, i) => (i === 3 ? "tocccccccccccott" : r));
-
-  /* 白天形态：About 猫戴墨镜；打字猫眯眼笑；巡逻猫吐舌头散热；坐姿猫躺平晒太阳 */
-  const setCh = (row, idx, ch) => row.slice(0, idx) + ch + row.slice(idx + 1);
-  const CAT_SIT_SHADES = CAT_SIT.map((r, i) => (i === 3 ? "toooooccoooooot" : r));
-  const CAT_TYPE_DAY = CAT_TYPE.map((r, i) => (i === 2 ? CAT_HAPPY[2] : i === 3 ? CAT_HAPPY[3] : r));
-  const CAT_TYPE_DAY_BLINK = CAT_TYPE_DAY.map((r, i) => (i === 3 ? "tocccccccccccott" : r));
-  const CAT_WALK_A_DAY = CAT_WALK_A.map((r, i) => (i === 6 ? setCh(r, 15, "p") : r));
-  const CAT_WALK_B_DAY = CAT_WALK_B.map((r, i) => (i === 6 ? setCh(r, 15, "p") : r));
-  /* 仰面躺平晒太阳：四爪朝天 + 右侧脑袋（耳朵、眼睛、粉鼻头） */
-  const CAT_LIE = [
-    "tttttttttttttttt",
-    "ttttoottootttttt",
-    "ttttccttccttotot",
-    "ttooooooooooooot",
-    "toccccccccccccot",
-    "tocccccccccococt",
-    "toccccccccccpcot",
-    "tosccccccccccsot",
-    "ttoooooooooooott",
-  ];
-
-  /* 主题联动：猫的形态跟随昼夜切换（syncCats 在主题翻转时调用） */
-  const catSyncs = [];
-  let catsDay = document.documentElement.classList.contains("day");
-  const syncCats = (day) => { catsDay = day; catSyncs.forEach((fn) => fn()); };
-
-  function buildCat(box, rows, scale) {
-    box.style.setProperty("--cs", scale + "px");
-    rows.forEach((row) => {
-      const r = el("div", "crow");
-      for (const ch of row) r.appendChild(el("div", "cpx " + ch));
-      box.appendChild(r);
-    });
-  }
-
-  /* 打盹猫：黑夜趴在塔罗牌上睡觉（Zzz 漂浮），白天醒来蹲坐；点一下：夜里惊醒，白天冲你笑 */
-  const sleepBox = $("#catSleep");
-  if (sleepBox) {
-    const sSleep = el("div", "catframe");
-    const sAwake = el("div", "catframe");
-    const sSit = el("div", "catframe");
-    const sHappy = el("div", "catframe");
-    buildCat(sSleep, CAT_SLEEP, 4);
-    buildCat(sAwake, CAT_STARTLE, 4);
-    buildCat(sSit, CAT_SIT, 4);
-    buildCat(sHappy, CAT_HAPPY, 4);
-    sleepBox.append(sSleep, sAwake, sSit, sHappy);
-    const showOnly = (f) => [sSleep, sAwake, sSit, sHappy].forEach((x) => { x.style.display = x === f ? "" : "none"; });
-
-    const zzz = el("span", "zzz");
-    for (let zi = 0; zi < 3; zi++) {
-      const z = el("i", null, "z");
-      z.style.animationDelay = (zi * 0.9) + "s";
-      z.style.fontSize = (8 + zi * 3) + "px";
-      zzz.appendChild(z);
-    }
-    sleepBox.appendChild(zzz);
-
-    const applySleep = () => {                        // 按主题切默认形态：夜睡 / 日醒
-      showOnly(catsDay ? sSit : sSleep);
-      zzz.style.display = catsDay ? "none" : "";
-    };
-    catSyncs.push(applySleep);
-
-    let dozeTimer = null;
-    const poke = () => {
-      showOnly(catsDay ? sHappy : sAwake);            // 白天：笑一下；黑夜：惊醒
-      if (!catsDay) zzz.style.display = "none";
-      sleepBox.classList.remove("startled");
-      void sleepBox.offsetWidth;          // 强制回流，让惊醒动画可以连续触发
-      sleepBox.classList.add("startled");
-      clearTimeout(dozeTimer);
-      dozeTimer = setTimeout(() => {
-        applySleep();
-        sleepBox.classList.remove("startled");
-      }, 1500);
-    };
-    sleepBox.addEventListener("click", (e) => { e.stopPropagation(); poke(); });  // 不触发塔罗牌翻面
-    sleepBox.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); poke(); }
-    });
-    applySleep();
-  }
-
-  /* 巡逻猫：沿 PUBLICATIONS 上沿来回巡逻，到边自动转身；点一下会吓一跳、喵一声并加速逃窜 */
-  const patrolBox = $("#catPatrol");
-  const pubsPanel = $("#publications");
-  if (patrolBox && pubsPanel) {
-    const fA = el("div", "catframe");
-    const fB = el("div", "catframe");
-    const fDA = el("div", "catframe");
-    const fDB = el("div", "catframe");
-    buildCat(fA, CAT_WALK_A, 4);
-    buildCat(fB, CAT_WALK_B, 4);
-    buildCat(fDA, CAT_WALK_A_DAY, 4);
-    buildCat(fDB, CAT_WALK_B_DAY, 4);
-    patrolBox.append(fA, fB, fDA, fDB);
-    const allPaws = [fA, fB, fDA, fDB];
-    const gaitPair = () => (catsDay ? [fDA, fDB] : [fA, fB]);   // 白天巡逻吐舌头散热
-    allPaws.forEach((f) => { f.style.display = "none"; });
-    gaitPair()[0].style.display = "";
-    catSyncs.push(() => {
-      allPaws.forEach((f) => { f.style.display = "none"; });
-      gaitPair()[0].style.display = "";
-    });
-
-    setInterval(() => {           // 步态两帧切换（一显一隐）
-      const [a, b] = gaitPair();
-      const aHidden = a.style.display === "none";
-      allPaws.forEach((f) => { f.style.display = "none"; });
-      (aHidden ? a : b).style.display = "";
-    }, 220);
-
-    const CAT_W = 18 * 4, EDGE = 28;
-    let cx = 60, dir = 1, lastT = performance.now();
-    let boostUntil = 0;
-    let hopTimer = null;
-    const meows = ["MEOW!", "MRRP!", "PURR~"];
-    const meow = () => {
-      boostUntil = performance.now() + 1500;
-      allPaws.forEach((f) => {
-        f.classList.remove("hop"); void f.offsetWidth; f.classList.add("hop");
-      });
-      const m = el("span", "meow", meows[Math.floor(Math.random() * meows.length)]);
-      if (dir === -1) m.style.scale = "-1 1";   // 猫朝左时容器被镜像，气泡文字要翻回来
-      m.addEventListener("animationend", () => m.remove());
-      patrolBox.appendChild(m);
-      // hop 动画只播一次；不及时摘掉的话，步态切帧会反复重启动画，猫就一直跳
-      clearTimeout(hopTimer);
-      hopTimer = setTimeout(() => allPaws.forEach((f) => f.classList.remove("hop")), 550);
-    };
-    patrolBox.addEventListener("click", meow);
-    patrolBox.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); meow(); }
-    });
-
-    (function patrolStep(now) {
-      const dt = Math.min(60, now - lastT);
-      lastT = now;
-      const max = pubsPanel.clientWidth - CAT_W - EDGE;
-      cx += dir * dt * (now < boostUntil ? 0.18 : 0.05);   // 正常 ≈50px/s，受惊后 ≈180px/s
-      if (cx >= max)  { cx = max;  dir = -1; }
-      if (cx <= EDGE) { cx = EDGE; dir = 1; }
-      patrolBox.style.left = cx + "px";
-      patrolBox.style.transform = `scaleX(${dir})`;
-      requestAnimationFrame(patrolStep);
-    })(lastT);
-  }
-
-  /* 坐姿猫：蹲在 SIDE QUESTS 上沿，每隔几秒眨一次眼；白天躺平晒太阳；点一下会开心翻滚并溅出金色火花 */
-  const sitBox = $("#catSit");
-  if (sitBox) {
-    const sA = el("div", "catframe");
-    const sB = el("div", "catframe");
-    const sL = el("div", "catframe");
-    buildCat(sA, CAT_SIT, 4);
-    buildCat(sB, CAT_SIT_BLINK, 4);
-    buildCat(sL, CAT_LIE, 4);
-    sB.style.display = "none"; sL.style.display = "none";
-    sitBox.append(sA, sB, sL);
-    catSyncs.push(() => {          // 白天切到躺平晒太阳形态
-      sB.style.display = "none";
-      sA.style.display = catsDay ? "none" : "";
-      sL.style.display = catsDay ? "" : "none";
-    });
-    (function blink() {
-      if (!catsDay) {              // 只有蹲坐形态才眨眼
-        sA.style.display = "none"; sB.style.display = "";
-        setTimeout(() => { sB.style.display = "none"; if (!catsDay) sA.style.display = ""; }, 180);
-      }
-      setTimeout(blink, 2600 + Math.random() * 2600);
-    })();
-
-    const sparkle = () => {
-      sitBox.classList.remove("spin");
-      void sitBox.offsetWidth;          // 强制回流，让翻滚动画可以连续触发
-      sitBox.classList.add("spin");
-      for (let i = 0; i < 7; i++) {
-        const sp = el("span", "spark", "✦");
-        sp.style.left = (6 + Math.random() * 56) + "px";
-        sp.style.animationDelay = (Math.random() * 0.2) + "s";
-        sp.style.setProperty("--sx", (Math.random() * 72 - 36) + "px");
-        sp.style.setProperty("--sy", (-14 - Math.random() * 34) + "px");
-        sp.addEventListener("animationend", () => sp.remove());
-        sitBox.appendChild(sp);
-      }
-    };
-    sitBox.addEventListener("click", sparkle);
-    sitBox.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); sparkle(); }
-    });
-  }
-
-  /* 打字猫：蹲在 EXPERIENCE 上沿敲笔记本，偶尔眨眼；白天换成眯眼笑的表情；点一下会疯狂打字并飘出代码符号 */
-  const typeBox = $("#catType");
-  if (typeBox) {
-    const tA = el("div", "catframe");
-    const tB = el("div", "catframe");
-    const tD = el("div", "catframe");
-    const tDB = el("div", "catframe");
-    buildCat(tA, CAT_TYPE, 4);
-    buildCat(tB, CAT_TYPE_BLINK, 4);
-    buildCat(tD, CAT_TYPE_DAY, 4);
-    buildCat(tDB, CAT_TYPE_DAY_BLINK, 4);
-    tB.style.display = "none"; tD.style.display = "none"; tDB.style.display = "none";
-    typeBox.append(tA, tB, tD, tDB);
-    const typeBase = () => (catsDay ? tD : tA);
-    catSyncs.push(() => {
-      [tA, tB, tD, tDB].forEach((f) => { f.style.display = "none"; });
-      typeBase().style.display = "";
-    });
-    (function blink() {
-      const b = catsDay ? tDB : tB;
-      typeBase().style.display = "none"; b.style.display = "";
-      setTimeout(() => { b.style.display = "none"; typeBase().style.display = ""; }, 180);
-      setTimeout(blink, 3000 + Math.random() * 3000);
-    })();
-
-    const glyphs = ["</>", "{ }", "01", "&&", "fn", ";"];
-    let typeTimer = null;
-    const type = () => {
-      typeBox.classList.add("typing");
-      clearTimeout(typeTimer);
-      typeTimer = setTimeout(() => typeBox.classList.remove("typing"), 1200);
-      for (let i = 0; i < 5; i++) {
-        const c = el("span", "code", glyphs[Math.floor(Math.random() * glyphs.length)]);
-        c.style.left = (4 + Math.random() * 52) + "px";
-        c.style.animationDelay = (Math.random() * 0.4) + "s";
-        c.style.setProperty("--cx", (Math.random() * 32 - 16) + "px");
-        c.addEventListener("animationend", () => c.remove());
-        typeBox.appendChild(c);
-      }
-    };
-    typeBox.addEventListener("click", type);
-    typeBox.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); type(); }
-    });
-  }
-
-  /* About Me 互动猫：平时蹲坐（白天戴墨镜），点击后笑一下并飘出小爱心 */
-  const aboutBox = $("#catAbout");
-  if (aboutBox) {
-    const nA = el("div", "catframe");
-    const nB = el("div", "catframe");
-    const nD = el("div", "catframe");
-    buildCat(nA, CAT_SIT, 4);
-    buildCat(nB, CAT_HAPPY, 4);
-    buildCat(nD, CAT_SIT_SHADES, 4);
-    nB.style.display = "none"; nD.style.display = "none";
-    aboutBox.append(nA, nB, nD);
-    const aboutBase = () => (catsDay ? nD : nA);
-    catSyncs.push(() => {
-      [nA, nB, nD].forEach((f) => { f.style.display = "none"; });
-      aboutBase().style.display = "";
-    });
-
-    let happyTimer = null;
-    const boop = () => {
-      [nA, nB, nD].forEach((f) => { f.style.display = "none"; });
-      nB.style.display = "";
-      clearTimeout(happyTimer);
-      happyTimer = setTimeout(() => { nB.style.display = "none"; aboutBase().style.display = ""; }, 1100);
-      aboutBox.classList.remove("boop");
-      void aboutBox.offsetWidth;          // 强制回流，让挤压动画可以连续触发
-      aboutBox.classList.add("boop");
-      for (let i = 0; i < 6; i++) {
-        const h = el("span", "heart", "♥");
-        h.style.left = (10 + Math.random() * 44) + "px";
-        h.style.animationDelay = (Math.random() * 0.25) + "s";
-        h.style.setProperty("--hx", (Math.random() * 36 - 18) + "px");
-        h.addEventListener("animationend", () => h.remove());
-        aboutBox.appendChild(h);
-      }
-    };
-    aboutBox.addEventListener("click", boop);
-    aboutBox.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); boop(); }
-    });
-  }
-
-  syncCats(catsDay);   // 页面加载时按当前主题初始化所有猫的形态（固定黑夜开场，此处恒为夜晚）
-  syncTarot(catsDay);  // 塔罗牌的月亮/太阳纹样与背面座右铭同理
+  /* Companions are drawn and animated in companions.js. */
+  syncTarot(document.documentElement.classList.contains("day"));
 
   /* ==================== 塔罗牌交互 ==================== */
   const scene = $("#tarotScene");
   const tilt = $("#tarotTilt");
   const card = $("#tarotCard");
   const glare = $("#tarotGlare");
-  const MAX_TILT = 16;
+  const MAX_TILT = 5;
 
   scene.addEventListener("mousemove", (e) => {
     const rect = scene.getBoundingClientRect();
@@ -693,7 +310,14 @@
   scene.addEventListener("mouseleave", () => {
     tilt.style.transform = "rotateY(0deg) rotateX(0deg) scale(1)";
   });
-  scene.addEventListener("click", () => card.classList.toggle("flipped"));
+  const flipPortrait = () => {
+    const flipped = card.classList.toggle("flipped");
+    scene.setAttribute("aria-pressed", String(flipped));
+  };
+  scene.addEventListener("click", (e) => { if (!e.target.closest("a, .cat")) flipPortrait(); });
+  scene.addEventListener("keydown", (e) => {
+    if (e.target === scene && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); flipPortrait(); }
+  });
 
   /* ==================== 鼠标星尘轨迹 ==================== */
   const dustBox = $("#stardust");
@@ -720,6 +344,19 @@
     });
   }, { threshold: 0.12 });
   document.querySelectorAll(".reveal").forEach((s) => io.observe(s));
+
+  /* Keep the compact pixel navigation synchronized with the section in view. */
+  const navLinks = [...document.querySelectorAll(".nav-links a[href^='#']")];
+  const navTargets = navLinks
+    .map((link) => ({ link, target: document.querySelector(link.getAttribute("href")) }))
+    .filter(({ target }) => target);
+  const navIO = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      navTargets.forEach(({ link, target }) => link.classList.toggle("active", target === entry.target));
+    });
+  }, { rootMargin: "-22% 0px -62% 0px", threshold: 0 });
+  navTargets.forEach(({ target }) => navIO.observe(target));
 
   /* ==================== 彩蛋：Konami 秘籍 ==================== */
   const KONAMI = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];
@@ -1064,95 +701,28 @@
     };
     syncHint();
 
-    /* 过场动画：01 二进制列铺满全屏向上浮动、渐变隐去；配色跟随目标主题。
-       逐行插值出真实文字色（不依赖 background-clip），列顶加亮白"头部"仿代码雨。
-       换肤时机由所有列的 (delay, dur) 实时推算：取全屏被代码完全覆盖的时间窗口中点，
-       保证页面在代码后面完成换装，动画与渲染无缝衔接。 */
-    const WIPE_TO_DAY = ["#3f8ae0", "#6ba9e8", "#4da354", "#c9861a", "#1d7a99", "#8cc57e"];   // 去白天：蓝天/绿地/暖金
-    const WIPE_TO_NIGHT = ["#e8c46a", "#8fd8e8", "#8b8db0", "#b48fe8", "#d98fb8", "#5a5ea0"]; // 回夜晚：金/青/紫深夜系
-    const WIPE_FS = 15;                                  // 列宽 = 字号，列与列贴紧铺满
-    const HEAD = 0.14;                                   // 列顶亮白头部占比
-    const MID = 0.58;                                    // 三段渐变的中段分界（c1→c2→c3）
-    const lerpHex = (a, b, t) => {
-      const pa = [1, 3, 5].map((i) => parseInt(a.slice(i, i + 2), 16));
-      const pb = [1, 3, 5].map((i) => parseInt(b.slice(i, i + 2), 16));
-      return "#" + pa.map((v, k) => Math.round(v + (pb[k] - v) * t).toString(16).padStart(2, "0")).join("");
-    };
     let wiping = false;
     const wipeTheme = () => {
       if (wiping) return;
       wiping = true;
       const toDay = !document.documentElement.classList.contains("day");
-      const palette = toDay ? WIPE_TO_DAY : WIPE_TO_NIGHT;
-      const w = el("div", "theme-wipe");
-      const cols = Math.ceil(window.innerWidth / WIPE_FS);
-      /* 列高 ≈ 1.55 屏高：列从 105vh 出发、平移总量 ≈ 2.91 屏高，
-         列覆盖全屏 ⇔ 进度 p ∈ [0.361, 0.550]（推导：top=1.05-2.91p，需 top≤0 且 top≥-0.55） */
-      const rows = Math.ceil(window.innerHeight * 1.5 / (WIPE_FS * 1.6)) + 2;
-      const P_IN = 0.361, P_OUT = 0.550;
-      let maxEnd = 0, coverLo = 0, coverHi = Infinity;
-      for (let i = 0; i < cols; i++) {
-        const c = el("div", "bcol");
-        const dur = 2.05 + Math.random() * 0.35;        // 每列流速略有不同（方差小，保证全覆盖窗口存在）
-        const delay = Math.random() * 0.2;              // 每列错峰出发
-        const c1 = palette[Math.floor(Math.random() * palette.length)];
-        let c2 = palette[Math.floor(Math.random() * palette.length)];
-        if (c2 === c1) c2 = palette[(palette.indexOf(c1) + 1) % palette.length];
-        let c3 = palette[Math.floor(Math.random() * palette.length)];
-        if (c3 === c2) c3 = palette[(palette.indexOf(c2) + 1) % palette.length];
-        for (let r = 0; r < rows; r++) {                // 逐行三段渐变：亮白头部 → c1 → c2 → c3
-          const t = r / (rows - 1);
-          const color = t < HEAD ? lerpHex("#ffffff", c1, t / HEAD)
-                       : t < MID  ? lerpHex(c1, c2, (t - HEAD) / (MID - HEAD))
-                                  : lerpHex(c2, c3, (t - MID) / (1 - MID));
-          const row = el("div", "brow", Math.random() < 0.5 ? "0" : "1");
-          row.style.color = color;
-          row.style.opacity = (0.4 + Math.random() * 0.35).toFixed(2);    // 轻微明度抖动，整体压柔不刺眼
-          c.appendChild(row);
-        }
-        c.style.left = (i * WIPE_FS) + "px";
-        c.style.width = WIPE_FS + "px";
-        c.style.setProperty("--wt", dur + "s");
-        c.style.setProperty("--wd", delay + "s");
-        maxEnd = Math.max(maxEnd, dur + delay);
-        coverLo = Math.max(coverLo, delay + P_IN * dur);   // 所有列都进入"全覆盖"的最早时刻
-        coverHi = Math.min(coverHi, delay + P_OUT * dur);  // 有列开始离开"全覆盖"的最早时刻
-        w.appendChild(c);
-      }
-      document.body.appendChild(w);
-      document.documentElement.classList.add("wiping");   // 换肤期间给界面元素挂颜色过渡，衔接更顺滑
-
-      /* 幕布层：垫在代码雨下面、页面上面的目标主题底色。
-         换肤前淡入到近不透明，把 class 切换的硬边完全藏住；代码雨散场前再缓缓淡出。 */
-      const flipS = (coverLo < coverHi ? (coverLo + coverHi) / 2 : coverLo);
-      const veil = el("div", "theme-veil");
-      veil.style.background = toDay
-        ? "linear-gradient(to bottom, #6ba9e8 0%, #a8d4f5 60%, #e4f3ff 100%)"
-        : "linear-gradient(to bottom, #07070f 0%, #0d0e20 100%)";
-      document.body.appendChild(veil);
-      const totalS = maxEnd + 0.1;
-      veil.animate(
-        [
-          { opacity: 0 },
-          { opacity: .97, offset: Math.max(0.01, (flipS - 0.5) / totalS) },
-          { opacity: .97, offset: Math.min(0.97, (flipS + 1.1) / totalS) },
-          { opacity: 0 },
-        ],
-        { duration: totalS * 1000, easing: "ease-in-out", fill: "both" }
-      );
-
-      setTimeout(() => {                                // 全屏被代码+幕布完全覆盖的瞬间换肤
-        const day = document.documentElement.classList.toggle("day");   // 不写入 localStorage：每次打开固定黑夜开场
+      const syncTheme = () => {
+        const day = document.documentElement.classList.toggle("day");
         syncHint();
-        syncCats(day);                                  // 猫的形态跟随昼夜切换
-        syncTarot(day);                                 // 塔罗牌纹样与座右铭同理
-      }, flipS * 1000);
-      setTimeout(() => {
-        w.remove();
-        veil.remove();
-        document.documentElement.classList.remove("wiping");
+        syncTarot(day);
+      };
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        syncTheme();
         wiping = false;
-      }, maxEnd * 1000 + 100);
+        return;
+      }
+
+      try {
+        if (window.runPixelTransition) {
+          Promise.resolve(window.runPixelTransition(syncTheme)).finally(() => { wiping = false; });
+        } else { syncTheme(); wiping = false; }
+      } catch { wiping = false; }
+
     };
     moonWrap.addEventListener("click", wipeTheme);
     /* 月亮在背景层（z-index 低于正文），被正文透明区域盖住时点击/悬停无法直达。

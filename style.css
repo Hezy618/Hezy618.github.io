@@ -15,10 +15,10 @@
   --gold-dim: rgba(232, 196, 106, .55);
   --cyan:     #8fd8e8;   /* 次级强调，克制使用 */
   --text:     #d9d7e8;
-  --dim:      #8b8db0;
+  --dim:      #a9abc6;
   --pink:     #d98fb8;
   --font-pixel: "Press Start 2P", monospace;
-  --font-body:  "VT323", "Courier New", monospace;
+  --font-body:  -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -41,8 +41,8 @@ body {
   background: var(--bg0);
   color: var(--text);
   font-family: var(--font-body);
-  font-size: 22px;
-  line-height: 1.5;
+  font-size: 16px;
+  line-height: 1.65;
   overflow-x: hidden;
 }
 
@@ -150,12 +150,12 @@ body {
 
 /* ---------- 布局 ---------- */
 .container {
-  max-width: 880px;
+  max-width: 1040px;
   margin: 0 auto;
   padding: 24px 22px 120px;
   display: flex;
   flex-direction: column;
-  gap: 44px;
+  gap: 52px;
 }
 
 /* ---------- 导航 ---------- */
@@ -164,71 +164,86 @@ body {
   display: flex; justify-content: space-between; align-items: center;
   padding: 15px 24px;
   font-family: var(--font-pixel);
-  font-size: 10px;
-  letter-spacing: 1px;
+  font-size: 9px;
+  letter-spacing: 0;
   background: rgba(7, 7, 15, .68);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-bottom: 2px solid var(--line-soft);
 }
 .nav-logo { color: var(--gold); }
-.nav-links { display: flex; gap: 22px; }
+.nav-links { display: flex; gap: 22px; align-items: center; }
 .nav-links a { color: var(--dim); text-decoration: none; transition: color .15s; }
 .nav-links a:hover { color: var(--cream); text-shadow: 0 0 12px rgba(243, 233, 200, .5); }
+.nav-links a.active { color: var(--gold); text-shadow: 0 0 12px rgba(232, 196, 106, .32); }
+.nav-links a.active::before { content: "· "; color: var(--gold); }
 
 /* ---------- HERO ---------- */
 .hero {
   display: flex;
-  gap: 48px;
+  gap: clamp(40px, 7vw, 92px);
   align-items: center;
   flex-wrap: wrap;
-  padding: 56px 8px 24px;
+  padding: 52px 8px 12px;
 }
-.hero-info { flex: 1 1 380px; min-width: 280px; }
+.hero-info { flex: 1 1 460px; min-width: 280px; }
 .hero-hello {
   font-family: var(--font-pixel);
   font-size: 9px;
-  letter-spacing: 3px;
+  letter-spacing: 0;
   color: var(--cyan);
   margin-bottom: 18px;
   opacity: .85;
 }
 .pixel-title {
   font-family: var(--font-pixel);
-  font-size: 26px;
+  font-size: 28px;
   color: var(--cream);
-  letter-spacing: 1px;
+  letter-spacing: 0;
   text-shadow: 0 0 22px rgba(243, 233, 200, .28);
   margin-bottom: 16px;
 }
-.tagline { font-size: 24px; color: var(--cyan); min-height: 1.4em; margin-bottom: 18px; }
+.tagline { font-size: 17px; font-weight: 600; color: var(--cyan); min-height: 1.5em; margin-bottom: 14px; }
+.hero-summary { max-width: 560px; font-size: 17px; line-height: 1.6; color: var(--text); margin-bottom: 20px; }
+.hero-summary:empty { display: none; }
 .cursor { animation: blink .9s steps(1) infinite; }
 @keyframes blink { 50% { opacity: 0; } }
 
-.stat-list { list-style: none; margin-bottom: 16px; }
-.stat-list li { margin: 5px 0; }
+.stat-list { list-style: none; margin-bottom: 18px; border-top: 1px solid var(--line); padding-top: 12px; }
+.stat-list li { margin: 5px 0; font-size: 14px; }
 .stat-list .k {
-  display: inline-block; min-width: 96px;
+  display: inline-block; min-width: 82px;
   color: var(--dim);
   font-family: var(--font-pixel);
-  font-size: 9px;
-  letter-spacing: 1px;
+  font-size: 8px;
+  letter-spacing: 0;
   vertical-align: middle;
 }
 .stat-list a { color: inherit; text-decoration: none; border-bottom: 1px dashed var(--dim); }
 .stat-list a:hover { color: var(--cream); }
 
 /* 研究方向 chips */
-.chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+.chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
 .chip {
-  font-family: var(--font-pixel);
-  font-size: 8px;
-  letter-spacing: 1px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
   color: var(--cyan);
   border: 1px solid rgba(143, 216, 232, .35);
-  padding: 6px 9px;
+  padding: 4px 8px;
   background: rgba(143, 216, 232, .06);
 }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.hero-actions a {
+  display: inline-flex; align-items: center; justify-content: center; gap: 12px;
+  min-height: 42px; padding: 9px 14px;
+  font-size: 13px; font-weight: 700; text-decoration: none;
+  transition: background .2s, border-color .2s, transform .2s;
+}
+.hero-actions a:hover { transform: translateY(-2px); }
+.hero-action-primary { color: var(--bg0); background: var(--gold); border: 1px solid var(--gold); }
+.hero-action-secondary { color: var(--cream); border: 1px solid var(--line); background: rgba(18, 19, 38, .75); }
+.hero-action-secondary:hover { border-color: var(--gold); }
 
 /* ============================================================
    塔罗牌
@@ -381,12 +396,12 @@ body {
 /* ---------- 面板 ---------- */
 .panel {
   position: relative;
-  background: var(--panel);
-  border: 2px solid var(--line);
+  background: rgba(18, 19, 38, .86);
+  border: 1px solid var(--line);
   box-shadow:
     inset 0 1px 0 rgba(243, 233, 200, .05),
-    10px 10px 0 rgba(0, 0, 0, .32);
-  padding: 30px 30px 32px;
+    6px 6px 0 rgba(0, 0, 0, .22);
+  padding: 34px 38px 36px;
   scroll-margin-top: 92px;
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
@@ -394,18 +409,18 @@ body {
 .section-title {
   display: flex; align-items: center; gap: 14px;
   font-family: var(--font-pixel);
-  font-size: 13px; letter-spacing: 3px;
+  font-size: 12px; letter-spacing: 0;
   color: var(--cream);
   text-shadow: 0 0 16px rgba(243, 233, 200, .22);
   margin-bottom: 20px;
 }
 .section-title .glyph { color: var(--gold); font-size: 11px; }
 .section-title .rule { flex: 1; border-bottom: 2px dashed var(--line); }
-.note { color: var(--dim); font-size: 19px; margin-bottom: 16px; }
+.note { color: var(--dim); font-size: 14px; margin-bottom: 16px; }
 /* 合并板块内的子标题（WORK / EDUCATION） */
 .sub-title {
   font-family: var(--font-pixel);
-  font-size: 9px; letter-spacing: 2px;
+  font-size: 9px; letter-spacing: 0;
   color: var(--cyan);
   margin: 22px 0 12px;
 }
@@ -422,59 +437,57 @@ body {
   box-shadow: 0 0 10px rgba(232, 196, 106, .6);
 }
 .exp-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 6px; }
-.exp-role { color: var(--cream); font-size: 23px; }
+.exp-role { color: var(--cream); font-size: 17px; font-weight: 700; }
 .exp-org  { color: var(--cyan); }
 .exp-period {
-  font-family: var(--font-pixel); font-size: 9px; letter-spacing: 1px;
+  font-family: var(--font-pixel); font-size: 8px; letter-spacing: 0;
   color: var(--dim);
 }
-.exp-desc { color: var(--dim); margin-top: 4px; }
+.exp-desc { color: var(--text); font-size: 14px; margin-top: 7px; }
 
 /* ---------- 论文卡片 ---------- */
 .pub-card {
   position: relative;
   background: var(--panel-2);
-  border: 2px solid var(--line-soft);
-  border-left: 3px solid var(--gold);
-  padding: 18px 20px;
-  margin-bottom: 16px;
+  border: 1px solid var(--line-soft);
+  border-left: 3px solid var(--gold-dim);
+  padding: 20px 24px;
+  margin-bottom: 12px;
   transition: border-color .15s, transform .15s;
 }
 .pub-card:hover { border-color: var(--gold-dim); border-left-color: var(--gold); transform: translateX(3px); }
 .pub-title {
-  font-family: var(--font-pixel);
-  font-size: 11px; line-height: 1.9;
-  color: var(--text);
-  margin-bottom: 12px;
+  font-family: var(--font-body);
+  font-size: 17px; line-height: 1.4; font-weight: 700;
+  color: var(--cream);
+  margin-bottom: 8px;
 }
-.pub-authors { color: var(--dim); margin-bottom: 8px; }
+.pub-authors { color: var(--text); font-size: 13px; line-height: 1.55; margin-bottom: 4px; }
 .pub-authors strong { color: var(--cream); }
-.pub-venue { color: var(--pink); }
-.pub-badges { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 12px; }
+.pub-venue { color: var(--cyan); font-size: 14px; font-weight: 600; }
+.pub-badges { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; }
 
 .badge {
   font-family: var(--font-pixel);
-  font-size: 8px; letter-spacing: 1px;
-  padding: 6px 9px;
+  font-size: 7px; letter-spacing: 0;
+  padding: 6px 8px;
   color: var(--bg0);
 }
-.badge.ccf-a   { background: #e85a5a; box-shadow: 0 3px 0 #7e2f2f, 0 0 16px rgba(232,90,90,.55); font-size: 9px; padding: 7px 10px; }
+.badge.ccf-a   { background: #e85a5a; box-shadow: 0 3px 0 #7e2f2f; }
 .badge.ccf-b   { background: #e8c46a; box-shadow: 0 3px 0 #8a6d2f; }
 .badge.ccf-c   { background: #6ec6d8; box-shadow: 0 3px 0 #2f6f7e; }
 .badge.cas     { background: #d98fb8; box-shadow: 0 3px 0 #7e3f68; }
 .badge.default { background: #7fd8a4; box-shadow: 0 3px 0 #3f7e58; }
-/* 发表状态：Accepted = 绿灯呼吸 + 闪烁像素点；Under Review = 安静紫 */
+/* 发表状态 */
 .badge.status {
   display: inline-flex; align-items: center;
   background: rgba(127, 216, 164, .10);
   color: #7fd8a4; border: 1px solid #7fd8a4;
-  box-shadow: 0 0 10px rgba(127, 216, 164, .35);
-  animation: accPulse 2.2s ease-in-out infinite;
+  box-shadow: none;
 }
 .badge.status::before {
   content: ""; width: 5px; height: 5px;
   background: #7fd8a4; margin-right: 6px;
-  animation: accBlink 1.1s steps(2) infinite;
 }
 @keyframes accPulse {
   0%, 100% { box-shadow: 0 0 6px rgba(127, 216, 164, .25); }
@@ -497,14 +510,13 @@ body {
 /* 可点击的评级徽章 */
 a.badge { text-decoration: none; transition: transform .12s, filter .12s; }
 a.badge:hover { transform: translateY(-2px); filter: brightness(1.15); }
-.pub-note { font-size: 14px; color: var(--dim); margin: -2px 0 8px; }
+.pub-note { font-size: 11px; color: var(--dim); margin: 0 0 7px; }
 .pub-authors .eq { color: var(--pink); }
 
 /* 论文关键词（作者名单下方） */
-.pub-keywords { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; }
+.pub-keywords { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 0; }
 .pub-keywords .kw {
-  font-family: var(--font-pixel);
-  font-size: 7px; letter-spacing: 1px;
+  font-size: 11px; letter-spacing: 0;
   color: var(--dim);
   border: 1px solid rgba(139, 141, 176, .35);
   padding: 4px 7px;
@@ -514,8 +526,7 @@ a.badge:hover { transform: translateY(-2px); filter: brightness(1.15); }
 
 .pub-links { display: inline-flex; gap: 8px; }
 .pub-links a {
-  font-family: var(--font-pixel);
-  font-size: 8px; letter-spacing: 1px;
+  font-size: 12px; font-weight: 700; letter-spacing: 0;
   color: var(--cyan);
   text-decoration: none;
   border: 1px solid rgba(143, 216, 232, .4);
@@ -541,7 +552,7 @@ a.badge:hover { transform: translateY(-2px); filter: brightness(1.15); }
 /* ---------- 爱好 ---------- */
 .hobby-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
   gap: 16px;
 }
 .hobby-card {
@@ -565,10 +576,10 @@ a.badge:hover { transform: translateY(-2px); filter: brightness(1.15); }
   color: var(--cream);
   margin-bottom: 8px;
 }
-.hobby-desc { color: var(--dim); font-size: 20px; }
+.hobby-desc { color: var(--text); font-size: 14px; }
 
 /* ---------- 页脚 ---------- */
-.footer { text-align: center; color: var(--dim); font-size: 19px; margin-top: 8px; }
+.footer { text-align: center; color: var(--dim); font-size: 13px; margin-top: 8px; }
 .footer-divider { color: var(--gold); font-size: 13px; letter-spacing: 6px; margin-bottom: 14px; opacity: .8; }
 
 /* ---------- 滚动显现 ---------- */
@@ -577,13 +588,23 @@ a.badge:hover { transform: translateY(-2px); filter: brightness(1.15); }
 
 /* ---------- 手机端 ---------- */
 @media (max-width: 640px) {
-  body { font-size: 20px; }
-  .navbar { font-size: 8px; padding: 12px 14px; }
-  .nav-links { gap: 12px; }
-  .hero { flex-direction: column; gap: 40px; padding-top: 40px; }
-  .pixel-title { font-size: 18px; }
+  body { font-size: 15px; }
+  .navbar { font-size: 7px; padding: 12px 14px; }
+  .nav-links { gap: 10px; }
+  .hero { flex-direction: column; align-items: stretch; gap: 28px; padding-top: 34px; }
+  .tarot-scene { align-self: center; }
+  .hero-info { min-width: 0; width: 100%; flex-basis: auto; }
+  .pixel-title { font-size: 20px; line-height: 1.5; }
+  .hero-summary { font-size: 15px; }
+  .stat-list .k { min-width: 76px; }
   .panel { padding: 22px 18px; }
-  .moon-wrap { right: 2%; transform: scale(.7); transform-origin: top right; }
+  .pub-card { padding: 18px 16px; }
+  .pub-title { font-size: 16px; }
+  .moon-wrap {
+    top: 3px; left: 48px; right: auto; z-index: 41;
+    transform: scale(.24); transform-origin: top left;
+    animation: none;
+  }
   /* 触屏没有悬停，塔罗牌保持可见即可 */
 }
 
@@ -592,282 +613,179 @@ a.badge:hover { transform: translateY(-2px); filter: brightness(1.15); }
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
 
-/* ---------- 像素猫 ---------- */
-.cat { position: absolute; z-index: 6; pointer-events: none; }
-.cat .crow { display: flex; }
-.cat .cpx { width: var(--cs, 4px); height: var(--cs, 4px); }
-.cat .cpx.o { background: #17122b; }
-.cat .cpx.c { background: #f3e9c8; }
-.cat .cpx.p { background: #d98fb8; }
-.cat .cpx.s { background: #cdb98d; }
-.cat .cpx.g { background: #8f97bd; }
-
-/* 打盹猫：趴在塔罗牌上沿，随牌一起浮动，缓慢呼吸 */
-.cat-sleep {
-  top: -32px; right: 14px;
-  transform-origin: bottom center;
-  animation: catBreathe 3.4s ease-in-out infinite;
-}
-@keyframes catBreathe {
-  0%, 100% { transform: scaleY(1); }
-  50%      { transform: scaleY(1.045); }
-}
-.cat-sleep .zzz { position: absolute; top: -4px; right: -16px; }
-.cat-sleep .zzz i {
-  position: absolute;
-  font-family: var(--font-pixel);
-  font-style: normal;
-  color: var(--gold);
-  text-shadow: 0 0 8px rgba(232, 196, 106, .6);
-  opacity: 0;
-  animation: zFloat 2.7s linear infinite;
-}
-@keyframes zFloat {
-  0%   { opacity: 0; transform: translate(0, 0); }
-  18%  { opacity: 1; }
-  100% { opacity: 0; transform: translate(14px, -30px); }
-}
-
-/* 巡逻猫：沿 PUBLICATIONS 板块上沿来回走（JS 驱动位移与转向） */
-.cat-patrol { top: -32px; left: 60px; will-change: left, transform; }
-
-/* 坐姿猫：蹲在 SIDE QUESTS 板块上沿右侧（JS 驱动眨眼） */
-.cat-sit { top: -32px; right: 22px; }
-
-/* 打字猫被点到：疯狂敲键盘（快速抖动）+ 飘出代码符号 */
-.cat-type { top: -32px; right: 22px; }
-.cat-type.typing .catframe { animation: catType .12s linear infinite; }
-@keyframes catType {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-2px); }
-}
-.cat-type .code {
-  position: absolute; bottom: 100%;
-  font-family: var(--font-pixel); font-size: 12px;
-  color: #8fd6a0;
-  text-shadow: 0 0 8px rgba(143, 214, 160, .5);
-  white-space: nowrap;
-  pointer-events: none;
-  opacity: 0;
-  animation: codeFloat 1s ease-out forwards;
-}
-@keyframes codeFloat {
-  0%   { opacity: 0; transform: translate(0, 4px) scale(.7); }
-  20%  { opacity: 1; }
-  100% { opacity: 0; transform: translate(var(--cx, 0), -40px); }
-}
-
-/* About Me 互动猫：蹲在板块上沿左侧，点击会笑并飘出小爱心 */
-.cat-about { top: -32px; left: 22px; pointer-events: auto; cursor: pointer; }
-.cat-about.boop { animation: catBoop .45s ease-out; }
-@keyframes catBoop {
-  0%   { transform: scale(1); }
-  35%  { transform: scale(1.12, .85); }
-  70%  { transform: scale(.95, 1.08); }
-  100% { transform: scale(1); }
-}
-.cat-about .heart {
-  position: absolute; bottom: 100%;
-  font-family: var(--font-pixel);
-  font-size: 14px;
-  color: #d98fb8;
-  text-shadow: 0 0 8px rgba(217, 143, 184, .55);
-  pointer-events: none;
-  opacity: 0;
-  animation: heartFloat 1s ease-out forwards;
-}
-@keyframes heartFloat {
-  0%   { opacity: 0; transform: translate(0, 6px) scale(.6); }
-  20%  { opacity: 1; }
-  100% { opacity: 0; transform: translate(var(--hx, 0), -44px) scale(1.1); }
-}
-
-/* 所有猫都可以点 */
-.cat-sleep, .cat-patrol, .cat-sit, .cat-about, .cat-type { pointer-events: auto; cursor: pointer; }
-
-/* 打盹猫被点醒：弹跳起来哆嗦几下（覆盖呼吸动画，醒完自动恢复） */
-.cat-sleep.startled { animation: catStartle .55s ease-out; }
-@keyframes catStartle {
-  0%   { transform: translateY(0); }
-  22%  { transform: translateY(-14px); }
-  40%  { transform: translateY(0) rotate(-5deg); }
-  55%  { transform: translateY(-5px) rotate(4deg); }
-  70%  { transform: translateY(0) rotate(-2deg); }
-  85%  { transform: translateY(-2px) rotate(1deg); }
-  100% { transform: translateY(0); }
-}
-
-/* 巡逻猫被点到：跳一下 + 喵声气泡 */
-.cat-patrol .catframe.hop { animation: catHop .5s ease-out; }
-@keyframes catHop {
-  0%   { transform: translateY(0); }
-  40%  { transform: translateY(-16px); }
-  70%  { transform: translateY(0); }
-  85%  { transform: translateY(-4px); }
-  100% { transform: translateY(0); }
-}
-.cat-patrol .meow {
-  position: absolute; bottom: calc(100% + 6px); left: 50%;
-  padding: 2px 6px;
-  background: var(--panel-2);
-  border: 2px solid var(--gold);
-  font-family: var(--font-pixel); font-size: 12px; color: var(--gold);
-  white-space: nowrap;
-  pointer-events: none;
-  animation: meowPop .9s ease-out forwards;
-}
-@keyframes meowPop {
-  0%   { opacity: 0; transform: translate(-50%, 6px) scale(.6); }
-  20%  { opacity: 1; transform: translate(-50%, 0) scale(1); }
-  75%  { opacity: 1; }
-  100% { opacity: 0; transform: translate(-50%, -10px); }
-}
-
-/* 坐姿猫被点到：开心翻滚一周 + 金色火花 */
-.cat-sit { transform-origin: 50% 60%; }
-.cat-sit.spin { animation: catSpin .6s ease-in-out; }
-@keyframes catSpin {
-  0%   { transform: rotate(0deg); }
-  60%  { transform: rotate(370deg); }
-  80%  { transform: rotate(355deg); }
-  100% { transform: rotate(360deg); }
-}
-.cat-sit .spark {
-  position: absolute; bottom: 60%;
-  font-family: var(--font-pixel); font-size: 12px;
-  color: var(--gold);
-  text-shadow: 0 0 8px rgba(232, 196, 106, .55);
-  pointer-events: none;
-  opacity: 0;
-  animation: sparkBurst .8s ease-out forwards;
-}
-@keyframes sparkBurst {
-  0%   { opacity: 0; transform: translate(0, 0) scale(.5); }
-  25%  { opacity: 1; }
-  100% { opacity: 0; transform: translate(var(--sx, 0), var(--sy, -30px)) scale(1.2) rotate(90deg); }
-}
-
-@media (max-width: 640px) {
-  .cat-patrol, .cat-sit, .cat-about, .cat-type { display: none; }
-  .cat-sleep { animation: none; transform: scale(.72); top: -26px; right: 8px; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .cat-sleep { animation: none; }
-  .cat-sleep .zzz i { animation: none; opacity: 0; }
-  .cat-sleep.startled, .cat-sit.spin, .cat-about.boop, .cat-patrol .catframe.hop, .cat-type.typing .catframe { animation: none; }
-  .cat-about .heart, .cat-sit .spark, .cat-patrol .meow, .cat-type .code { animation-duration: .01s; }
-}
-
 /* ============================================================
-   白天主题（html.day）—— 马里奥风格的晴空
-   默认是夜晚主题：以下规则全部限定在 html.day 作用域内，
-   不设置 day 类时这套样式完全不生效，黑夜版不受任何影响。
+   Day theme: the same lunar palette in daylight.
    ============================================================ */
 
 /* ---------- 白天配色：覆写变量 ---------- */
 html.day {
-  --bg0:      #6ba9e8;   /* 柔和晴空蓝 */
-  --bg1:      #a8d4f5;
-  --panel:    rgba(255, 251, 240, .85);
-  --panel-2:  #fdf6e3;
-  --line:     #d9c08a;
-  --line-soft:#e8dcc0;
-  --cream:    #2b3a67;   /* 标题/强调：深海军蓝（浅底上替代月光白） */
-  --gold:     #c9861a;
-  --gold-dim: rgba(201, 134, 26, .55);
-  --cyan:     #1d7a99;
-  --text:     #3a4066;
-  --dim:      #7a7f9e;
-  --pink:     #d2699e;
+  --bg0:      #eceef1;
+  --bg1:      #f6f6f3;
+  --panel:    rgba(255, 255, 255, .9);
+  --panel-2:  #f8f8f7;
+  --line:     #cbd1d6;
+  --line-soft:#dde1e4;
+  --cream:    #252c36;
+  --gold:     #ad8132;
+  --gold-dim: rgba(173, 129, 50, .5);
+  --cyan:     #286e78;
+  --text:     #394451;
+  --dim:      #58636d;
+  --pink:     #825c70;
 }
 
-/* ---------- 白天天空：柔和蓝渐变，隐藏星星与流星 ---------- */
 html.day #starfield {
   background:
-    radial-gradient(ellipse at 78% 6%, rgba(255, 236, 170, .35) 0%, transparent 55%),
-    linear-gradient(to bottom, var(--bg0) 0%, var(--bg1) 60%, #e4f3ff 100%);
+    radial-gradient(ellipse 90% 22% at 85% 82%, rgba(74, 85, 88, .065), transparent 78%),
+    linear-gradient(to bottom, #eef0ef 0%, #f7f7f4 68%, #e9edeb 100%);
 }
 html.day .star, html.day .shooting { display: none; }
 
-/* ---------- 白云与青山（马里奥风，低饱和） ---------- */
-html.day .cloud { --cl: rgba(255, 255, 255, .92); }
-html.day .mountains-back  { background: #8cc57e; opacity: .75; }
-html.day .mountains-front { background: #5da862; }
-html.day .grain { opacity: .03; }
+html.day .cloud { --cl: rgba(75, 85, 87, .045); }
+html.day .ink-geese { display: block; }
+html.day .mountains-back {
+  height: 260px;
+  background: linear-gradient(to bottom, rgba(80, 93, 93, .18), rgba(80, 93, 93, .035));
+  opacity: 1;
+  clip-path: polygon(0 100%, 0 78%, 7% 71%, 12% 73%, 20% 49%, 24% 44%, 28% 54%, 36% 75%, 43% 59%, 49% 63%, 56% 31%, 59% 28%, 64% 48%, 70% 69%, 79% 52%, 84% 56%, 90% 36%, 94% 46%, 100% 65%, 100% 100%);
+  filter: blur(2px);
+}
+html.day .mountains-front {
+  height: 145px;
+  background: linear-gradient(to bottom, rgba(62, 77, 78, .17), rgba(62, 77, 78, .04));
+  opacity: 1;
+  clip-path: polygon(0 100%, 0 70%, 8% 77%, 16% 45%, 20% 41%, 26% 60%, 32% 67%, 39% 38%, 44% 51%, 49% 76%, 57% 59%, 64% 64%, 72% 33%, 77% 46%, 85% 70%, 93% 54%, 100% 67%, 100% 100%);
+  filter: blur(1px);
+}
+html.day .grain { opacity: .07; }
 
-/* ---------- 白天导航与杂项 ---------- */
-html.day .navbar { background: rgba(250, 246, 232, .72); }
-html.day .cat .cpx.c { background: #ecd9a8; }   /* 猫身在浅底上稍微加深 */
+html.day .navbar { background: rgba(248, 249, 248, .86); border-color: var(--line); }
+html.day .panel {
+  background: var(--panel);
+  border-color: #c7c2b7;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .9), 6px 6px 0 rgba(112, 76, 48, .07);
+}
+html.day .section-title { color: #3b3430; text-shadow: none; }
+html.day .section-title .glyph { color: #9f3f35; }
+html.day .section-title .rule { border-color: rgba(159, 63, 53, .3); }
+html.day .nav-links a.active { color: #9f3f35; text-shadow: none; }
+html.day .nav-links a.active::before { color: #9f3f35; }
+html.day .hero-action-primary { color: #1e252c; }
+html.day .hero-action-primary {
+  position: relative;
+  background: linear-gradient(135deg, #f4f0e5 0%, #e9e0cb 100%);
+  border-color: #b69b64;
+  box-shadow: 4px 4px 0 rgba(112, 76, 48, .16), inset 0 1px 0 rgba(255, 255, 255, .85);
+  color: #5c4030;
+}
+html.day .hero-action-primary::before { display: none; }
+html.day .hero-action-primary:hover { background: #e9dfc6; border-color: #9f3f35; box-shadow: 4px 4px 0 rgba(112, 76, 48, .18); }
+html.day .hero-action-secondary { background: rgba(255, 255, 255, .88); }
+html.day .cat .cpx.c { background: #c1a66f; }
+/* Daylight ink palette for pixel cats: warm ink replaces the night-only purple outline. */
+html.day .cat .cpx.o { background: #4b4038; }
+html.day .cat .cpx.c { background: #f3eee2; }
+html.day .cat .cpx.p { background: #a44b42; }
+html.day .cat .cpx.s { background: #b89b65; }
+html.day .cat .cpx.g { background: #718383; }
 
 /* ---------- 白天论文徽章：浅底可读版（夜间配色是为深底设计的） ---------- */
-html.day .badge { color: #14152c; }   /* 徽章文字：夜间吃 var(--bg0) 近黑，白天 --bg0 是浅蓝，需固定深色 */
-/* 评级徽章：底色加深到与白天色板同族（暖金/深青/草绿/砖红），去掉夜间的彩色光晕 */
-html.day .badge.ccf-a   { background: #d84f4f; box-shadow: 0 3px 0 #8a3232; }
-html.day .badge.ccf-b   { background: #e0a83c; box-shadow: 0 3px 0 #8a6420; }
-html.day .badge.ccf-c   { background: #4da8bd; box-shadow: 0 3px 0 #2a6272; }
-html.day .badge.cas     { background: #c97aa5; box-shadow: 0 3px 0 #7e3f68; }
-html.day .badge.default { background: #4da354; box-shadow: 0 3px 0 #2c6634; color: #ffffff; }
+html.day .badge { color: #fff; }
+html.day .badge.ccf-a   { background: #a8575a; box-shadow: none; }
+html.day .badge.ccf-b   { background: #775719; box-shadow: none; }
+html.day .badge.ccf-c   { background: #427e86; box-shadow: none; }
+html.day .badge.cas     { background: #846878; box-shadow: none; }
+html.day .badge.default { background: #4e7962; box-shadow: none; }
+html.day .badge.alt { color: #775719; }
 html.day .badge.status {
-  background: rgba(46, 160, 90, .12);
-  color: #1e7a4a; border: 1px solid #2e9e5c;
-  box-shadow: 0 0 10px rgba(46, 160, 90, .25);
-  animation: accPulseDay 2.2s ease-in-out infinite;
+  background: #e8f0e9;
+  color: #326348; border: 1px solid #83a894;
+  box-shadow: none;
+  animation: none;
 }
-html.day .badge.status::before { background: #2e9e5c; }
-@keyframes accPulseDay {
-  0%, 100% { box-shadow: 0 0 6px rgba(46, 160, 90, .2); }
-  50%      { box-shadow: 0 0 14px rgba(46, 160, 90, .45); }
-}
-html.day .badge.status.review { color: #7a4fc0; border-color: #8a5fd0; }
+html.day .badge.status::before { background: #326348; }
+html.day .badge.status.review { color: #70566e; border-color: #bca9ba; background: #f4eef3; }
 html.day .badge.meta {
-  background: rgba(122, 79, 192, .10);
-  color: #6b3fb8; border: 1px solid #8a5fd0;
-  box-shadow: 0 0 10px rgba(122, 79, 192, .22);
+  background: #f4eef3;
+  color: #70566e; border: 1px solid #bca9ba;
+  box-shadow: none;
 }
-html.day .pub-links a { border-color: rgba(29, 122, 153, .45); }
+html.day .pub-links a { border-color: rgba(40, 110, 120, .4); }
 
-/* 关键词/方向标签：白天改为实心徽章——深青底白字，在象牙底上对比最强 */
 html.day .pub-keywords .kw {
-  color: #ffffff;
-  border: 2px solid #155e77;
-  background: #1d7a99;
+  color: var(--dim);
+  border: 1px solid var(--line);
+  background: #f5f7f7;
 }
 html.day .pub-keywords .kw:hover {
-  background: #155e77;
-  border-color: #0f4a5e;
+  color: var(--cyan);
+  border-color: var(--cyan);
 }
 html.day .chip {
-  color: #ffffff;
-  border: 2px solid #155e77;
-  background: #1d7a99;
+  color: var(--cyan);
+  border: 1px solid #a6c4c7;
+  background: rgba(255, 255, 255, .72);
 }
 
-/* ---------- 白天塔罗牌：象牙羊皮纸质感，取代深夜蓝 ---------- */
 html.day .tarot-face {
-  background: linear-gradient(165deg, #fffaf0 0%, #f8ecd2 55%, #f0deb4 100%);
+  background: #f8f9f8;
   box-shadow:
-    0 0 0 1px rgba(120, 90, 30, .25),
-    0 0 44px rgba(201, 134, 26, .18),
-    14px 18px 0 rgba(90, 70, 30, .18);
+    0 0 0 1px rgba(46, 58, 70, .16),
+    0 0 36px rgba(173, 129, 50, .1),
+    14px 18px 0 rgba(46, 58, 70, .1);
 }
 html.day .tarot-scene:hover .tarot-face {
   box-shadow:
-    0 0 0 1px rgba(120, 90, 30, .3),
-    0 0 64px rgba(201, 134, 26, .3),
-    18px 26px 0 rgba(90, 70, 30, .16);
+    0 0 0 1px rgba(46, 58, 70, .18),
+    0 0 44px rgba(173, 129, 50, .16),
+    18px 24px 0 rgba(46, 58, 70, .1);
 }
+html.day .pub-card, html.day .hobby-card { background: #fbfcfb; }
+html.day .tarot-photo-frame { background: #eef0f0; }
+html.day .tarot-links a { background: rgba(173, 129, 50, .05); }
 
 /* ---------- 太阳：替换月亮（与月亮同一容器，复用浮动动画） ---------- */
 #sun { display: none; }
 #sun .row { display: flex; }
 #sun .px { width: 4px; height: 4px; }
-#sun .y { background: #fff3a0; }   /* 核心亮黄 */
-#sun .g { background: #ffd94d; }   /* 中层金色 */
-#sun .a { background: #ffb61a; }   /* 边缘琥珀 */
+#sun .y { background: #f4d79a; }
+#sun .g { background: #c65d45; }
+#sun .a { background: #9f3f35; }
 #sun .t { background: transparent; }
 html.day #moon { display: none; }
 html.day #sun { display: grid; grid-auto-rows: 4px; }
-html.day .moon-wrap { filter: drop-shadow(0 0 44px rgba(255, 208, 84, .6)); }
+html.day .moon-wrap { filter: drop-shadow(0 0 24px rgba(178, 77, 55, .2)); }
+
+/* 水墨雁阵：多层次队形、轻微升降和墨迹拖影，作为白天远景 */
+.ink-geese { display: none; position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+.ink-geese i {
+  position: absolute; left: -100px; width: 34px; height: 14px;
+  border-top: 2px solid rgba(50, 62, 62, .34);
+  border-radius: 50% 50% 0 0;
+  transform: rotate(-7deg) scaleX(.9);
+  filter: drop-shadow(-8px 3px 0 rgba(50, 62, 62, .055));
+  animation: geeseFlight 30s linear infinite;
+}
+.ink-geese i::before, .ink-geese i::after {
+  content: ""; position: absolute; top: -7px; width: 17px; height: 9px;
+  border-top: 2px solid rgba(50, 62, 62, .34); border-radius: 50%;
+}
+.ink-geese i::before { left: 0; transform: rotate(21deg); }
+.ink-geese i::after { right: 0; transform: rotate(-21deg); }
+.ink-geese i:nth-child(1) { top: 18%; animation-delay: -6s; opacity: .72; }
+.ink-geese i:nth-child(2) { top: 23%; transform: scale(.72) rotate(-7deg); animation-delay: -16s; opacity: .48; }
+.ink-geese i:nth-child(3) { top: 27%; transform: scale(.55) rotate(-7deg); animation-delay: -24s; opacity: .4; }
+.ink-geese i:nth-child(4) { top: 20%; transform: scale(.42) rotate(-7deg); animation-delay: -12s; opacity: .28; }
+.ink-geese i:nth-child(5) { top: 31%; transform: scale(.34) rotate(-7deg); animation-delay: -27s; opacity: .23; }
+.ink-geese i:nth-child(6) { top: 16%; transform: scale(.28) rotate(-7deg); animation-delay: -20s; opacity: .2; }
+@keyframes geeseFlight {
+  0% { left: -100px; opacity: 0; }
+  8% { opacity: inherit; }
+  42% { transform: translateY(-15px) rotate(-5deg) scaleX(.9); }
+  68% { transform: translateY(10px) rotate(-9deg) scaleX(.9); }
+  92% { opacity: inherit; }
+  100% { left: calc(100% + 100px); opacity: 0; transform: translateY(-4px) rotate(-7deg) scaleX(.9); }
+}
 
 /* ---------- 主题切换提示：月亮/太阳右侧的像素箭头 + 目标主题图标，周期性闪现 ---------- */
 .theme-hint {
@@ -901,42 +819,37 @@ html.day .moon-wrap { filter: drop-shadow(0 0 44px rgba(255, 208, 84, .6)); }
   .theme-hint { display: none; }   /* 窄屏右侧空间不足，避免溢出 */
 }
 
-/* ---------- 主题切换过场：一列列 01 代码向上浮动、渐变隐去（透明背景，不遮挡） ---------- */
+/* ---------- 主题切换过场：二进制列由下向上扫过画面 ---------- */
 .theme-wipe {
   position: fixed; inset: 0; z-index: 200;
+  width: 100vw; height: 100vh;
+  margin: 0; padding: 0; border: 0; background: transparent;
   overflow: hidden;
   pointer-events: none;
 }
 .theme-wipe .bcol {
   position: absolute; top: 0;
-  font-family: var(--font-pixel); font-size: 15px; line-height: 1.6;
-  text-align: center;
+  font-family: var(--font-pixel); font-size: 10px; line-height: 2.2;
+  white-space: pre; text-align: center;
+  color: var(--code-color);
   opacity: 0;
-  /* 列的上下两端做透明渐变，隐去更柔和（顶部收窄淡出区，保住亮白头部） */
-  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 80%, transparent);
-  mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 80%, transparent);
-  animation: binFloat var(--wt, 2.8s) linear var(--wd, 0s) both;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, .08) 16%, #000 34%, #000 66%, rgba(0, 0, 0, .08) 84%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, .08) 16%, #000 34%, #000 66%, rgba(0, 0, 0, .08) 84%, transparent 100%);
+  animation: binFloat var(--wt, 1.2s) linear var(--wd, 0s) both;
 }
 @keyframes binFloat {
-  0%   { transform: translateY(105vh); opacity: 0; }
-  12%  { opacity: .55; }
-  75%  { opacity: .55; }
-  100% { transform: translateY(-120%); opacity: 0; }
+  0%   { transform: translateY(112vh); opacity: 0; }
+  14%  { opacity: .12; }
+  28%  { opacity: .4; }
+  70%  { opacity: .28; }
+  100% { transform: translateY(-122%); opacity: 0; }
 }
-
-/* 换肤瞬间给主要界面元素挂上短暂的颜色过渡，让新旧主题在代码雨后面平滑融合 */
-html.wiping body, html.wiping .panel, html.wiping .navbar,
-html.wiping .badge, html.wiping .chip, html.wiping .tarot-card,
-html.wiping .pub-item, html.wiping .section-title,
-html.wiping a, html.wiping h1, html.wiping p, html.wiping li {
-  transition: background-color .45s ease, color .45s ease, border-color .45s ease;
+::view-transition-old(root), ::view-transition-new(root) {
+  animation-duration: .75s;
+  animation-timing-function: ease-in-out;
 }
-
-/* 过场幕布：垫在代码雨（z200）之下、页面之上的目标主题底色，藏住换肤硬边 */
-.theme-veil {
-  position: fixed; inset: 0; z-index: 199;
-  pointer-events: none;
-  opacity: 0;
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .01s; }
 }
 
 /* ---------- 马里奥奔跑场景（仅白天显示） ---------- */
@@ -1073,3 +986,257 @@ html.day #mario-scene {
 @media (prefers-reduced-motion: reduce) {
   html.day #mario-scene { display: none; }
 }
+
+/* ===== Pixel observatory: one grid, one accent, quiet hierarchy ===== */
+:root {
+  --bg0: #0c0e10; --bg1: #15191b; --panel: rgba(18,22,24,.93);
+  --panel-2: #191e20; --line: #41494a; --line-soft: #303738;
+  --cream: #e4e8e3; --gold: #b7c6b9; --gold-dim: #7b9084;
+  --cyan: #a3bbb5; --text: #c7ceca; --dim: #9ca9a4; --pink: #b3a6af;
+}
+html.day {
+  --bg0: #f0f1ed; --bg1: #f7f8f4; --panel: rgba(247,248,244,.94);
+  --panel-2: #ecefe9; --line: #c3cbc3; --line-soft: #d5dbd3;
+  --cream: #27312e; --gold: #435e50; --gold-dim: #8d9e91;
+  --cyan: #4b6960; --text: #414f49; --dim: #63726a; --pink: #746874;
+}
+.hero { display: grid; grid-template-columns: 252px minmax(0,1fr); gap: 64px; align-items: center; padding: 76px 8px 66px; }
+.portrait-column { width: 252px; align-self: center; }
+.tarot-scene { width: 252px; animation: none; perspective: 1300px; }
+.tarot-card { width: 252px; height: 252px; }
+.tarot-scene .tarot-face, .tarot-scene:hover .tarot-face,
+html.day .tarot-scene .tarot-face, html.day .tarot-scene:hover .tarot-face {
+  background: transparent; border: 0; box-shadow: none;
+}
+.tarot-face::before, .tarot-top, .tarot-deco, .tarot-shadow, #catSleep { display: none; }
+.tarot-scene .tarot-border-inner { inset: 0; border: 0; padding: 0; }
+.tarot-scene .tarot-photo-ring { width: 252px; height: 252px; margin: 0; background: none; clip-path: none; filter: none; }
+.tarot-scene .tarot-photo-frame { clip-path: none; overflow: hidden; background: transparent; }
+.tarot-photo-frame img { image-rendering: auto; filter: saturate(.7); }
+.tarot-glare { display: none; }
+.tarot-scene .tarot-back, html.day .tarot-scene .tarot-back { background: transparent; }
+.tarot-back-quote { line-height: 1.7; font-size: 18px; }
+.tarot-scene:focus-visible { outline: 1px solid var(--cyan); outline-offset: 6px; }
+.portrait-links { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:3px 12px; margin-top:18px; position:relative; }
+.portrait-links a { display: inline-flex; align-items: center; min-height: 32px; color: var(--dim); text-decoration: none; font: 11px/1.5 var(--font-body); white-space: nowrap; border-bottom: 1px solid transparent; transition: color .2s,border-color .2s; }
+.portrait-links a:hover, .portrait-links a:focus-visible { color: var(--cream); border-bottom-color: var(--gold); }
+.portrait-links .lico { width: 12px; height: 12px; margin-right: 5px; }
+.hero-info { min-width: 0; }
+.hero-hello { font: 10px/1.6 monospace; letter-spacing: .17em; color: var(--dim); margin-bottom: 6px; opacity: 1; }
+.identity-wordmark { position: relative; width: 100%; height: 98px; margin-bottom: 6px; }
+.identity-wordmark h1 { display: flex; align-items: center; height: 100%; font-size: clamp(22px, 3vw, 34px); text-shadow: none; white-space: nowrap; margin: 0; }
+.identity-wordmark.ready h1 { opacity: 0; }
+#signalCanvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: pan-y; pointer-events: auto; }
+.tagline { font-size: 15px; font-weight: 400; color: var(--dim); letter-spacing: .015em; margin-bottom: 22px; }
+.stat-list { border-top: 1px solid var(--line); padding-top: 17px; }
+.stat-list li { line-height: 1.8; }
+.chip-row { gap: 7px; }
+.chip, html.day .chip { background: transparent; border-color: var(--line-soft); color: var(--cyan); font-size: 11px; padding: 5px 8px; }
+.hero-actions { gap: 18px; align-items: center; margin-top: 23px; }
+.hero-actions a { font-size: 12px; font-weight: 500; padding: 11px 13px; border-radius: 0; }
+.hero-actions .hero-action-primary, html.day .hero-actions .hero-action-primary { background: var(--cream); color: var(--bg0); border: 1px solid var(--cream); box-shadow: none; }
+.hero-actions .hero-action-secondary, html.day .hero-actions .hero-action-secondary { background: transparent; color: var(--text); border: 0; border-bottom: 1px solid var(--line); padding: 10px 0; box-shadow: none; }
+.hero-actions a:hover { transform: none; filter: brightness(.93); }
+.panel, html.day .panel { background: var(--panel); border: 0; border-top: 1px solid var(--line); box-shadow: none; padding: 36px 30px 38px; }
+.section-title, html.day .section-title { font: 11px/1.7 var(--font-pixel); color: var(--cream); text-shadow: none; gap: 14px; margin-bottom: 25px; }
+.section-title .glyph, html.day .section-title .glyph { color: var(--gold); font-size: 9px; }
+.section-title .rule, html.day .section-title .rule { border: 0; height: 5px; background: repeating-linear-gradient(90deg,var(--line) 0 2px,transparent 2px 6px); opacity: .55; }
+.sub-title { color: var(--dim); font-size: 8px; }
+.exp-item::before { width: 5px; height: 5px; box-shadow: none; }
+.exp-period { font: 10px/1.6 monospace; letter-spacing: .03em; }
+.pub-card, html.day .pub-card { background: transparent; border: 0; border-bottom: 1px solid var(--line-soft); padding: 22px 0; margin: 0; }
+.pub-card:hover { transform: none; border-color: var(--gold-dim); }
+.pub-title { font-size: 18px; font-weight: 600; line-height: 1.55; }
+.pub-links a { border: 0; border-bottom: 1px solid var(--line); background: transparent; }
+.hobby-card, html.day .hobby-card { background: transparent; box-shadow: none; border-color: var(--line-soft); }
+.hobby-card:hover { box-shadow: none; transform: translateY(-2px); }
+.cat { filter: grayscale(.8); opacity: .65; transition: opacity .2s,filter .2s; }
+.cat:hover { filter: grayscale(.2); opacity: 1; }
+.dust { display: none; }
+.nav-logo, .nav-links a.active, html.day .nav-links a.active { color: var(--gold); text-shadow: none; }
+.nav-links a.active::before, html.day .nav-links a.active::before { color: var(--gold); }
+#starfield { background: radial-gradient(ellipse at 75% 20%,#1c2429 0%,#0c0e10 65%); }
+.star { opacity: .45; }
+.moon-wrap { filter: grayscale(.8); }
+html.day .moon-wrap { filter: grayscale(.8); }
+.theme-wipe { pointer-events: none; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: .55s; animation-timing-function: cubic-bezier(.22,.61,.36,1); }
+@media (max-width: 760px) {
+  .hero { grid-template-columns: 1fr; justify-items: center; gap: 34px; padding: 40px 0 44px; }
+  .hero-info { width: 100%; }
+  .identity-wordmark { height: 80px; }
+  .identity-wordmark h1 { font-size: clamp(21px,5vw,30px); }
+  .hero-hello { font-size: 9px; }
+  .panel, html.day .panel { padding: 28px 18px 30px; }
+  .tagline { font-size: 13px; line-height: 1.8; min-height: 3.6em; }
+  .hero-actions { gap: 16px; }
+  .section-title, html.day .section-title { font-size: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tarot-tilt, .tarot-card, .tarot-photo-frame img { transition: none !important; }
+  .tarot-tilt { transform: none !important; }
+  .star, .dust, .cat, .moon-wrap { animation: none !important; }
+  ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .01s; }
+}
+/* The arriving theme is revealed by the same wave that carries the glyphs. */
+html.pixel-transition-active::view-transition-old(root) { animation: none; mix-blend-mode: normal; }
+html.pixel-transition-active::view-transition-new(root) {
+  animation: holdThemeFrame 1.24s linear both;
+  clip-path: var(--theme-mask, inset(100% 0 0));
+  mix-blend-mode: normal;
+}
+@keyframes holdThemeFrame { from { opacity: 1; } to { opacity: 1; } }
+
+/* Warm starlight + lagoon blue: color belongs to the hierarchy. */
+:root {
+  --bg0: #111326; --bg1: #191d35; --panel: rgba(24,29,49,.94); --panel-2: #202840;
+  --line: #414d68; --line-soft: #34415a; --cream: #fff0d0;
+  --gold: #edc47c; --gold-dim: #b69665; --cyan: #83cec9;
+  --text: #d5ddee; --dim: #a5b4cb; --pink: #e4a1bc;
+}
+html.day {
+  --bg0: #f4f6f1; --bg1: #fbfaf4; --panel: rgba(255,253,247,.94); --panel-2: #edf3ef;
+  --line: #c3d0cb; --line-soft: #d8e0d6; --cream: #273c40;
+  --gold: #a76a27; --gold-dim: #c29c66; --cyan: #257c83;
+  --text: #3f5357; --dim: #627779; --pink: #ad5b7d;
+}
+#starfield { background: radial-gradient(ellipse at 80% 16%,#243753 0%,#191c36 42%,#101324 80%); }
+html.day #starfield { background: radial-gradient(ellipse at 8% 5%,#dcefeb80,transparent 50%),radial-gradient(ellipse at 90% 40%,#f5dfc040,transparent 55%),linear-gradient(#f0f6f2,#fbfaf4 65%,#edf3ee); }
+.moon-wrap, html.day .moon-wrap { filter: none; }
+.nav-logo { color: var(--gold); }
+.hero-hello { color: var(--cyan); }
+.hero-actions .hero-action-primary, html.day .hero-actions .hero-action-primary { background: #ebbf77; border-color: #ebbf77; color: #313129; }
+.hero-actions .hero-action-primary:hover { background: #f2cb8f; border-color: #f2cb8f; }
+.section-title .glyph, html.day .section-title .glyph { color: var(--gold); }
+.section-title .rule, html.day .section-title .rule { background: repeating-linear-gradient(90deg,var(--cyan) 0 2px,transparent 2px 6px); opacity: .3; }
+.exp-item::before { background: var(--cyan); }
+.pub-title { color: var(--cream); }
+.pub-venue { color: var(--cyan); }
+.pub-badges { gap: 7px; align-items: center; }
+.badge, html.day .badge { font: 600 10px/1.3 var(--font-body); letter-spacing: .015em; padding: 5px 8px; border-radius: 4px; border: 1px solid transparent; box-shadow: none; }
+.badge.ccf-a, html.day .badge.ccf-a { color: #f2b5a7; background: #da7c6120; border-color: #d895724d; }
+.badge.ccf-b, html.day .badge.ccf-b { color: #edc781; background: #d4a75120; border-color: #d4a7514d; }
+.badge.ccf-c, html.day .badge.ccf-c { color: #96cfe9; background: #68a8ce20; border-color: #68a8ce4d; }
+.badge.cas, html.day .badge.cas { color: #d3b7e9; background: #b58ad120; border-color: #b58ad14d; }
+.badge.alt, html.day .badge.alt { color: #a7cce7; background: #8aafd31a; border-color: #8aafd34d; }
+.badge.default, .badge.status, html.day .badge.status { color: #9bd7bc; background: #6db68f1a; border-color: #6db68f4d; }
+.badge.status::before, html.day .badge.status::before { width: 4px; height: 4px; background: currentColor; border-radius: 50%; }
+.badge.status.review, html.day .badge.status.review { color: #c6b6e2; background: #b29ad21a; border-color: #b29ad24d; }
+html.day .badge.ccf-a { color: #9a473b; background: #fae9e0; border-color: #e9c6b8; }
+html.day .badge.ccf-b { color: #89601f; background: #fbf0d5; border-color: #e5d0a1; }
+html.day .badge.ccf-c, html.day .badge.alt { color: #3c6d8b; background: #e8f1f7; border-color: #bfd4e0; }
+html.day .badge.cas { color: #775192; background: #f1eaf7; border-color: #d8c5e5; }
+html.day .badge.status { color: #367253; background: #e8f3ea; border-color: #c2ddca; }
+html.day .badge.status.review { color: #77608f; background: #f1edf7; border-color: #d7cbe6; }
+.pub-links { gap: 8px; flex-wrap: wrap; }
+.pub-links a, html.day .pub-links a { font-weight: 500; font-size: 11px; color: var(--cyan); padding: 5px 2px; border: 0; border-bottom: 1px solid var(--line); }
+.pub-keywords .kw, html.day .pub-keywords .kw { border: 0; border-radius: 3px; color: var(--dim); background: #87bcb714; padding: 4px 7px; }
+.pub-keywords .kw:hover { color: var(--cyan); background: #87bcb72a; }
+/* One simple cat silhouette, with a different resting activity per section. */
+.cat.companion { position: absolute; z-index: 6; display: block; width: 70px; height: 70px; top: -61px; right: 25px; pointer-events: auto; opacity: 1; filter: none; transform: none; cursor: pointer;
+  --cat-fur:#191b26; --cat-line:#768095; --cat-face:#e2e3dc; --cat-prop:#252d40; --cat-accent:#bca878; }
+html.day .cat.companion { --cat-fur:#f2ecdf; --cat-line:#b1a89a; --cat-face:#55514a; --cat-prop:#e5e9e5; --cat-accent:#b28c49; }
+.companion svg { width: 100%; height: 100%; overflow: visible; }
+.companion-shell { fill:var(--cat-fur); stroke:var(--cat-line); stroke-width:.8; }
+.companion-open { fill:var(--cat-face); color:var(--cat-face); }
+.companion-happy, .cat-mouth { stroke:var(--cat-face); }
+.cat-nose { fill:var(--cat-face); opacity:.65; }
+.companion-paw { fill:var(--cat-fur); stroke:var(--cat-line); stroke-width:.65; }
+.companion-tail { stroke:var(--cat-fur); transform-origin:63px 65px; }
+.companion-head, .companion-breathe { transform-origin:43px 74px; }
+.companion-hands { transform-origin:43px 67px; }
+.companion-shadow { fill:var(--cat-line); opacity:.13; }
+.companion-blink { transform-origin:43px 45px; }
+.companion-breathe { animation:companionBreathe 4.2s ease-in-out infinite; }
+.companion-blink { animation:companionBlink 5.7s linear infinite; }
+.companion-breathe, .companion-blink, .cat-star { animation-delay:var(--idle-delay); animation-play-state:paused; }
+.companion.is-visible .companion-breathe, .companion.is-visible .companion-blink, .companion.is-visible .cat-star { animation-play-state:running; }
+.companion:focus-visible { outline:1px solid var(--cyan); outline-offset:3px; border-radius:50%; }
+.companion-bubble { position:absolute; top:0; right:-10px; color:var(--gold); font:13px/1.4 monospace; opacity:0; pointer-events:none; }
+.companion.static-happy .companion-open { opacity:0 !important; }
+.companion.static-happy .companion-happy, .companion.static-happy .companion-bubble { opacity:1 !important; }
+.companion-code .companion-breathe { animation-name:catWorking; }
+.companion-curious .companion-breathe { animation-name:catReading; animation-duration:6s; }
+.companion-celebrate .cat-star { animation:catStar 3.5s ease-in-out infinite paused; transform-origin:70px 14px; }
+@keyframes companionBreathe { 0%,100% { transform:translateY(0) scale(1); } 50% { transform:translateY(-1.5px) scale(1.015,1.025); } }
+@keyframes companionBlink { 0%,42%,47%,100% { transform:scaleY(1); } 44%,45% { transform:scaleY(.1); } }
+@keyframes catWorking { 0%,100% { transform:translateY(0) rotate(-1deg); } 50% { transform:translateY(1px) rotate(1deg); } }
+@keyframes catReading { 0%,100% { transform:rotate(-2deg); } 50% { transform:rotate(2deg); } }
+@keyframes catStar { 0%,100% { opacity:.35; transform:scale(.8) rotate(-8deg); } 50% { opacity:.9; transform:scale(1) rotate(8deg); } }
+@media(max-width:640px) { .cat.companion { width:55px; height:55px; top:-48px; right:12px; } }
+.panel { scroll-margin-top: 150px; }
+
+.pub-badges .badge { box-shadow: none; }
+@media (max-width: 640px) {
+  .moon-wrap { transform: scale(.24) !important; transform-origin: top left; }
+}
+/* A tapered light trail: a broad warm head and a thin, fading cool tail. */
+.portrait-orbit { position:absolute; inset:-6px; width:calc(100% + 12px); height:calc(100% + 12px); overflow:visible; pointer-events:none; transform:translateZ(1px); --trail-color:#90d9dc; --trail-head:#f5d59d; filter:drop-shadow(0 0 3px #8dd6e640); }
+html.day .portrait-orbit { --trail-color:#428d98; --trail-head:#bd8c46; filter:drop-shadow(0 0 2px #497f8b25); }
+.portrait-orbit rect { fill:none; stroke:var(--trail-color); stroke-linecap:round; stroke-dasharray:8.5 991.5; stroke-dashoffset:var(--trail-start); animation:portraitTrail 9s linear infinite; }
+.portrait-orbit rect:nth-child(-n+3) { stroke:var(--trail-head); }
+@keyframes portraitTrail { from { stroke-dashoffset:var(--trail-start); } to { stroke-dashoffset:calc(var(--trail-start) - 1000px); } }
+.cursor-lens { position:fixed; top:0; left:0; width:64px; height:64px; z-index:10000;
+  border-radius:50%; pointer-events:none; opacity:0; transition:opacity .22s;
+  backdrop-filter:url(#page-liquid-optics); -webkit-backdrop-filter:url(#page-liquid-optics);
+  background:radial-gradient(circle,transparent 56%,#a9dcd604 77%,#bde8df0a 95%,transparent 100%);
+  box-shadow:inset 0 0 0 .7px #b8dfdb40,0 0 8px #93c5c608;
+}
+.cursor-lens::after { content:''; position:absolute; inset:0; border-radius:50%;
+  background:conic-gradient(from 35deg,transparent 0deg,transparent 90deg,#b4d7d233 180deg,#e4eee2bb 245deg,transparent 305deg);
+  -webkit-mask:radial-gradient(transparent 68%,#000 69%,#000 70%,transparent 71%);mask:radial-gradient(transparent 68%,#000 69%,#000 70%,transparent 71%);
+}
+.cursor-lens.visible { opacity:1; }
+html.day .cursor-lens { box-shadow:inset 0 0 0 .7px #40858235,0 0 8px #497f8b08; }
+html.day .cursor-lens::after { background:conic-gradient(from 35deg,transparent 0deg,transparent 90deg,#4c8a8733 180deg,#407d7ca0 245deg,transparent 305deg); }
+@media(prefers-reduced-motion:reduce) { .cursor-lens { display:none; } .portrait-orbit rect { animation:none; } }
+/* Astronomy occupies the margins; content remains on calm, opaque surfaces. */
+#cosmicCanvas { position:fixed; inset:0; width:100%; height:100%; z-index:-4; pointer-events:none; image-rendering:pixelated; }
+.cosmic-ready .cloud, .cosmic-ready .mountains, html.cosmic-ready .ink-geese { display:none; }
+html.cosmic-ready .moon-wrap { top:76px; right:35px; transform:scale(.6) !important; transform-origin:top right; animation:none; }
+html.cosmic-ready .panel { background:rgba(23,29,49,.94); }
+html.cosmic-ready.day .panel { background:rgba(255,253,247,.95); }
+@media(max-width:640px) { html.cosmic-ready .moon-wrap { top:3px; left:48px; right:auto; transform:scale(.24) !important; transform-origin:top left; } }
+/* Resource actions are distinct from venue/status badges, with generous hit areas. */
+.pub-card .pub-links { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+.pub-card .pub-links a, html.day .pub-card .pub-links a {
+  display:inline-flex; align-items:center; gap:7px; min-height:34px; padding:7px 10px;
+  border:1px solid #86c9d43b; border-radius:5px; background:#83cec90e;
+  color:#a6deda; font:500 11px/1.4 var(--font-body); text-decoration:none;
+  transition:background .18s,border-color .18s,color .18s;
+}
+html.day .pub-card .pub-links a { background:#f0f6f3; border-color:#bfd4cf; color:#316e76; }
+.pub-card .pub-links a:hover { background:#83cec923; border-color:#83cec985; color:#e0f5e9; }
+html.day .pub-card .pub-links a:hover { background:#dfede7; border-color:#77a59f; color:#234e56; }
+.pub-links svg { width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:1.5; stroke-linejoin:round; stroke-linecap:round; }
+.resource-arrow { font-size:12px; opacity:.6; margin-left:3px; }
+.pub-links a:focus-visible { outline:2px solid var(--cyan); outline-offset:3px; }
+.pixel-transition-active .portrait-orbit rect, .pixel-transition-active .companion * { animation-play-state:paused !important; }
+/* Idle activities have separate paw/body layers; gaze and reactions stay spring-driven. */
+.companion-code .cat-paw-left { animation:catTypeLeft 1.25s ease-in-out infinite paused; }
+.companion-code .cat-paw-right { animation:catTypeRight 1.25s ease-in-out infinite paused; }
+.companion-code .companion-breathe { animation-duration:3.8s; }
+.companion-sport .companion-breathe { animation:catJog 1.1s ease-in-out infinite paused; }
+.companion-sport .cat-paw-left { animation:catStride 1.1s ease-in-out infinite paused; }
+.companion-sport .cat-paw-right { animation:catStride 1.1s ease-in-out -.55s infinite paused; }
+.companion-sport .cat-ball { transform-origin:73px 72px; animation:catBall 3.5s linear infinite paused; }
+.companion-love .companion-tail { animation:catTailWave 4s ease-in-out infinite paused; }
+.companion-celebrate .cat-paw-right { transform:translate(-1px,-10px) rotate(-8deg); transform-origin:58px 69px; }
+.companion.is-visible .cat-paw-left, .companion.is-visible .cat-paw-right, .companion.is-visible .cat-ball, .companion.is-visible .companion-tail { animation-play-state:running; }
+@keyframes catTypeLeft { 0%,40%,100% { transform:translateY(0); } 20%,65% { transform:translateY(-3px); } 80% { transform:translateY(1px); } }
+@keyframes catTypeRight { 0%,20%,65%,100% { transform:translateY(-2px); } 40%,80% { transform:translateY(1px); } }
+@keyframes catJog { 0%,50%,100% { transform:translateY(0) rotate(-1deg); } 25%,75% { transform:translateY(-2px) rotate(1deg); } }
+@keyframes catStride { 0%,100% { transform:translate(-2px,0); } 50% { transform:translate(2px,-3px); } }
+@keyframes catBall { to { transform:rotate(360deg); } }
+@keyframes catTailWave { 0%,100% { rotate:-5deg; } 50% { rotate:12deg; } }
+
+/* Official ACL mark; alpha masking keeps it legible in both themes. */
+.portrait-links a { min-width:0; min-height:34px; padding:4px 0; }
+.portrait-links .lico { width:14px; height:14px; margin-right:7px; }
+.lico-acl { display:inline-block; background:currentColor; -webkit-mask:url("assets/acl-logo.svg") center/contain no-repeat; mask:url("assets/acl-logo.svg") center/contain no-repeat; }
+.companion-sport { --cat-band:#d89a80; }
+html.day .companion-sport { --cat-band:#b96f5d; }
+.cat-band-ribbons { transform-origin:66px 37px; animation:headbandFlutter 1.1s ease-in-out infinite paused; }
+.companion.is-visible .cat-band-ribbons { animation-play-state:running; }
+@keyframes headbandFlutter { 0%,100% { transform:rotate(-7deg) scaleX(.95); } 50% { transform:rotate(7deg) scaleX(1.04); } }
+.portrait-links .lico-acl { width:18px; margin-right:5px; }

@@ -4,50 +4,30 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Zhongyu He — Homepage</title>
-  <meta name="description" content="Personal homepage of Zhongyu He" />
+  <meta name="description" content="Zhongyu He is an LLM researcher working on agents, reinforcement learning, and model post-training." />
 
-  <!-- 主题固定以夜晚模式开场（不做 localStorage 记忆，白天仅为当次浏览的彩蛋） -->
+  <!-- Default: night. Add class="day" to <html> for daylight. -->
 
   <!-- 像素字体：标题 Press Start 2P / 正文 VT323 -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="style.css?v=20260821c" />
+  <link rel="stylesheet" href="style.css?v=20261106-template" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'><rect width='8' height='8' fill='%2307070f'/><rect x='3' y='1' width='2' height='2' fill='%23f3e9c8'/><rect x='1' y='3' width='6' height='2' fill='%23f3e9c8'/><rect x='3' y='5' width='2' height='2' fill='%23f3e9c8'/></svg>" />
 </head>
 <body>
 
   <!-- 夜空背景：星星 / 流星（JS）· 月亮 / 云 / 群山（CSS+JS）；月亮/太阳即主题开关 -->
   <div id="starfield" aria-hidden="true"></div>
+  <canvas id="cosmicCanvas" aria-hidden="true"></canvas>
   <div class="moon-wrap" role="button" tabindex="0" title="Switch theme" aria-label="Switch day and night theme"><div id="moon"></div><div id="sun"></div><div id="themeHint" class="theme-hint"></div></div>
   <div class="cloud cloud-1" aria-hidden="true"></div>
   <div class="cloud cloud-2" aria-hidden="true"></div>
+  <div class="ink-geese" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
   <div class="mountains mountains-back" aria-hidden="true"></div>
   <div class="mountains mountains-front" aria-hidden="true"></div>
   <div class="grain" aria-hidden="true"></div>
-
-  <!-- 白天主题背景：马里奥奔跑场景（仅 html.day 时显示，JS 生成与驱动） -->
-  <div id="mario-scene" aria-hidden="true">
-    <div class="pcloud" id="pc1"></div>
-    <div class="pcloud" id="pc2"></div>
-    <div class="pcloud" id="pc3"></div>
-    <div class="deco" id="hill1"></div>
-    <div class="deco" id="bush1"></div>
-    <div class="deco" id="bush2"></div>
-    <div class="deco" id="pipe1"></div>
-    <div class="deco" id="pipe2"></div>
-    <div class="deco deco-brick" id="brickL"></div>
-    <div class="deco deco-brick" id="brickR"></div>
-    <div class="qblk" id="qb1">?<div class="bcoin"></div></div>
-    <div class="qblk" id="qb2">?<div class="bcoin"></div></div>
-    <div class="qblk" id="qb3">?<div class="bcoin"></div></div>
-    <div id="shroom"></div>
-    <div id="mario"></div>
-    <div id="marioBubble">HELP ME!</div>
-    <div id="coinCount"><span class="ccoin"></span>×<span id="coinNum">0</span></div>
-    <div class="mario-ground"></div>
-  </div>
 
   <!-- 鼠标星尘轨迹容器 -->
   <div id="stardust" aria-hidden="true"></div>
@@ -60,6 +40,7 @@
       <a href="#experience">EXP</a>
       <a href="#publications">PAPERS</a>
       <a href="#hobbies">FUN</a>
+      <a id="nav-contact" href="mailto:hezhongyu618@qq.com">CONTACT</a>
     </div>
   </nav>
 
@@ -69,8 +50,35 @@
     <header class="hero" id="about">
 
       <!-- 塔罗牌：悬停 3D 倾斜 + 流光，点击翻面 -->
-      <div class="tarot-scene" id="tarotScene" title="Click to flip">
+      <div class="portrait-column">
+      <div class="tarot-scene" id="tarotScene" role="button" tabindex="0" aria-label="Flip portrait to read a personal note" aria-pressed="false" title="Click to flip">
         <div class="tarot-tilt" id="tarotTilt">
+          <svg class="portrait-orbit" viewBox="0 0 264 264" aria-hidden="true" focusable="false">
+            <rect x="3" y="3" width="258" height="258" rx="3" pathLength="1000" style="--trail-start:0px;stroke-width:4.40;opacity:1.000" />
+            <rect x="3" y="3" width="258" height="258" rx="3" pathLength="1000" style="--trail-start:7px;stroke-width:4.23;opacity:0.948" />
+            <rect x="3" y="3" width="258" height="258" rx="3" pathLength="1000" style="--trail-start:14px;stroke-width:4.07;opacity:0.897" />
+            <rect x="3" y="3" width="258" height="258" rx="3" pathLength="1000" style="--trail-start:21px;stroke-width:3.90;opacity:0.846" />
+            <rect x="3" y="3" width="258" height="258" rx="3" pathLength="1000" style="--trail-start:28px;stroke-width:3.74;opacity:0.796" />
+            <rect x="3" y="3" width="258" height="258" rx="3" pathLength="1000" style="--trail-start:35px;stroke-width:3.57;opacity:0.747" />
+            <rect x="3" y="3" width="258" height="258" rx="3" pathLength="1000" style="--trail-start:42px;stroke-width:3.41;opacity:0.698" />
+            <rect x="3" y="3" width="258" height="258" rx="3" pathLength="1000" style="--trail-start:49px;stroke-width:3.24;opacity:0.650" />
+            <rect x="3" y="3" width="258" height="258" rx="3" pathLength="1000" style="--trail-start:56px;stroke-width:3.08;opacity:0.602" />
+            <rect x="3" y="3" width="258" height="258" rx="3" pathLength="1000" style="--trail-start:63px;stroke-width:2.91;opacity:0.556" />
+            <rect x="3" y="3" width="258" height="258" rx="3" pathLength="1000" style="--trail-start:70px;stroke-width:2.75;opacity:0.510" />
+            <rect x="3" y="3" width="258" height="258" rx="3" pathLength="1000" style="--trail-start:77px;stroke-width:2.58;opacity:0.465" />
+            <rect x="3" y="3" width="258" height="258" rx="3" pathLength="1000" style="--trail-start:84px;stroke-width:2.42;opacity:0.420" />
+            <rect x="3" y="3" width="258" height="258" rx="3" pathLength="1000" style="--trail-start:91px;stroke-width:2.25;opacity:0.377" />
+            <rect x="3" y="3" width="258" height="258" rx="3" pathLength="1000" style="--trail-start:98px;stroke-width:2.09;opacity:0.335" />
+            <rect x="3" y="3" width="258" height="258" rx="3" pathLength="1000" style="--trail-start:105px;stroke-width:1.92;opacity:0.293" />
+            <rect x="3" y="3" width="258" height="258" rx="3" pathLength="1000" style="--trail-start:112px;stroke-width:1.76;opacity:0.253" />
+            <rect x="3" y="3" width="258" height="258" rx="3" pathLength="1000" style="--trail-start:119px;stroke-width:1.59;opacity:0.214" />
+            <rect x="3" y="3" width="258" height="258" rx="3" pathLength="1000" style="--trail-start:126px;stroke-width:1.43;opacity:0.177" />
+            <rect x="3" y="3" width="258" height="258" rx="3" pathLength="1000" style="--trail-start:133px;stroke-width:1.26;opacity:0.141" />
+            <rect x="3" y="3" width="258" height="258" rx="3" pathLength="1000" style="--trail-start:140px;stroke-width:1.10;opacity:0.106" />
+            <rect x="3" y="3" width="258" height="258" rx="3" pathLength="1000" style="--trail-start:147px;stroke-width:0.93;opacity:0.074" />
+            <rect x="3" y="3" width="258" height="258" rx="3" pathLength="1000" style="--trail-start:154px;stroke-width:0.77;opacity:0.045" />
+            <rect x="3" y="3" width="258" height="258" rx="3" pathLength="1000" style="--trail-start:161px;stroke-width:0.60;opacity:0.019" />
+          </svg>
           <div class="tarot-card" id="tarotCard">
             <!-- 正面 -->
             <div class="tarot-face tarot-front">
@@ -86,7 +94,7 @@
                     <div class="tarot-glare" id="tarotGlare"></div>
                   </div>
                 </div>
-                <div class="tarot-links" id="tarot-links"><!-- JS 渲染：GitHub / Scholar 等外链 --></div>
+
                 <div class="tarot-deco">
                   <span class="tgly" data-night="☾">☾</span><span class="diamond"></span><span>✦</span><span class="diamond"></span><span class="tgly" data-night="☽">☽</span>
                 </div>
@@ -107,13 +115,24 @@
         <div class="cat cat-sleep" id="catSleep" role="button" tabindex="0" title="Boop!" aria-label="Sleeping pixel cat — click to startle it awake"></div>
       </div>
 
+      <nav class="portrait-links" id="tarot-links" aria-label="Social profiles"></nav>
+      </div>
+
       <!-- 角色信息 -->
       <div class="hero-info">
-        <p class="hero-hello">✦ WELCOME, TRAVELER ✦</p>
-        <h1 id="profile-name" class="pixel-title">Zhongyu He</h1>
+        <p class="hero-hello">RESEARCHER · ENGINEER</p>
+        <div class="identity-wordmark">
+          <h1 id="profile-name" class="pixel-title">Zhongyu He</h1>
+          <canvas id="signalCanvas" aria-hidden="true"></canvas>
+        </div>
         <p class="tagline"><span id="typewriter"></span><span class="cursor">_</span></p>
+        <p class="hero-summary" id="hero-summary"></p>
         <ul class="stat-list" id="stat-list"><!-- JS 渲染 --></ul>
         <div class="chip-row" id="chip-row"><!-- JS 渲染：研究方向 --></div>
+        <div class="hero-actions">
+          <a class="hero-action-primary" href="https://hezy618.github.io/SIRI/">Explore featured work: SIRI <span aria-hidden="true">↗</span></a>
+          <a class="hero-action-secondary" href="#publications">Publications <span aria-hidden="true">↓</span></a>
+        </div>
       </div>
     </header>
 
@@ -148,6 +167,7 @@
     <section class="panel reveal" id="awards">
       <h2 class="section-title"><span class="glyph">✦</span> HONORS <span class="rule"></span></h2>
       <ul class="award-list" id="award-list"><!-- JS 渲染 --></ul>
+      <div class="cat cat-firework" id="catFirework" role="button" tabindex="0" title="Celebrate!" aria-label="Pixel cat with fireworks — click to celebrate"></div>
     </section>
 
     <!-- ===== Hobbies ===== -->
@@ -165,7 +185,12 @@
 
   </main>
 
-  <script src="data.js?v=20260821c"></script>
-  <script src="script.js?v=20260821c"></script>
+  <script src="data.js?v=20261106-template"></script>
+  <script src="cosmic.js?v=20261106-template"></script>
+  <script src="script.js?v=20261106-template"></script>
+  <script src="signal.js?v=20261106-template"></script>
+  <script src="theme-transition.js?v=20261106-template"></script>
+  <script src="companions.js?v=20261106-template"></script>
+  <script src="cursor.js?v=20261106-template"></script>
 </body>
 </html>

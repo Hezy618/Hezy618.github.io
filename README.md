@@ -1,186 +1,120 @@
-# 🌙☀️ Pixel Day & Night · 像素昼夜个人主页
+# Pixel Observatory · 像素星空个人主页
 
-一个像素风个人学术主页模板，**白天 / 夜晚双主题**：深夜是月光星空塔罗牌，白天是超级马里奥奔跑场景。**纯静态**（HTML + CSS + 原生 JS），零依赖、零构建， fork 下来改一个文件就能变成你自己的主页，直接部署到 GitHub Pages。
+纯静态的个人学术主页模板，使用 HTML、CSS 和原生 JavaScript，无框架、无构建步骤。
 
-**在线预览 → https://hezy618.github.io**
+[在线演示](https://hezy618.github.io/) · [开源模板分支](https://github.com/Hezy618/Hezy618.github.io/tree/master)
 
----
+> `main` 是作者实际使用的个人站点；**`master` 是可复用模板**，使用占位头像，不包含 SIRI 论文子站。在线演示使用作者的真实照片，默认白天；模板默认夜间。
 
-## ✨ 页面里有哪些设计
+![模板夜间预览](assets/preview.png)
 
-**🌙 像素月夜场景（夜晚，默认主题）**
+## 当前设计
 
-- 🌕 **手绘像素月亮**：16×16 点阵、7 级明暗色阶，光源在左上——陨石坑带深色坑底与受光侧坑沿高光，整体有光晕、上下浮动和滚动视差
-- ⭐ **闪烁星空** + 不定期划过的**流星**
-- ☁️ 像素云、远山剪影、胶片噪点颗粒
-- 🖱️ **像素鼠标指针**（悬停链接时变金色），移动时拖出星尘轨迹
+- **昼夜星空**：缓慢自转的抖色像素星球、银河与倾斜吸积盘黑洞；白天使用暖白、青蓝和柔金，夜间使用深蓝星空。点击太阳／月亮切换。主题不写入 localStorage，刷新恢复默认状态。
+- **字符过渡**：ASCII 字符波前与像素边界同步揭示新主题；等待浏览器快照释放后清理，背景暂停并恢复，减少结束时的跳变。不支持 View Transition 时采用直接换肤配合字符动画的回退。
+- **液态光标**：64px 局部液态放大镜，折射底下的文字、照片、SVG 和动态画布。保留原生点击目标，触屏及减少动态效果模式关闭跟随。液态折射依赖浏览器对 SVG backdrop-filter 的支持，已在桌面 Chrome 验证；其他浏览器效果可能不同。
+- **个人信息区**：方形照片、透明翻面背面、头粗尾细的流动光边、点阵姓名和两列个人链接。支持 GitHub、Google Scholar、ACL Anthology 和 X 图标。
+- **纯猫小伙伴**：短圆耳、昼浅夜深的毛色，眼睛用平滑弹簧运动跟随鼠标；经历区敲代码、论文区读书、奖项区庆祝、兴趣区戴头带跑步。支持点击和键盘互动，屏外暂停待机动画。
+- **论文展示**：作者姓名自动加粗、共同一作标记、Accepted／Under Review 状态、评级标签、关键词，以及带图标的 PDF／ACL／Homepage 入口。评级与资源按钮适配昼夜配色。
+- **可访问性**：键盘操作、焦点样式、响应式布局，以及 `prefers-reduced-motion` 静态模式。
 
-**☀️ 像素白日场景（白天主题）**
+旧版马里奥背景、圆形塔罗头像和旧像素猫已不作为当前模板的展示设计。
 
-- 🌞 **点月亮/太阳即可切换主题**（右上角，带像素箭头提示），选择经 localStorage 记忆，刷新不重置
-- 🎬 切换时全屏**二进制代码雨渐变过场**：逐列 0/1 字符倾泻，颜色逐行插值，幕布遮盖换肤瞬间
-- 🍄 **可玩的马里奥小游戏背景**：马里奥在页面底部自动奔跑——**点他起跳**，头顶撞到 `?` 砖块**赚金币**（右下角计数）；中间的砖块会顶出**蘑菇**，吃到会变大（跨循环保留）；跑到水管前会被挡住并喊出 **HELP ME!**，点一下救他跳过去
-- 🌤️ 漂移的像素云、山丘草丛等场景装饰
+## 快速开始
 
-**昼夜联动的细节**
+```bash
+git clone --branch master --single-branch https://github.com/Hezy618/Hezy618.github.io.git my-homepage
+cd my-homepage
+python3 -m http.server 8000
+```
 
-- 🐱 全站像素猫**随主题换形态**：塔罗牌上的猫夜里打盹、白天醒来晒太阳；巡逻猫白天吐舌头；打字猫白天换笑脸
-- 🃏 塔罗牌也换"皮肤"：白天变成象牙羊皮纸质感，牌面**月亮纹样换成太阳**，背面格言切换为白天专属座右铭（`backQuoteDay`，可自定义）
+访问 `http://localhost:8000`。建议使用 HTTP 本地预览，避免 `file://` 的浏览器安全限制。
 
-**塔罗牌照片卡（Hero 区）**
+## 修改个人内容
 
-- 照片嵌在像素圆环里，悬停时 **3D 倾斜 + 流光跟随鼠标**
-- 头像下方内嵌 **GitHub / Google Scholar 官方 logo 外链按钮**（内联 SVG，跟随悬停反色与主题变色，点击不触发翻面）
-- **点击翻面**，背面显示一句属于你的格言（昼夜可各配一句）
-- 牌框上沿趴着一只**像素猫**（夜里打盹带 Zzz，白天趴平晒太阳）
+编辑 `data.js`。当前内容以作者经历作为公开示例，使用前请替换为自己的资料。
 
-**内容版块**
-
-- ABOUT ME 个人简介（多段）
-- EXPERIENCE 工作/实习 + 教育经历
-- PUBLICATIONS 论文列表（学术向特化，见下）
-- HONORS 荣誉奖项
-- SIDE QUESTS 爱好卡片
-- 所有版块滚动到可视区时柔和显现，顶部有像素导航栏
-
-**学术主页特化功能**
-
-- 🏷️ **评级徽章自动配色**：`CCF-A`（高亮发光）/ `CCF-B` / `CAS Q1 Top`（中科院分区）等，按文字自动匹配颜色，昼夜两套配色
-- 🔗 **徽章可点击**：CCF 徽章直达 CCF 官方目录、CORE 直达 ICORE 查询页、TH-CPL 直达清华官方 PDF（跳转表可自行增删）
-- 🔑 **论文关键词**：作者名单下方一行小 chips，悬停高亮
-- ✍️ 你的名字在作者列表中**自动加粗**；名字后加 `*` 自动标注共同一作并生成 "* Equal contribution" 脚注
-- 📌 `Accepted`（绿，呼吸灯）/ `Under Review`（紫）状态徽章自动区分，在审论文可挂 `meta` 审稿均分
-
-**彩蛋与细节**
-
-- 🐱 全站共四只像素猫，**都可以点击互动**：打盹的会惊醒、简介区的会笑并飘爱心、EXPERIENCE 的会疯狂敲代码飘字符、巡逻的会吓一跳喵一声（沿 PUBLICATIONS 上沿来回巡逻自动调头）
-- ⌨️ 打字机效果的 tagline
-- 🎮 Konami 秘籍彩蛋：方向键 `↑↑↓↓←→←→` 再按 `B A`，看看会发生什么
-
-**工程特性**：无任何框架与依赖、无需 Node/构建工具、响应式适配手机、尊重 `prefers-reduced-motion`、文件极小。
-
----
-
-## ✏️ 改成你自己的：只需编辑 `data.js`
-
-所有个人信息都集中在 **`data.js`** 一个文件里，每段都有中文注释，改完保存即可，不用碰 HTML/CSS/JS：
-
-| 想改的内容 | 对应字段 |
+| 内容 | 字段 |
 |---|---|
-| 姓名 / 大学 / 学院 / 专业 / 学位 / 城市 | `name` `university` `school` `major` `degree` `location` |
-| 邮箱（`emailAlt` 留空自动隐藏） | `email` / `emailAlt` |
-| 研究方向标签（chips） | `research` |
-| 个人照片 | 替换 `pic/` 里的图片，并改 `photo` 路径 |
-| Google Scholar / GitHub 等外链（按钮在塔罗牌头像下方） | `links` |
-| 塔罗牌文案（顶部编号 / 翻面格言，编号留空则隐藏整行；`backQuoteDay` 为白天专属格言，留空则昼夜共用） | `tarot` |
-| 个人简介 | `bio`（数组，一项一段） |
-| 工作 / 实习经历 | `experience`（数组） |
-| 教育经历 | `education` |
-| 发表论文 | `publications`（见下方字段说明） |
-| 荣誉奖项 | `awards` |
-| 爱好卡片 | `hobbies`（图标可用 emoji 或图片路径） |
-| 评级徽章的跳转链接 | `levelLinks`（按徽章文字前缀匹配） |
+| 姓名、简介、照片 | `name`、`tagline`、`heroSummary`、`photo` |
+| 学位、大学、城市、联系邮箱 | `degree`、`university`、`location`、`email` |
+| 研究方向 | `research`（首屏显示前三项） |
+| 个人链接 | `links`（增删后自动排列） |
+| 主要项目入口 | `featuredWork`：`{ label, url }`；设为 `null` 隐藏 |
+| 照片翻面文字 | `tarot.backQuote`、`tarot.backQuoteDay` |
+| 简介、经历、教育、奖项、爱好 | `bio`、`experience`、`education`、`awards`、`hobbies` |
+| 论文与评级链接 | `publications`、`levelLinks` |
 
-**论文条目（`publications`）字段一览：**
+把照片放到 `pic/` 后，将 `photo` 改为自己的路径，例如 `pic/avatar.jpg`。模板默认使用 `assets/photo.svg` 占位头像。首屏的经历摘要取自 `experience` 第一项，联系入口读取 `email`。
 
 ```js
 {
-  title: "论文标题",
-  authors: ["Your Name", "Co Author*"],   // 与 name 一致的自动加粗；* 标记共同一作
-  venue: "期刊/会议名",
+  title: "Your Paper Title",
+  authors: ["Your Name*", "Co Author*"],
+  venue: "Conference or Journal",
   year: 2026,
-  status: "Accepted",                      // 或 "Under Review"
-  meta: 3.5,                               // 可选：在审会议论文的审稿均分（仅填写后显示）
-  level: "CCF-A",                          // 主评级徽章，颜色自动匹配（CCF-A 高亮发光）
-  extraLevels: ["CORE A*", "TH-CPL A"],    // 补充评级（金色空心徽章），可省略
-  keywords: ["LLM Agents", "Reinforcement Learning"],  // 关键词 chips（作者下方），留空 [] 不显示
-  links: { PDF: "https://doi.org/..." },   // 论文链接，键名随意增删
+  status: "Accepted", // 在审可填 Under Review
+  level: "CCF-A",
+  extraLevels: ["CORE A*"],
+  keywords: ["LLM Agents", "Reinforcement Learning"],
+  links: {
+    PDF: "https://example.com/paper.pdf",
+    Homepage: "https://example.com/project/"
+  }
 }
 ```
 
-> 💡 `experience` / `publications` / `awards` 留成空数组 `[]` 时，对应版块会**自动隐藏**。
+`experience`、`publications`、`awards` 为空数组时，对应区块隐藏。若想默认白天，将 `index.html` 的 `<html lang="en">` 改为 `<html lang="en" class="day">`。
 
-**本地预览**：直接双击打开 `index.html` 即可，或运行 `python3 -m http.server` 后访问 `http://localhost:8000`。
+文字内容主要由 `data.js` 控制；修改页面布局、动效或导航区块仍需编辑相应 HTML／CSS／JS。模板保留外部字体链接，离线或字体加载失败时使用系统回退字体。
 
----
+## 部署 GitHub Pages
 
-## 🚀 部署到 GitHub Pages
-
-> ⚠️ **最重要的规则**：GitHub 个人主页的地址由**用户名**决定。想拥有 `https://<用户名>.github.io`，仓库名必须**恰好**是 `<用户名>.github.io`（例如用户名是 `tom`，仓库名就是 `tom.github.io`）。名字不匹配 GitHub 就不会把它当个人主页。
-
-### 方式一：命令行（推荐）
-
-先安装并登录 GitHub CLI（[安装地址](https://cli.github.com)，登录时会打开浏览器授权）：
+1. 在自己的 GitHub 账号下创建空仓库。个人根站点使用 `<用户名>.github.io`；普通项目页也可以使用其他仓库名。
+2. 修改个人资料后，将本地模板推送到自己的仓库：
 
 ```bash
-gh auth login        # 依次选 GitHub.com → HTTPS → Yes → Login with a web browser
-```
-
-然后执行：
-
-```bash
-# 1. 下载本模板，并删除原仓库的 git 历史（这样它就是你的全新项目了）
-git clone https://github.com/Hezy618/Hezy618.github.io.git my-homepage
-cd my-homepage
-rm -rf .git
-
-# 2. 打开 data.js 填入你的个人信息，替换 pic/ 里的照片
-#    （这一步在编辑器里完成，改完记得保存）
-
-# 3. 初始化你自己的仓库并提交
-git init -b main                        # 新建 git 仓库，主分支命名为 main
-git add -A                              # 暂存所有文件
-git commit -m "🌙 my pixel homepage"    # 提交
-
-# 4. 在 GitHub 上创建仓库并推送（把 <用户名> 换成你的 GitHub 用户名）
-gh repo create <用户名>.github.io --public --source=. --remote=origin --push
-```
-
-### 方式二：网页操作
-
-1. 点本页右上角 **Fork**，或下载 ZIP 解压
-2. 在 GitHub 网页右上角 **New repository**：仓库名填 `<用户名>.github.io`，选 Public，**不要**勾选初始化 README
-3. 把文件推送到新仓库（网页上按提示操作，或在本地文件夹里执行）：
-
-```bash
-git init -b main && git add -A && git commit -m "🌙 my pixel homepage"
-git remote add origin https://github.com/<用户名>/<用户名>.github.io.git
+git remote set-url origin https://github.com/<用户名>/<仓库名>.git
+git branch -M main
+git add .
+git commit -m "Customize my homepage"
 git push -u origin main
 ```
 
-### 生效与日常更新
+3. 在目标仓库 **Settings → Pages → Build and deployment** 中选择从分支部署，选 `main` 和 `/ (root)`，保存并等待部署成功。
+4. 个人根站点地址为 `https://<用户名>.github.io/`，普通项目页地址为 `https://<用户名>.github.io/<仓库名>/`。
 
-`<用户名>.github.io` 这种仓库会**自动开启 Pages**，无需任何设置。首次构建通常需要几分钟（偶尔更久），稍等后访问：
+使用 Fork 时也要确认当前分支：本仓库默认 `main` 是个人站点，模板位于 `master`。不要依赖未指定分支的 clone 命令获取模板。
 
-**`https://<用户名>.github.io`**
+## 文件结构
 
-之后每次修改，三连即可自动重新部署：
+```text
+index.html           页面结构与默认主题
+style.css            昼夜样式、光边与待机动画
+data.js              个人内容与主要项目入口
+script.js            内容渲染、导航、照片交互
+cosmic.js            像素星空、星球与黑洞
+signal.js            点阵姓名
+cursor.js            全页液态光标
+theme-transition.js  字符波前和换肤时序
+companions.js        小猫造型、视线与互动
+assets/              占位头像、ACL 图标、预览等素材
+pic/                 个人照片目录（默认留空）
+```
+
+## 检查与贡献
+
+无需安装 Node 来运行页面；修改 JavaScript 时，如已安装 Node，可执行语法检查：
 
 ```bash
-git add -A && git commit -m "更新说明" && git push
+node --check script.js
+node --check cosmic.js
+node --check signal.js
+node --check cursor.js
+node --check theme-transition.js
+node --check companions.js
+node --check data.js
+git diff --check
 ```
 
-> 💡  push 后网站更新有延迟属正常现象（GitHub 要重新构建）；浏览器端如看到旧版，按 `Cmd/Ctrl + Shift + R` 强制刷新。
->
-> 💡 想用普通项目页也可以：任意仓库推送后到 **Settings → Pages** 选择 `main` 分支根目录，地址为 `https://<用户名>.github.io/<仓库名>/`。
-
----
-
-## 📁 文件结构
-
-```
-├── index.html      # 页面结构
-├── style.css       # 全部样式：夜晚为默认，白天规则均收纳在 html.day 作用域下
-├── data.js         # ★ 你的所有信息都在这里，只改这个文件
-├── script.js       # 渲染与动效（塔罗牌 3D / 主题切换过场 / 马里奥 / 像素猫 / 星尘 / 流星）
-├── pic/            # 个人照片
-└── assets/         # 像素图标素材
-```
-
----
-
-## ⭐ 最后
-
-如果这个模板帮你搭起了自己的主页，欢迎点一个 **Star** ⭐ 支持一下！
-
-也欢迎通过 Issues 反馈问题、PR 贡献改进。期待看到大家的像素昼夜主页 🌙☀️
+也请在浏览器中检查昼夜切换、鼠标交互、手机布局和减少动态效果模式。欢迎通过 Issues 反馈问题、提交 PR 改进模板，也欢迎 Star 支持。
