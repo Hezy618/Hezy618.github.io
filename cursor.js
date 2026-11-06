@@ -8,18 +8,18 @@
   const defs=document.createElementNS(ns,'svg');
   defs.setAttribute('aria-hidden','true');defs.setAttribute('width','0');defs.setAttribute('height','0');
   defs.style.cssText='position:absolute;pointer-events:none;overflow:hidden';
-  const map=document.createElement('canvas');map.width=map.height=128;
-  const context=map.getContext('2d'),pixels=context.createImageData(128,128);
-  for(let y=0;y<128;y++)for(let x=0;x<128;x++){
-    const dx=(x-63.5)/64,dy=(y-63.5)/64,r=Math.hypot(dx,dy);
+  const map=document.createElement('canvas');map.width=map.height=96;
+  const context=map.getContext('2d'),pixels=context.createImageData(96,96);
+  for(let y=0;y<96;y++)for(let x=0;x<96;x++){
+    const dx=(x-47.5)/48,dy=(y-47.5)/48,r=Math.hypot(dx,dy);
     const falloff=Math.max(0,1-r*r)**1.6;
-    const i=(y*128+x)*4;
+    const i=(y*96+x)*4;
     pixels.data[i]=128-dx*falloff*108;
     pixels.data[i+1]=128-dy*falloff*108;
     pixels.data[i+2]=128;pixels.data[i+3]=255;
   }
   context.putImageData(pixels,0,0);
-  defs.innerHTML='<defs><filter id="page-liquid-optics" filterUnits="userSpaceOnUse" x="0" y="0" width="128" height="128" color-interpolation-filters="sRGB"><feImage x="0" y="0" width="128" height="128" preserveAspectRatio="none" result="radial-field"/><feDisplacementMap in="SourceGraphic" in2="radial-field" scale="48" xChannelSelector="R" yChannelSelector="G"/></filter></defs>';
+  defs.innerHTML='<defs><filter id="page-liquid-optics" filterUnits="userSpaceOnUse" x="0" y="0" width="96" height="96" color-interpolation-filters="sRGB"><feImage x="0" y="0" width="96" height="96" preserveAspectRatio="none" result="radial-field"/><feDisplacementMap in="SourceGraphic" in2="radial-field" scale="36" xChannelSelector="R" yChannelSelector="G"/></filter></defs>';
   defs.querySelector('feImage').setAttribute('href',map.toDataURL());document.body.append(defs);
   const ring=document.createElement('div');ring.className='cursor-lens';ring.setAttribute('aria-hidden','true');document.body.append(ring);
   let x=0,y=0,tx=0,ty=0,scale=1,targetScale=1,frame=0,last=0,shown=false;
@@ -38,7 +38,7 @@
     window.liquidBackdropActive=true;
     targetScale=e.target.closest('a,button,[role="button"]') ? .9 : 1;wake();
   },{passive:true});
-  document.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&shown){targetScale=1.25;wake();}});
+  document.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&shown){targetScale=1.08;wake();}});
   document.addEventListener('pointerup',e=>{targetScale=e.target.closest('a,button,[role="button"]') ? .9 : 1;wake();});
   document.addEventListener('pointerout',e=>{if(!e.relatedTarget)hide();});
   window.addEventListener('blur',hide);
