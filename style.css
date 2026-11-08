@@ -1309,8 +1309,8 @@ html.day .companion-sport { --cat-band:#b96f5d; }
 .content-column .hero-info { width: 100%; }
 
 @media (min-width: 861px) {
-  .hero-info .stat-list { display: none; }
-  .hero-actions .hero-action-primary { display: none; }
+  .content-column { padding-top: 70px; }
+  .content-column .hero { display: none; }
 }
 @media (min-width: 861px) and (max-height: 740px) {
   .profile-rail { position: static; }
@@ -1341,4 +1341,43 @@ html.day .companion-sport { --cat-band:#b96f5d; }
     justify-content: space-between;
     gap: 4px;
   }
+}
+
+/* The theme control belongs to the navigation, not the illustrated sky. */
+.navbar { padding-top: 9px; padding-bottom: 9px; }
+.nav-controls { display: flex; align-items: center; gap: 18px; min-width: 0; }
+.navbar .moon-wrap, html.cosmic-ready .navbar .moon-wrap {
+  position: relative;
+  inset: auto;
+  z-index: 1;
+  flex: none;
+  display: block;
+  width: 30px;
+  height: 28px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  filter: none;
+  transform: none !important;
+  animation: none;
+  transition: background .2s ease, border-color .2s ease;
+}
+.navbar .moon-wrap:hover, .navbar .moon-wrap:focus-visible {
+  background: var(--panel-2);
+  border-color: var(--line);
+  outline: none;
+}
+.navbar .moon-wrap #moon, .navbar .moon-wrap #sun {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(.18);
+  transform-origin: center;
+}
+@media (max-width: 640px) {
+  .navbar { padding: 8px 12px; }
+  .navbar .nav-logo { display: inline-flex; flex: none; }
+  .navbar .nav-controls { flex: 1; justify-content: flex-end; gap: 7px; }
+  .navbar .nav-links { width: auto; padding-left: 0; gap: clamp(4px, 1.3vw, 9px); }
+  .navbar .moon-wrap, html.cosmic-ready .navbar .moon-wrap { width: 30px; height: 28px; }
 }
