@@ -10,14 +10,14 @@
   let w=0,h=0,day=true,stars=[],planets=[],hole=[],frame=0,last=0,time=0,then=0,small=false,transitioning=false;
   const palettes={night:['#171b2c','#26364b','#3b5368','#587787','#8aa5ac','#c2c3ad'],day:['#9aaab7','#b3bec5','#cad0cc','#dcd7c9','#e9dfcb','#f5ead7']};
   function sphere(cx,cy,r,variant){
-    const points=[],step=small?5:5;
+    const points=[],step=4;
     for(let y=-r;y<=r;y+=step)for(let x=-r;x<=r;x+=step){
       const nx=x/r,ny=y/r,rr=nx*nx+ny*ny;if(rr>1)continue;
       const nz=Math.sqrt(1-rr),lat=Math.asin(ny),lon=Math.atan2(nx,nz);
       const light=Math.max(0,-nx*.52-ny*.4+nz*.75);
       points.push({x:cx+x,y:cy+y,nx,ny,nz,lat,lon,light,edge:Math.min(1,nz*7),dither:bayer[((Math.floor(x/step)&3)+((Math.floor(y/step)&3)*4))]/16});
     }
-    return{points,step,variant};
+    return{cx,cy,r,points,step,variant};
   }
   function accretion(cx,cy,r){
     const points=[],step=4,tilt=-.40,co=Math.cos(tilt),si=Math.sin(tilt);
@@ -79,7 +79,8 @@
     canvas.width=plate.width=w;canvas.height=plate.height=h;ctx.imageSmoothingEnabled=false;
     stars=Array.from({length:Math.min(200,Math.floor(w*h/6500))},(_,i)=>({x:hash(i,1)*w,y:hash(i,2)*h,size:i%11===0?3:1.5,a:.18+hash(i,3)*.5,warm:i%5===0}));
     // Keep the principal disk partially offscreen, leaving the reading column quiet.
-    planets=[sphere(w*.035,h*1.05,Math.min(w*(small?.57:.25),330),0)];
+    // Shift the visible cap away from the viewport edge so its pixel arc reads as round.
+    planets=[sphere(w*(small?.24:.085),h*(small?1.06:.95),Math.min(w*(small?.53:.155),225),0)];
     hole=accretion(w*(small?1.01:.945),h*.30,Math.min(w*(small?.22:.13),175));
     bake();draw();
   }
@@ -109,6 +110,11 @@
         ctx.globalAlpha=day?(p.variant?.25:(small?.20:.58)):(p.variant?.62:(small?.38:.86));
         ctx.fillStyle=palette[level];ctx.fillRect(a.x,a.y,p.step,p.step);
       }
+      // A soft circular rim keeps the top tangent legible through the dither.
+      ctx.globalAlpha=day?.18:.24;
+      ctx.strokeStyle=day?'#879ba5':'#8ba9ba';
+      ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.arc(p.cx,p.cy,p.r,0,Math.PI*2);ctx.stroke();
     }
     ctx.globalAlpha=1;
     drawHole();
