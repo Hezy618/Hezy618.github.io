@@ -89,6 +89,26 @@
   });
   tarotLinks.addEventListener("click", (e) => e.stopPropagation());
 
+  const detailIcons = {
+    location: '<path d="M12 21s7-5.5 7-12a7 7 0 1 0-14 0c0 6.5 7 12 7 12Z"/><circle cx="12" cy="9" r="2.4"/>',
+    degree: '<path d="m2 8 10-5 10 5-10 5L2 8Zm4 3v5c3.7 3.3 8.3 3.3 12 0v-5M22 8v7"/>',
+    school: '<path d="M3 21h18M5 21V7l7-4 7 4v14M9 10h1m4 0h1M9 14h1m4 0h1M10 21v-4h4v4"/>',
+    work: '<path d="m12 2 1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8L12 2Zm7 14 .6 1.4L21 18l-1.4.6L19 20l-.6-1.4L17 18l1.4-.6L19 16Z"/>',
+  };
+  const profileDetails = $("#profile-details");
+  [
+    ["location", SITE.location],
+    ["degree", SITE.degree],
+    ["school", SITE.university],
+    ["work", "Featured work · SIRI", "SIRI/"],
+  ].forEach(([icon, label, href]) => {
+    if (!label) return;
+    const row = el(href ? "a" : "div", "profile-detail" + (href ? " featured" : ""));
+    if (href) row.href = href;
+    row.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">${detailIcons[icon]}</svg><span>${esc(label)}</span>`;
+    profileDetails.appendChild(row);
+  });
+
   /* 塔罗牌文案 */
   if (SITE.tarot) {
     $("#tarot-numeral").textContent = SITE.tarot.numeral || "";

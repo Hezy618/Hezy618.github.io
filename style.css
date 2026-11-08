@@ -1267,6 +1267,39 @@ html.day .companion-sport { --cat-band:#b96f5d; }
 }
 .profile-rail .identity-wordmark h1 { font-size: 22px; }
 .profile-rail .portrait-links { margin-top: 8px; }
+.profile-details {
+  display: grid;
+  gap: 2px;
+  margin-top: 15px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line-soft);
+}
+.profile-detail {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 31px;
+  color: var(--dim);
+  font: 11px/1.5 var(--font-body);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+.profile-detail svg {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.65;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.profile-detail.featured { color: var(--cyan); }
+.profile-detail.featured:hover, .profile-detail.featured:focus-visible {
+  color: var(--cream);
+  border-bottom-color: var(--gold);
+}
+.profile-detail.featured:focus-visible { outline: 1px solid var(--cyan); outline-offset: 3px; }
 .content-column { display: flex; flex-direction: column; gap: 52px; min-width: 0; }
 .content-column .hero {
   display: block;
@@ -1274,6 +1307,14 @@ html.day .companion-sport { --cat-band:#b96f5d; }
   scroll-margin-top: 100px;
 }
 .content-column .hero-info { width: 100%; }
+
+@media (min-width: 861px) {
+  .hero-info .stat-list { display: none; }
+  .hero-actions .hero-action-primary { display: none; }
+}
+@media (min-width: 861px) and (max-height: 740px) {
+  .profile-rail { position: static; }
+}
 
 @media (max-width: 860px) {
   .container { grid-template-columns: minmax(0, 1fr); gap: 0; }
@@ -1285,6 +1326,7 @@ html.day .companion-sport { --cat-band:#b96f5d; }
   }
   .profile-rail .portrait-column { margin: 0 auto; }
   .profile-rail .portrait-links { margin-top: 18px; }
+  .profile-details { display: none; }
   .content-column { gap: 36px; }
   .content-column .hero { padding: 28px 0 8px; }
 }
