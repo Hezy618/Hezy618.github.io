@@ -17,7 +17,7 @@
       const light=Math.max(0,-nx*.52-ny*.4+nz*.75);
       points.push({x:cx+x,y:cy+y,nx,ny,nz,lat,lon,light,edge:Math.min(1,nz*7),dither:bayer[((Math.floor(x/step)&3)+((Math.floor(y/step)&3)*4))]/16});
     }
-    return{cx,cy,r,points,step,variant};
+    return{points,step,variant};
   }
   function accretion(cx,cy,r){
     const points=[],step=4,tilt=-.40,co=Math.cos(tilt),si=Math.sin(tilt);
@@ -110,11 +110,6 @@
         ctx.globalAlpha=day?(p.variant?.25:(small?.20:.58)):(p.variant?.62:(small?.38:.86));
         ctx.fillStyle=palette[level];ctx.fillRect(a.x,a.y,p.step,p.step);
       }
-      // A soft circular rim keeps the top tangent legible through the dither.
-      ctx.globalAlpha=day?.18:.24;
-      ctx.strokeStyle=day?'#879ba5':'#8ba9ba';
-      ctx.lineWidth=1.5;
-      ctx.beginPath();ctx.arc(p.cx,p.cy,p.r,0,Math.PI*2);ctx.stroke();
     }
     ctx.globalAlpha=1;
     drawHole();

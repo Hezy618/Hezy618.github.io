@@ -1253,9 +1253,11 @@ html.day .companion-sport { --cat-band:#b96f5d; }
   column-gap: clamp(38px, 5vw, 72px);
 }
 .profile-rail {
-  position: sticky;
+  position: fixed;
   top: 88px;
-  align-self: start;
+  left: max(22px, calc(50% - 600px + 22px));
+  z-index: 2;
+  width: 280px;
   padding: 30px 20px 26px 7px;
   border-right: 1px solid var(--line-soft);
 }
@@ -1300,7 +1302,7 @@ html.day .companion-sport { --cat-band:#b96f5d; }
   border-bottom-color: var(--gold);
 }
 .profile-detail.featured:focus-visible { outline: 1px solid var(--cyan); outline-offset: 3px; }
-.content-column { display: flex; flex-direction: column; gap: 52px; min-width: 0; }
+.content-column { grid-column: 2; display: flex; flex-direction: column; gap: 52px; min-width: 0; }
 .content-column .hero {
   display: block;
   padding: 40px 0 22px;
@@ -1329,6 +1331,8 @@ html.day .companion-sport { --cat-band:#b96f5d; }
   .container { grid-template-columns: minmax(0, 1fr); gap: 0; }
   .profile-rail {
     position: static;
+    width: auto;
+    left: auto;
     padding: 28px 0 0;
     border-right: 0;
     border-bottom: 0;
@@ -1336,7 +1340,7 @@ html.day .companion-sport { --cat-band:#b96f5d; }
   .profile-rail .portrait-column { margin: 0 auto; }
   .profile-rail .portrait-links { margin-top: 18px; }
   .profile-details { display: none; }
-  .content-column { gap: 36px; }
+  .content-column { grid-column: 1; gap: 36px; }
   .content-column .hero { padding: 28px 0 8px; }
 }
 
