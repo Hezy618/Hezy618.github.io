@@ -43,7 +43,7 @@ body {
   font-family: var(--font-body);
   font-size: 16px;
   line-height: 1.65;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 /* ---------- 夜空层次 ---------- */
@@ -1240,3 +1240,60 @@ html.day .companion-sport { --cat-band:#b96f5d; }
 .companion.is-visible .cat-band-ribbons { animation-play-state:running; }
 @keyframes headbandFlutter { 0%,100% { transform:rotate(-7deg) scaleX(.95); } 50% { transform:rotate(7deg) scaleX(1.04); } }
 .portrait-links .lico-acl { width:18px; margin-right:5px; }
+
+/* A compact identity rail stays in view while the CV flows as one page. */
+.container {
+  max-width: 1200px;
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  align-items: start;
+  column-gap: clamp(38px, 5vw, 72px);
+}
+.profile-rail {
+  position: sticky;
+  top: 88px;
+  align-self: start;
+  padding: 30px 27px 26px 0;
+  border-right: 1px solid var(--line-soft);
+}
+.profile-rail .portrait-column { width: 252px; }
+.profile-rail .identity-wordmark {
+  width: 252px;
+  height: 70px;
+  margin: 22px 0 0;
+}
+.profile-rail .identity-wordmark h1 { font-size: 22px; }
+.profile-rail .portrait-links { margin-top: 8px; }
+.content-column { display: flex; flex-direction: column; gap: 52px; min-width: 0; }
+.content-column .hero {
+  display: block;
+  padding: 40px 0 22px;
+  scroll-margin-top: 100px;
+}
+.content-column .hero-info { width: 100%; }
+
+@media (max-width: 860px) {
+  .container { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .profile-rail {
+    position: static;
+    padding: 28px 0 0;
+    border-right: 0;
+    border-bottom: 0;
+  }
+  .profile-rail .portrait-column { margin: 0 auto; }
+  .profile-rail .portrait-links { margin-top: 18px; }
+  .content-column { gap: 36px; }
+  .content-column .hero { padding: 28px 0 8px; }
+}
+
+@media (max-width: 640px) {
+  .navbar { width: 100%; box-sizing: border-box; overflow: hidden; }
+  .navbar .nav-logo { display: none; }
+  .navbar .nav-links {
+    width: 100%;
+    box-sizing: border-box;
+    padding-left: 76px;
+    justify-content: space-between;
+    gap: 4px;
+  }
+}

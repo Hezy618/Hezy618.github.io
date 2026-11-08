@@ -25,6 +25,16 @@
   $("#profile-photo").src = SITE.photo;
   $("#hero-summary").textContent = SITE.heroSummary || "";
 
+  /* Keep the original mobile reading order while docking the name in the desktop rail. */
+  const identityWordmark = $(".identity-wordmark");
+  const mobileLayout = matchMedia("(max-width: 860px)");
+  const placeIdentity = () => {
+    if (mobileLayout.matches) $(".hero-hello").after(identityWordmark);
+    else $("#tarot-links").before(identityWordmark);
+  };
+  placeIdentity();
+  mobileLayout.addEventListener("change", placeIdentity);
+
   const stats = [
     ["CURRENT", `${SITE.degree} · ${SITE.university}`],
     ["EXPERIENCE", "6-month LLM Algorithm Engineer internship · Meituan"],

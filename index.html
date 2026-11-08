@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="style.css?v=20261106c" />
+  <link rel="stylesheet" href="style.css?v=20261108a" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'><rect width='8' height='8' fill='%2307070f'/><rect x='3' y='1' width='2' height='2' fill='%23f3e9c8'/><rect x='1' y='3' width='6' height='2' fill='%23f3e9c8'/><rect x='3' y='5' width='2' height='2' fill='%23f3e9c8'/></svg>" />
 </head>
 <body>
@@ -46,8 +46,8 @@
 
   <main class="container">
 
-    <!-- ===== HERO：塔罗牌 + 角色信息 ===== -->
-    <header class="hero" id="about">
+    <!-- 固定的个人名片：照片、姓名和外部入口 -->
+    <aside class="profile-rail" aria-label="Profile and links">
 
       <!-- 塔罗牌：悬停 3D 倾斜 + 流光，点击翻面 -->
       <div class="portrait-column">
@@ -115,16 +115,19 @@
         <div class="cat cat-sleep" id="catSleep" role="button" tabindex="0" title="Boop!" aria-label="Sleeping pixel cat — click to startle it awake"></div>
       </div>
 
+      <div class="identity-wordmark">
+        <h1 id="profile-name" class="pixel-title">Zhongyu He</h1>
+        <canvas id="signalCanvas" aria-hidden="true"></canvas>
+      </div>
       <nav class="portrait-links" id="tarot-links" aria-label="Social profiles"></nav>
       </div>
+    </aside>
 
-      <!-- 角色信息 -->
+    <div class="content-column">
+    <!-- ===== 介绍与履历：随页面滚动 ===== -->
+    <header class="hero" id="about">
       <div class="hero-info">
         <p class="hero-hello">RESEARCHER · ENGINEER</p>
-        <div class="identity-wordmark">
-          <h1 id="profile-name" class="pixel-title">Zhongyu He</h1>
-          <canvas id="signalCanvas" aria-hidden="true"></canvas>
-        </div>
         <p class="tagline"><span id="typewriter"></span><span class="cursor">_</span></p>
         <p class="hero-summary" id="hero-summary"></p>
         <ul class="stat-list" id="stat-list"><!-- JS 渲染 --></ul>
@@ -182,12 +185,13 @@
       <p class="footer-divider">✦ · ✦</p>
       <p id="footer-text"></p>
     </footer>
+    </div>
 
   </main>
 
   <script src="data.js?v=20261106c"></script>
   <script src="cosmic.js?v=20261106c"></script>
-  <script src="script.js?v=20261106c"></script>
+  <script src="script.js?v=20261108a"></script>
   <script src="signal.js?v=20261106c"></script>
   <script src="theme-transition.js?v=20261106c"></script>
   <script src="companions.js?v=20261106c"></script>
