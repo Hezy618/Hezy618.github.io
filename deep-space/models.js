@@ -1,6 +1,6 @@
 import * as T from '../moon/vendor/three.module.min.js';
 import { block, mesh, bevel, tube, canvasTexture, seeded } from '../moon/mesh.js';
-import { localSite, surfaceAt } from './terrain.js';
+import { localSite, surfaceAt } from './terrain.js?v=2';
 import { materials } from './catalog.js';
 
 export function paintSet() {

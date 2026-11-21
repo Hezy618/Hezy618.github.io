@@ -2,7 +2,7 @@ import * as T from '../moon/vendor/three.module.min.js';
 import { createSuit } from '../moon/suit.js?v=3';
 import { seeded } from '../moon/mesh.js';
 import { blueprints, materials, recipes, costLabel } from './catalog.js';
-import { createSystem, localSite, nearestPlanet, surfaceAt, surfaceRadius, tangentBasis } from './terrain.js';
+import { createSystem, localSite, nearestPlanet, surfaceAt, surfaceRadius, tangentBasis } from './terrain.js?v=2';
 import { alignSurface, boulders, makeCockpit, makeDeposit, makeRuin, makeShip, makeStructure, paintSet } from './models.js';
 import { approachPoint, frame, key, makeFlight } from './flight.js';
 

@@ -1,5 +1,5 @@
 import * as T from '../moon/vendor/three.module.min.js';
-import { nearestPlanet, surfaceRadius, tangentBasis } from './terrain.js';
+import { nearestPlanet, surfaceRadius, tangentBasis } from './terrain.js?v=2';
 
 const ease = (dt, rate) => 1 - Math.exp(-dt*rate);
 const v = new T.Vector3(), w = new T.Vector3(), target = new T.Vector3();

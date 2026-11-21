@@ -301,7 +301,7 @@ export async function createSystem(scene) {
   const loader=new T.TextureLoader();
   const scans=await Promise.all(worlds.map(async world=>{
     const [color,relief]=await Promise.all(['color','relief'].map(kind=>
-      loader.loadAsync(new URL(`textures/${world.id}-${kind}.jpg`, import.meta.url).href)));
+      loader.loadAsync(new URL(`textures/${world.id}-${kind}.webp`, import.meta.url).href)));
     color.colorSpace=T.SRGBColorSpace;
     for(const map of [color,relief]){
       map.wrapS=map.wrapT=T.RepeatWrapping;
