@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a1012">
+<meta name="description" content="星际野地，原创第一人称星系探索与建设游戏。">
+<title>星际野地 · Wild Meridian</title>
+<link rel="stylesheet" href="./style.css?v=1">
+</head>
+<body>
+<main id="app" aria-label="星际野地">
+  <div id="viewport"></div>
+  <div class="vignette"></div>
+  <header class="top">
+    <a href="../#games">〈 游戏目录</a><span>WILD MERIDIAN</span>
+    <div><button id="audio" aria-pressed="false">音效</button><button id="help">操作</button></div>
+  </header>
+  <section id="intro">
+    <div class="intro-copy">
+      <p class="eyebrow">MERIDIAN SURVEY</p>
+      <h1>星际野地<span>WILD MERIDIAN</span></h1>
+      <p class="lede">先在赤脊星建起一座能运转的基地，再驾驶远征船驶入群星之间。</p>
+      <button class="primary" id="start" disabled>正在初始化星系</button>
+      <p id="boot" role="alert" hidden></p>
+    </div>
+    <div id="intro-location"><b>赤脊星</b><span>远征船停泊区</span></div>
+  </section>
+  <section id="hud" hidden aria-label="远征仪表">
+    <div class="location instrument"><b id="world-name">赤脊星</b><span id="mode">地表</span>
+      <canvas id="radar" width="152" height="152" aria-label="附近目标雷达" role="img"></canvas>
+      <small id="navigation"></small>
+    </div>
+    <div class="mission instrument"><span>远征日志</span><b id="objective"></b><small id="objective-detail"></small></div>
+    <div id="reticle"></div><div id="markers"></div>
+    <div id="prompt" hidden></div><div id="notice" role="status"></div>
+    <div id="readouts" class="instrument"></div>
+    <div id="hud-actions"><button id="build" title="B">建造</button><button id="cargo" title="I">货舱</button><button id="map" title="M">星图</button><button id="pause" aria-label="暂停">Ⅱ</button></div>
+    <div id="touch">
+      <div class="move" aria-label="移动"><button data-key="KeyW">↑</button><button data-key="KeyA">←</button><button data-key="KeyS">↓</button><button data-key="KeyD">→</button></div>
+      <div class="touch-actions"><button data-key="KeyR" class="lift">上升</button><button data-key="KeyC" class="lift">下降</button><button data-key="Space">跳跃 / 制动</button><button id="touch-scan">扫描</button><button id="touch-use">交互</button><button id="touch-board">飞船</button><button id="touch-place" hidden>放置</button></div>
+    </div>
+  </section>
+  <section id="dialog" hidden aria-label="远征面板">
+    <div class="dialog-frame">
+      <header><p class="eyebrow" id="dialog-kind"></p><button id="close" aria-label="关闭">×</button></header>
+      <h2 id="dialog-title"></h2>
+      <div id="dialog-content"></div>
+    </div>
+  </section>
+</main>
+<script type="module" src="./game.js?v=1"></script>
+</body>
+</html>
