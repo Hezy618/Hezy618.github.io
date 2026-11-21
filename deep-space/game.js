@@ -448,7 +448,8 @@ function marker(i,label,location,color) {
   if(view.z>0||!Number.isFinite(x)||x<61||x>viewport.clientWidth-61){
     const left=view.x<0, side=left?0:1, slot=offscreen[side]++;
     if(slot>=(mobile?2:3))return;
-    x=left?65:viewport.clientWidth-65;
+    const inset=Math.max(65,label.replace(/[^\x00-\x7f]/g,'MM').length*4.1+12);
+    x=left?inset:viewport.clientWidth-inset;
     y=viewport.clientHeight*.52+slot*32;arrow=left?'‹ ':'› ';
   }
   item.hidden=false;
