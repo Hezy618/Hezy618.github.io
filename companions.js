@@ -70,14 +70,12 @@
     for(const [side,cx] of [['left',34],['right',53]]){
       const eye=s.eyes[side],open=f[side],x=cx+f.gx,y=45+f.gy;
       eye.shape.setAttribute('cx',n(x));eye.shape.setAttribute('cy',n(y));
-      eye.shape.setAttribute('rx',n(2.1+Math.max(0,open-.6)*.55));
-      eye.shape.setAttribute('ry',n(.35+open*3.05));
-      eye.glint.setAttribute('cx',n(x-.55));eye.glint.setAttribute('cy',n(y-1));
-      eye.glint.style.opacity=n(Math.max(0,Math.min(1,(open-.3)*1.6)));
+      eye.shape.setAttribute('rx',n(3.25+Math.max(0,open-.6)*.55));
+      eye.shape.setAttribute('ry',n(.45+open*4.2));
     }
     s.brows[0].setAttribute('d',`M29 41 Q34 ${n(40+f.brow)} 39 ${n(41+f.tilt)}`);
     s.brows[1].setAttribute('d',`M48 ${n(41-f.tilt)} Q53 ${n(40+f.brow)} 58 41`);
-    s.browGroup.style.opacity=n(f.brows);
+    s.browGroup.style.opacity=n(f.brows*.42);
     s.smile.setAttribute('d',`M38 55 Q43 ${n(55+f.smile*7)} 48 55`);
     s.smile.style.opacity=n(1-f.oh);
     s.oh.style.opacity=n(f.oh);
@@ -90,13 +88,15 @@
     const joy=s.joy;
     const motion=reactions[s.p.mode];
     const eased=joy*joy*(3-2*joy);
+    const attention=s.attention*(1-eased);
+    const greeting=s.greeting*(1-eased);
     s.gaze.style.transform=`translate(${s.x}px,${s.y}px)`;
-    s.head.style.transform=`translateY(${eased*motion.rise}px) rotate(${s.x*.5+eased*motion.tilt}deg) scale(${1+eased*.025},${1-eased*.012})`;
+    s.head.style.transform=`translateY(${eased*motion.rise-attention*2}px) rotate(${s.x*.8+eased*motion.tilt}deg) scale(${1+eased*.025+attention*.035},${1-eased*.012})`;
     s.node.style.setProperty('--joy',joy.toFixed(4));
     s.bubble.style.opacity=eased;
     s.bubble.style.transform=`translateY(${(1-eased)*7}px) scale(${.85+eased*.15})`;
-    s.tail.style.transform=`rotate(${eased*motion.tail+s.x*1.5}deg)`;
-    s.hands.style.transform=`translateY(${eased*motion.paw}px) rotate(${-eased*motion.tilt*.55}deg)`;
+    s.tail.style.transform=`rotate(${eased*motion.tail+s.x*1.5+attention*9}deg)`;
+    s.hands.style.transform=`translateY(${eased*motion.paw-greeting*4}px) rotate(${-eased*motion.tilt*.55}deg)`;
     paintFace(s);
   }
   function tick(time){
@@ -110,10 +110,17 @@
       moving=spring(s,'x',s.tx,dt)||moving;
       moving=spring(s,'y',s.ty,dt)||moving;
       moving=spring(s,'joy',time<s.happyUntil?1:0,dt)||moving;
+      moving=spring(s,'attention',s.near,dt)||moving;
+      moving=spring(s,'greeting',s.hover?1:0,dt)||moving;
       const staged=time<s.happyUntil;
       const target=expression(staged
         ?faces[s.p.mode].react[time-s.reactStart<480?0:1]
         :faces[s.p.mode].idle[s.idleIndex]);
+      if(!staged){
+        target.left+=(1.12-target.left)*s.attention;
+        target.right+=(1.12-target.right)*s.attention;
+        target.smile+=(.8-target.smile)*s.greeting;
+      }
       moving=springFace(s,target,dt)||moving;
       paint(s);
       if(time<s.happyUntil)moving=true;
@@ -149,13 +156,13 @@
       <g class="companion-breathe">
         <path class="companion-tail" d="M62 67C80 74 80 53 73 56" fill="none" stroke-width="5" stroke-linecap="round"/>
         <g class="companion-head">
-          <path class="companion-shell" d="M18 37Q17 31 21 25Q23 22 26 25L34 30Q43 27 52 30L60 25Q64 22 66 26Q69 32 68 38C79 56 69 75 43 75C17 75 7 56 18 37Z"/>
+          <path class="companion-shell" d="M16 40C15 34 17 25 22 25C26 25 30 28 34 30Q43 27 52 30C56 28 61 25 64 25C69 25 71 34 70 40C83 61 67 76 43 76C19 76 3 61 16 40Z"/>
           ${p.mode==='sport' ? '<g class="cat-headband"><path d="M19 36Q43 30 68 36L67 41Q43 35 19 41Z" fill="var(--cat-band)"/><path d="M21 38Q43 33 65 38" fill="none" stroke="var(--cat-fur)" stroke-width=".8" opacity=".7"/><g class="cat-band-ribbons" fill="var(--cat-band)"><path d="M66 36Q74 30 79 34L75 38Q70 35 66 38ZM66 37Q73 37 77 43L72 44Q70 39 66 39Z"/><circle cx="66" cy="37" r="2.5"/></g></g>' : ''}
           <g class="companion-gaze">
             <g class="cat-brows" fill="none" stroke="var(--cat-face)" stroke-width="1.15" stroke-linecap="round"><path class="cat-brow-left"/><path class="cat-brow-right"/></g>
             <g class="cat-normal-eyes" fill="var(--cat-face)">
-              <g class="cat-eye-left"><ellipse class="cat-eye-shape"/><ellipse class="cat-eye-glint" rx=".55" ry=".7" fill="var(--cat-fur)"/></g>
-              <g class="cat-eye-right"><ellipse class="cat-eye-shape"/><ellipse class="cat-eye-glint" rx=".55" ry=".7" fill="var(--cat-fur)"/></g>
+              <g class="cat-eye-left"><ellipse class="cat-eye-shape"/></g>
+              <g class="cat-eye-right"><ellipse class="cat-eye-shape"/></g>
             </g>
             <g class="cat-star-eyes" fill="var(--cat-face)" opacity="0"><path d="M34 39L35 43L39 45L35 47L34 51L33 47L29 45L33 43ZM53 39L54 43L58 45L54 47L53 51L52 47L48 45L52 43Z"/></g>
             <path class="cat-nose" d="M41 51L45 51L43 53Z"/>
@@ -170,9 +177,10 @@
     </svg><span class="companion-bubble" aria-hidden="true">${p.symbol}</span>`;
     const get=(selector)=>node.querySelector(selector);
     const s={node,p,index:states.length,visible:false,x:0,y:0,joy:0,xV:0,yV:0,joyV:0,tx:0,ty:0,happyUntil:0,reactStart:0,idleIndex:0,
+      attention:0,attentionV:0,near:0,greeting:0,greetingV:0,hover:false,
       face:expression(faces[p.mode].idle[0]),faceV:Object.fromEntries(faceKeys.map(key=>[key,0])),
       gaze:node.querySelector('.companion-gaze'),head:node.querySelector('.companion-head'),
-      eyes:{left:{shape:get('.cat-eye-left .cat-eye-shape'),glint:get('.cat-eye-left .cat-eye-glint')},right:{shape:get('.cat-eye-right .cat-eye-shape'),glint:get('.cat-eye-right .cat-eye-glint')}},
+      eyes:{left:{shape:get('.cat-eye-left .cat-eye-shape')},right:{shape:get('.cat-eye-right .cat-eye-shape')}},
       brows:[get('.cat-brow-left'),get('.cat-brow-right')],browGroup:get('.cat-brows'),
       normalEyes:get('.cat-normal-eyes'),starEyes:get('.cat-star-eyes'),smile:get('.cat-smile'),oh:get('.cat-oh'),blush:get('.cat-blush'),
       bubble:get('.companion-bubble'),tail:get('.companion-tail'),hands:get('.companion-hands')};
@@ -195,15 +203,33 @@
     for(const s of states){
       if(!s.visible)continue;
       const r=s.node.getBoundingClientRect();
-      s.tx=Math.atan((e.clientX-r.x-r.width/2)/95)*2.6;
-      s.ty=Math.atan((e.clientY-r.y-r.height/2)/120)*1.7;
+      const dx=e.clientX-r.x-r.width/2,dy=e.clientY-r.y-r.height/2;
+      s.near=Math.max(0,1-Math.hypot(dx,dy)/175);
+      s.hover=s.node.contains(e.target);
+      s.tx=Math.atan(dx/85)*2.7;
+      s.ty=Math.atan(dy/100)*1.8;
     }
     wake();
   };
   document.addEventListener('pointermove',look,{passive:true});
-  const reset=()=>{for(const s of states)s.tx=s.ty=0;wake();};
+  const reset=()=>{
+    for(const s of states){s.tx=s.ty=s.near=0;s.hover=false;}
+    wake();
+  };
+  window.addEventListener('scroll',reset,{passive:true});
   document.addEventListener('pointerout',e=>{if(!e.relatedTarget)reset();});
   window.addEventListener('blur',reset);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)wake();});
-  reduced.addEventListener('change',wake);
+  reduced.addEventListener('change',()=>{
+    reset();
+    for(const s of states){
+      if(reduced.matches){
+        s.x=s.y=s.joy=s.attention=s.greeting=0;
+        s.xV=s.yV=s.joyV=s.attentionV=s.greetingV=0;
+        s.face=expression(faces[s.p.mode].idle[s.idleIndex]);
+        paint(s);
+      }
+      scheduleIdle(s);
+    }
+  });
 })();
