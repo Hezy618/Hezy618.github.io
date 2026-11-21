@@ -1,4 +1,6 @@
 import * as T from './vendor/three.module.min.js';
+import { createLander } from './lander.js?v=2';
+import { seeded, canvasTexture } from './mesh.js?v=2';
 
 export const stations = [
   { x: 11, z: -48, label: '月岩阵列', result: '月岩谱线已记录。样本中含有钛铁矿。' },
@@ -7,14 +9,7 @@ export const stations = [
   { x: 9, z: -13, label: '登陆舱' },
 ];
 
-function random(seed) {
-  return () => {
-    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
-    return seed / 4294967296;
-  };
-}
-
-const rng = random(1969);
+const rng = seeded(1969);
 const craters = [
   [-23, -49, 16, 3], [29, -78, 13, 2], [-70, -123, 29, 6],
   [23, -168, 35, 7], [58, -41, 20, 4], [-95, -48, 25, 5],
@@ -31,22 +26,12 @@ export function height(x, z) {
   return y;
 }
 
-function texture(width, height, paint) {
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-  paint(canvas.getContext('2d'));
-  const map = new T.CanvasTexture(canvas);
-  map.colorSpace = T.SRGBColorSpace;
-  return map;
-}
-
 function regolith() {
-  const map = texture(512, 512, ctx => {
+  const map = canvasTexture(512, 512, ctx => {
     const pixels = ctx.createImageData(512, 512);
     for (let y = 0; y < 512; y++) {
       for (let x = 0; x < 512; x++) {
-        const grain = 160 + 42 * rng() + 12 * Math.sin(x * Math.PI / 32) * Math.sin(y * Math.PI / 64);
+        const grain = 163 + 54 * rng();
         pixels.data.set([grain, grain * .98, grain * .96, 255], (y * 512 + x) * 4);
       }
     }
@@ -60,12 +45,12 @@ function regolith() {
     }
   });
   map.wrapS = map.wrapT = T.RepeatWrapping;
-  map.repeat.set(105, 105);
+  map.repeat.set(115, 115);
   map.anisotropy = 8;
   return map;
 }
 
-function planet(scene, earthMap) {
+export function planet(scene, earthMap) {
   earthMap.colorSpace = T.SRGBColorSpace;
   earthMap.anisotropy = 4;
   const earth = new T.Mesh(new T.SphereGeometry(49, 64, 36),
@@ -84,14 +69,15 @@ function planet(scene, earthMap) {
   }));
   halo.position.copy(earth.position);
   scene.add(halo);
+  return [earth, halo];
 }
 
-function stars(scene) {
+export function stars(scene, fullSphere = false) {
   const positions = [];
   const colors = [];
   for (let i = 0; i < 2700; i++) {
     const angle = rng() * 2 * Math.PI;
-    const up = rng();
+    const up = fullSphere ? rng() * 2 - 1 : rng();
     const r = Math.sqrt(1 - up * up) * 1300;
     positions.push(Math.sin(angle) * r, up * 1300, Math.cos(angle) * r);
     const l = .17 + rng() ** 4 * .74;
@@ -117,29 +103,49 @@ function surface(scene) {
     const mountains = T.MathUtils.smoothstep(distance, 140, 238)
       * (3 + 24 * Math.max(0, .36 + ridge * .64) ** 1.65);
     pos.setY(i, height(x, z) + mountains);
-    const gray = .77 + .13 * Math.sin(x * .17 + z * .065) * Math.cos(z * .12) + .05 * rng();
+    const shadows = craters.reduce((sum, [cx, cz, radius]) => {
+      const r = Math.hypot(x - cx, z - cz) / radius;
+      return sum + .12 * Math.exp(-((r - .47) ** 2) * 4.5);
+    }, 0);
+    const gray = .82 + .09 * Math.sin(x * .17 + z * .065) * Math.cos(z * .12)
+      + .055 * Math.sin(x * .45 - z * .34) - shadows + .035 * rng();
     colors.push(gray, gray * .99, gray * .97);
   }
   geometry.computeVertexNormals();
   geometry.setAttribute('color', new T.Float32BufferAttribute(colors, 3));
   const map = regolith();
   const ground = new T.Mesh(geometry, new T.MeshStandardMaterial({
-    map, bumpMap: map, bumpScale: .038, vertexColors: true, roughness: .99,
+    map, vertexColors: true, roughness: .99,
   }));
+  ground.material.onBeforeCompile = shader => {
+    shader.fragmentShader = shader.fragmentShader.replace('#include <map_fragment>', `
+      vec2 grainUV = vMapUv;
+      vec3 fines = texture2D(map, grainUV).rgb;
+      vec3 dust = texture2D(map, mat2(.78, .62, -.62, .78) * grainUV * .237).rgb;
+      diffuseColor.rgb *= mix(fines, dust, .42) * 1.12;`);
+  };
   ground.receiveShadow = true;
   scene.add(ground);
 }
 
 function rocks(scene) {
-  const geometry = new T.IcosahedronGeometry(1, 1);
+  const geometry = new T.IcosahedronGeometry(1, 2);
   const positions = geometry.attributes.position;
   for (let i = 0; i < positions.count; i++) {
     const x = positions.getX(i), y = positions.getY(i), z = positions.getZ(i);
-    const size = .86 + .2 * Math.sin(7 * x + 4 * y + z * 11);
+    const size = .88 + .085 * Math.sin(7 * x + 4 * y + z * 11)
+      + .13 * Math.cos(4 * z + 3 * x) + .08 * Math.cos(19 * y + 13 * z);
     positions.setXYZ(i, x * size, y * size, z * size);
   }
   geometry.computeVertexNormals();
-  const mesh = new T.InstancedMesh(geometry, new T.MeshStandardMaterial({ roughness: 1, flatShading: true }), 2100);
+  const normals = geometry.attributes.normal;
+  const radial = new T.Vector3(), normal = new T.Vector3();
+  for (let i = 0; i < positions.count; i++) {
+    radial.fromBufferAttribute(positions, i).normalize();
+    normal.fromBufferAttribute(normals, i).lerp(radial, .43).normalize();
+    normals.setXYZ(i, normal.x, normal.y, normal.z);
+  }
+  const mesh = new T.InstancedMesh(geometry, new T.MeshStandardMaterial({ roughness: .97 }), 1350);
   const transform = new T.Object3D();
   for (let i = 0; i < mesh.count; i++) {
     const x = (rng() - .5) * 298, z = (rng() - .58) * 302;
@@ -150,7 +156,7 @@ function rocks(scene) {
     transform.scale.set(size, size * (.38 + rng() * .42), size * (1 + rng() * .55));
     transform.updateMatrix();
     mesh.setMatrixAt(i, transform.matrix);
-    const shade = .23 + rng() * .26;
+    const shade = .16 + rng() * .23;
     mesh.setColorAt(i, new T.Color(shade, shade, shade * .97));
   }
   mesh.castShadow = mesh.receiveShadow = true;
@@ -202,21 +208,7 @@ function hardware(scene) {
     group.position.set(point.x, height(point.x, point.z), point.z);
     scene.add(group);
     if (index === 3) {
-      part(group, new T.CylinderGeometry(1.48, 1.48, .9, 8), gold, 0, 1.35, 0);
-      part(group, new T.CylinderGeometry(1.08, 1.38, 1.52, 8), alloy, 0, 2.46, 0);
-      part(group, new T.CylinderGeometry(.77, 1.08, .55, 8), alloy, 0, 3.49, 0);
-      box(group, dark, 0, 2.64, 1.22, .92, .91, .18);
-      box(group, lamp, 0, 2.85, 1.32, .6, .14, .05);
-      for (const x of [-1, 1]) for (const z of [-1, 1]) {
-        bar(group, [x * .76, 1.82, z * .76], [x * 2.12, .2, z * 2.05], .085, alloy);
-        bar(group, [x * .85, .99, z * .85], [x * 1.81, .53, z * 1.79], .045, gold);
-        part(group, new T.CylinderGeometry(.37, .47, .12, 9), gold, x * 2.12, .16, z * 2.05);
-      }
-      for (let i = 0; i < 7; i++) box(group, alloy, 0, .24 + i * .22, 1.5 + (6 - i) * .077, .55, .042, .16);
-      bar(group, [0, 3.65, 0], [.2, 5.02, 0], .045, alloy);
-      part(group, new T.SphereGeometry(.43, 16, 10, 0, 2 * Math.PI, 0, 1.1), alloy, .2, 4.66, 0).rotation.z = .6;
-      solar(group, -2.28, 1.67, -.13, 1.7);
-      solar(group, 2.28, 1.67, -.13, 1.7);
+      createLander(group);
     } else {
       const top = index === 2 ? 2.75 : 1.65;
       box(group, dark, 0, .18, 0, 1.36, .28, 1.21);
@@ -242,12 +234,13 @@ export async function createWorld() {
   sun.castShadow = true;
   sun.shadow.mapSize.set(2048, 2048);
   Object.assign(sun.shadow.camera, { left: -96, right: 96, top: 90, bottom: -90, near: 1, far: 240 });
-  sun.shadow.normalBias = .14;
+  sun.shadow.normalBias = .043;
+  sun.shadow.bias = -.00027;
   scene.add(sun, sun.target);
   surface(scene);
   stars(scene);
   planet(scene, earthMap);
   rocks(scene);
   hardware(scene);
-  return scene;
+  return { scene, earthMap };
 }

@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#080b10">
   <meta name="description" content="一段原创的第一人称月面探索任务。">
   <title>静海余光 · MARE TRANQUILLITATIS</title>
-  <link rel="stylesheet" href="style.css?v=1">
+  <link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
   <main id="game" aria-label="静海余光游戏">
@@ -21,33 +21,42 @@
       <div class="brief">
         <p class="eyebrow"><span></span> LUNAR SURFACE EXPEDITION</p>
         <h1>静海余光<span lang="en">AFTERLIGHT</span></h1>
-        <p class="description">沿着静海边缘的三座信标，记录月岩、微震和地球升起时的光。然后回到登陆舱。</p>
+        <p class="description">徒步勘察静海边缘，或驾驶登陆舱进入月球轨道，校准两颗通信卫星。</p>
         <button class="primary" id="start" disabled>正在生成月面…</button>
         <p id="boot-error" role="alert" hidden></p>
       </div>
       <div class="caption"><span>月面外勤任务</span><strong>静海 · 低日照区</strong></div>
     </section>
     <section id="hud" hidden aria-label="任务仪表">
-      <div class="telemetry"><span>航向 <b id="heading">000°</b></span><span>距登陆舱 <b id="range">0 m</b></span></div>
-      <div class="objectives"><p>月面采样 <b id="count">0 / 3</b></p><div id="sample-list"></div></div>
+      <aside class="navigation" aria-label="导航与任务">
+        <div class="navigation-header"><span id="mode-label">月面外勤</span><span id="heading">000°</span></div>
+        <canvas id="radar" role="img" aria-label="北向小地图，显示当前位置和任务信标"></canvas>
+        <div class="objectives"><p id="objective-title">月面采样</p><b id="count">0 / 3</b></div>
+        <div id="sample-list"></div>
+      </aside>
+      <div class="telemetry"><span id="range-label">距登陆舱</span><b id="range">0 m</b></div>
       <div id="waypoints" aria-hidden="true"></div>
       <div class="reticle" aria-hidden="true"></div>
+      <div id="flight-panel" hidden>
+        <span>速度 <b id="speed">0.0</b> km/s</span><span>高度 <b id="altitude">0</b> km</span>
+        <span id="flight-phase">待命</span>
+      </div>
       <div id="notice" role="status"></div>
       <div id="prompt" hidden></div>
-      <button id="pause" aria-label="暂停">Ⅱ</button>
-      <div class="legend"><span>WASD 移动</span><span>鼠标或拖动观察</span><span>Shift 加速</span><span>Space 跳跃</span><span>E 采样</span></div>
+      <div class="hud-actions"><button id="help" aria-label="操作说明" aria-expanded="false">?</button><button id="pause" aria-label="暂停">Ⅱ</button></div>
+      <div id="controls" hidden></div>
       <div id="touch-controls" aria-label="触屏操作">
         <div class="dpad"><button data-key="KeyW" aria-label="前进">↑</button><button data-key="KeyA" aria-label="左移">←</button><button data-key="KeyS" aria-label="后退">↓</button><button data-key="KeyD" aria-label="右移">→</button></div>
-        <div class="touch-actions"><button id="hop">跳跃</button><button id="use">交互</button></div>
+        <div class="touch-actions"><button id="hop">跳跃</button><button id="use">交互</button><button id="board">登船</button></div>
       </div>
     </section>
     <section class="screen dialog" id="pause-screen" hidden>
-      <div><p class="eyebrow">EVA PAUSED</p><h2>月面外勤已暂停</h2><button class="primary" id="resume">继续探索</button></div>
+      <div><p class="eyebrow">EVA PAUSED</p><h2>任务已暂停</h2><button class="primary" id="resume">继续探索</button></div>
     </section>
     <section class="screen dialog" id="complete" hidden>
       <div><p class="eyebrow">EVA COMPLETE</p><h2>外勤结束</h2><p class="description">三份观测记录已上传至登陆舱。</p><p id="summary"></p><button class="primary" id="restart">再次踏上月面</button></div>
     </section>
   </main>
-  <script type="module" src="game.js?v=1"></script>
+  <script type="module" src="game.js?v=2"></script>
 </body>
 </html>
