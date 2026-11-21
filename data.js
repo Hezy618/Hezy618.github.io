@@ -162,7 +162,6 @@ const SITE = {
 
   games: [
     { title: "Wild Meridian · 星际野地", desc: "Survey three worlds, build powered outposts, and fly your own ship between planets.", href: "deep-space/" },
-    { title: "Afterlight · 静海余光", desc: "Explore the Moon on foot, then pilot a lander and touch down on the same terrain.", href: "moon/" },
   ],
 
   /* ---------- 页脚 ---------- */

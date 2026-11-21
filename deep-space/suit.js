@@ -1,5 +1,5 @@
 import * as T from './vendor/three.module.min.js';
-import { mesh, block, bevel, canvasTexture, seeded, tube } from './mesh.js?v=2';
+import { mesh, block, bevel, canvasTexture, seeded, tube } from './mesh.js';
 
 const random = seeded(51);
 

@@ -8,4 +8,4 @@
 - I 打开货舱，可在船上或船旁加注已储备的燃料。舱内或靠近飞船可补给，供电后的居住舱也能恢复宇航服能源。
 - 鼠标可锁定观察，浏览器未授权时可按住画面拖动。触屏长按方向或升降键，使用屏幕按钮采集和登船。
 
-地形与三维设备由网页内程序化生成。地表材质采用 Poly Haven 的 CC0 [Dry Ground Rocks](https://polyhaven.com/a/dry_ground_rocks)、[Gray Rocks](https://polyhaven.com/a/gray_rocks) 与 [Aerial Grass Rock](https://polyhaven.com/a/aerial_grass_rock) 扫描，并叠加程序化分层。游戏复用了自有宇航服模型和本仓库随附的 MIT Three.js。
+地形与三维设备由网页内程序化生成。地表材质采用 Poly Haven 的 CC0 [Dry Ground Rocks](https://polyhaven.com/a/dry_ground_rocks)、[Gray Rocks](https://polyhaven.com/a/gray_rocks) 与 [Aerial Grass Rock](https://polyhaven.com/a/aerial_grass_rock) 扫描，并叠加程序化分层。游戏包含自有宇航服模型和随附的 MIT Three.js。

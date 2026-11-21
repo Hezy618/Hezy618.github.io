@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0a1012">
 <meta name="description" content="星际野地，原创第一人称星系探索与建设游戏。">
 <title>星际野地 · Wild Meridian</title>
-<link rel="stylesheet" href="./style.css?v=1">
+<link rel="stylesheet" href="./style.css?v=2">
 </head>
 <body>
 <main id="app" aria-label="星际野地">
@@ -27,8 +27,9 @@
     <div id="intro-location"><b>赤脊星</b><span>远征船停泊区</span></div>
   </section>
   <section id="hud" hidden aria-label="远征仪表">
-    <div class="location instrument"><b id="world-name">赤脊星</b><span id="mode">地表</span>
-      <canvas id="radar" width="152" height="152" aria-label="附近目标雷达" role="img"></canvas>
+    <div class="location">
+      <canvas id="radar" width="176" height="176" aria-label="附近目标雷达" role="img"></canvas>
+      <b id="world-name">赤脊星</b><span id="mode">地表</span>
       <small id="navigation"></small>
     </div>
     <div class="mission instrument"><span>远征日志</span><b id="objective"></b><small id="objective-detail"></small></div>
@@ -49,6 +50,6 @@
     </div>
   </section>
 </main>
-<script type="module" src="./game.js?v=3"></script>
+<script type="module" src="./game.js?v=4"></script>
 </body>
 </html>

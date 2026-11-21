@@ -1,9 +1,10 @@
-import * as T from '../moon/vendor/three.module.min.js';
-import { createSuit } from '../moon/suit.js?v=3';
-import { seeded } from '../moon/mesh.js';
+import * as T from './vendor/three.module.min.js';
+import { createSuit } from './suit.js';
+import { seeded } from './mesh.js';
 import { blueprints, materials, recipes, costLabel } from './catalog.js';
-import { createSystem, localSite, nearestPlanet, surfaceAt, surfaceRadius, tangentBasis } from './terrain.js?v=2';
-import { alignSurface, boulders, makeCockpit, makeDeposit, makeRuin, makeShip, makeStructure, paintSet } from './models.js';
+import { createSystem, localSite, nearestPlanet, surfaceAt, surfaceRadius, tangentBasis } from './terrain.js?v=3';
+import { alignSurface, boulders, makeDeposit, makeRuin, makeShip, makeStructure, paintSet } from './models.js';
+import { makeCockpit } from './cockpit.js';
 import { approachPoint, frame, key, makeFlight } from './flight.js';
 
 const $ = id=>document.getElementById(id);
@@ -12,7 +13,7 @@ const mobile=matchMedia('(pointer: coarse)').matches;
 const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const eye=new T.PerspectiveCamera(61,1,.09,95000);
 const keys=new Set(), scene=new T.Scene();
-const upVector=new T.Vector3(0,1,0), rightAxis=new T.Vector3(1,0,0);
+const upVector=new T.Vector3(0,1,0), rightAxis=new T.Vector3(1,0,0), bankAxis=new T.Vector3(0,0,1);
 const q=new T.Quaternion(), pilot=new T.Quaternion();
 const player=new T.Vector3(), heading=new T.Vector3(0,0,-1);
 const relative=new T.Vector3(), projected=new T.Vector3(), sight=new T.Vector3();
@@ -23,7 +24,10 @@ let mode='intro', dialog=null, drag=null, started=false;
 let pitch=0, jump=0, jumpSpeed=0, stride=0, time=0, energy=100;
 let chosen=null, placing=null, ghost=null, scanUntil=0, noticeUntil=0, hintKey='', hudAt=0, refreshAt=0, saveAt=0;
 let loadedSector='', visualsFrozen=false, sceneTimer=0, clock=0, context, soundOn=false, dirtyShadow=true;
-let data, previousPosition, renderHold=0;
+let data, previousPosition, renderHold=0, introFrame=0;
+let pixelRatio=1, maxRatio=1, averageFrame=0, sampleCount=0, tuneAt=0, cameraBank=0;
+const cockpitControls={forward:0,side:0,lift:0};
+const cockpitTelemetry={speed:0,altitude:0,vertical:0,fuel:100,landed:true,cruise:false,braking:false};
 const objects=new Map(), scenic=[], markerNodes=[], effects=[], offscreen=[0,0];
 const storageKey='wild-meridian-save-1';
 
@@ -100,7 +104,7 @@ function populatePlanets() {
     const ruin=makeRuin(paint,p);
     placeOnSurface(ruin,p,localSite(p,upVector,37,77));
     addObject({id:`${p.id}-archive`,kind:'archive',world:p.id,name:'古代记录站',model:ruin,pos:ruin.position});
-    if(!scenic.some(item=>item.world===p.id))scenic.push({world:p.id,mesh:boulders(scene,paint,p,upVector)});
+
   }
   data.built.forEach(registerStructure);
 }
@@ -131,7 +135,10 @@ function updateDeposits() {
   }
 }
 function setMode(next) {
-  mode=next;game.dataset.mode=next;
+  mode=next;game.dataset.mode=next;cameraBank=0;
+  if(next==='eva'&&!suit)suit=createSuit(reduced);
+  if(next!=='eva'&&next!=='intro'&&!cockpit)cockpit=makeCockpit(paint);
+  sizeOverlays();
   $('intro').hidden=next!=='intro';$('hud').hidden=next==='intro';
   for(const button of document.querySelectorAll('.lift'))button.hidden=next!=='flight';
   $('build').hidden=next!=='eva';
@@ -151,7 +158,7 @@ function begin() {
   if(snapshot?.view)pilot.fromArray(snapshot.view);else pilot.copy(frame(heading,upVector));
   energy=snapshot?.energy??100;
   chosen=system.planets.find(p=>p.id===snapshot?.chosen)||null;
-  started=true;populatePlanets();
+  started=true;cancelAnimationFrame(introFrame);introFrame=0;populatePlanets();
   setMode(snapshot?.mode==='flight'?'flight':snapshot?.mode==='seat'?'seat':'eva');
   refreshWindow();
   capture();
@@ -172,7 +179,7 @@ function surfacePosition() {
     eye.quaternion.copy(frame(flight.heading,up));
   } else {
     eye.position.copy(flight.position).addScaledVector(flight.up,2.39).addScaledVector(flight.heading,1.5);
-    eye.quaternion.copy(pilot);
+    eye.quaternion.copy(pilot).multiply(q.setFromAxisAngle(bankAxis,cameraBank));
   }
 }
 function updateEVA(dt) {
@@ -341,7 +348,7 @@ function leaveShip() {
   const exit=flight.position.clone().addScaledVector(flight.heading,-4.8).sub(world.position).normalize();
   player.copy(surfaceAt(world,exit));
   heading.copy(flight.heading).negate();heading.addScaledVector(up,-heading.dot(up)).normalize();
-  pitch=jump=jumpSpeed=0;suit.reset();setMode('eva');save();announce('已离舱。');
+  pitch=jump=jumpSpeed=0;setMode('eva');suit.reset();save();announce('已离舱。');
 }
 function board() {
   if(dialog)return;
@@ -688,20 +695,20 @@ function bindInput() {
 function refreshWindow() {
   const anchor=mode==='eva'?player:flight.position;
   for(const body of system.planets)body.update(anchor,body===world);
+  world.loadSurface();
   for(const object of objects.values())object.model.visible=object.world===world.id&&object.pos.distanceTo(anchor)<1250;
   for(const row of scenic)row.mesh.visible=row.world===world.id;
-  dirtyShadow=true;
+  if(shadowPosition.distanceToSquared(anchor)>14**2)dirtyShadow=true;
 }
 function render() {
   const exterior=mode==='eva'||mode==='intro';
   vehicle.root.visible=exterior;
-  if(started){
+  if(started&&exterior){
     const up=flight.position.clone().sub((flight.landingWorld||world).position).normalize();
     vehicle.root.position.copy(flight.position);
     const forward=flight.heading.clone().addScaledVector(up,-flight.heading.dot(up)).normalize();
     vehicle.root.quaternion.copy(frame(forward.lengthSq()>.01?forward:tangentBasis(up).forward,up));
   }
-  vehicle.engineLight.intensity=mode==='flight'&&flight.altitude<30?4.3:0;
   if(dirtyShadow){
     const surface=mode==='flight'?player:eye.position;
     shadowPosition.copy(surface);
@@ -716,44 +723,99 @@ function render() {
   renderer.render(overlay.scene,overlay.camera);
   renderer.autoClear=true;
 }
+function stepCockpit(dt) {
+  if(!cockpit||mode==='eva')return;
+  const flying=mode==='flight';
+  cockpitControls.forward=flying?key(keys,'KeyW','KeyS'):0;
+  cockpitControls.side=flying?key(keys,'KeyD','KeyA'):0;
+  cockpitControls.lift=flying?key(keys,'KeyR','KeyC'):0;
+  cameraBank=T.MathUtils.damp(cameraBank,reduced?0:-cockpitControls.side*.067,5.8,dt);
+  cockpitTelemetry.speed=flying?flight.speed:0;
+  cockpitTelemetry.altitude=flying?flight.altitude:0;
+  cockpitTelemetry.vertical=flying?flight.vertical:0;
+  cockpitTelemetry.fuel=flight.fuel;cockpitTelemetry.landed=!flying;
+  cockpitTelemetry.cruise=flying&&flight.auto;cockpitTelemetry.braking=flying&&keys.has('Space');
+  cockpit.update(dt,time,cockpitControls,cockpitTelemetry);
+}
+function tuneResolution(ms) {
+  if(ms<4||ms>200)return;
+  averageFrame=sampleCount?averageFrame*.93+ms*.07:ms;
+  sampleCount++;
+  if(time<tuneAt||sampleCount<42)return;
+  tuneAt=time+1.25;
+  const next=averageFrame>29?Math.max(.70,pixelRatio*.87):averageFrame<18?Math.min(maxRatio,pixelRatio+.09):pixelRatio;
+  if(Math.abs(next-pixelRatio)>.025){
+    pixelRatio=next;renderer.setPixelRatio(pixelRatio);
+  }
+}
+function addScenery(body) {
+  if(body.hasPending()||scenic.some(item=>item.world===body.id))return;
+  scenic.push({world:body.id,mesh:boulders(scene,paint,body,upVector)});
+  dirtyShadow=true;
+}
+function streamTerrain(body) {
+  if(body?.stream())return true;
+  return system.planets.some(planet=>planet!==body&&planet.stream(1));
+}
 function frameTick(now) {
   if(!started||dialog||document.hidden||visualsFrozen)return;
-  const dt=Math.min((now-clock)/1000,.064);clock=now;if(dt<=0)return;
+  const ms=now-clock;const dt=Math.min(ms/1000,.064);clock=now;if(dt<=0)return;
+  tuneResolution(ms);
   time+=dt;
   renderHold+=dt;
   look(key(keys,'ArrowRight','ArrowLeft')*dt*640,key(keys,'ArrowDown','ArrowUp')*dt*550);
   if(mode==='eva')updateEVA(dt);else if(mode==='flight')updateFlight(dt);
   surfacePosition();
+  stepCockpit(dt);
   if(time>refreshAt){
     const pos=mode==='eva'?player:flight.position;
     const movement=previousPosition.distanceTo(pos);
-    if(movement>Math.max(10,flight.altitude*.13)||time-sceneTimer>3){
+    if(movement>Math.max(9,flight.altitude*.13)||time-sceneTimer>4&&movement>1.5){
       refreshWindow();previousPosition.copy(pos);sceneTimer=time;
     }
-    refreshAt=time+.45;
+    refreshAt=time+.34;
   }
+  streamTerrain(world);
+  if(mode!=='flight')addScenery(world);
   if(time>saveAt){save();saveAt=time+5;}
   if(time>noticeUntil)set('notice','');
   updateEffects();
   updateHUD();
-  if(renderHold>=1/(mobile?32:45)){renderHold=0;render();}
+  const interval=1/(mobile?30:45);
+  if(renderHold>=interval){renderHold%=interval;render();}
 }
 function pauseLoop(){
   renderer?.setAnimationLoop(null);
+  cancelAnimationFrame(introFrame);introFrame=0;
   if(context?.state==='running'&&document.hidden)context.suspend().catch(()=>{});
 }
 function resumeLoop(){
   if(!renderer||document.hidden||dialog||visualsFrozen)return;
   if(soundOn&&context?.state==='suspended')context.resume().catch(()=>{});
-  if(!started){render();return;}
-  clock=performance.now();
+  if(!started){scheduleIntro();return;}
+  clock=performance.now();averageFrame=0;sampleCount=0;
   renderer.setAnimationLoop(frameTick);
+}
+function sizeOverlays(){
+  if(suit){suit.camera.aspect=eye.aspect;suit.camera.updateProjectionMatrix();}
+  cockpit?.resize(eye.aspect);
+}
+function scheduleIntro(){
+  if(introFrame||started||document.hidden||dialog||visualsFrozen)return;
+  introFrame=requestAnimationFrame(()=>{
+    introFrame=0;
+    const home=system.planets[0];
+    streamTerrain(home);
+    addScenery(home);
+    render();
+    if(system.planets.some(body=>body.hasPending()))scheduleIntro();
+  });
 }
 function resize(){
   if(!renderer)return;
   const width=viewport.clientWidth,height=Math.max(1,viewport.clientHeight);
   eye.aspect=width/height;eye.fov=width<580?68:61;eye.updateProjectionMatrix();
-  suit.camera.aspect=eye.aspect;suit.camera.updateProjectionMatrix();cockpit.resize(eye.aspect);
+  sizeOverlays();
   renderer.setSize(width,height,false);
   if(mode==='intro')introView();
   if(!visualsFrozen&&!document.hidden)render();
@@ -766,23 +828,22 @@ function introView() {
 }
 try {
   renderer=new T.WebGLRenderer({antialias:!mobile,logarithmicDepthBuffer:true,powerPreference:'high-performance'});
-  renderer.setPixelRatio(Math.min(devicePixelRatio,mobile?1.1:1.35));
+  maxRatio=Math.min(devicePixelRatio,mobile?1.10:1.35);pixelRatio=maxRatio;
+  renderer.setPixelRatio(pixelRatio);
   renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.14;
   renderer.shadowMap.enabled=!mobile;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.shadowMap.autoUpdate=false;
   renderer.domElement.tabIndex=-1;
   renderer.domElement.setAttribute('aria-label','星系第一视角');
   viewport.append(renderer.domElement);
-  system=await createSystem(scene);
+  system=createSystem(scene,()=>scheduleIntro());
   paint=paintSet();vehicle=makeShip(paint);scene.add(vehicle.root);
-  suit=createSuit(reduced);cockpit=makeCockpit(paint);
   const home=system.planets[0];
   alignSurface(vehicle.root,home,localSite(home,upVector,8,15),.06);
   previousPosition=new T.Vector3();
   introView();
   for(const body of system.planets)body.update(eye.position,body===home);
-  const foreground=boulders(scene,paint,home,upVector);
-  scenic.push({world:home.id,mesh:foreground});
   resize();bindInput();
+  scheduleIntro();home.loadSurface();
   window.addEventListener('resize',resize);
   $('start').disabled=false;set('start',readSave()?'继续远征':'开始远征');
 }catch(error){

@@ -77,3 +77,30 @@ button.primary:hover:not(:disabled){color:#142016;background:#f0ffd4}
  #readouts{font-size:.72rem;gap:7px}#hud-actions{right:10px}
 }
 @media(max-height:510px){#intro-location,#radar,.mission small{display:none}.intro-copy h1{font-size:3.4rem}.lede{margin:13px 0}}
+
+.location {
+  width: max-content; max-width: 152px; padding: 0;
+  text-align: center; justify-items: center; gap: 2px;
+  background: none; border: 0; box-shadow: none;
+}
+#radar {
+  width: 118px; height: 118px; border-radius: 50%; margin-bottom: 5px;
+  box-shadow: 0 0 0 1px #c3d8b85d, 0 6px 20px #02090868;
+}
+.location > b, .location > span, .location > small { text-shadow: 0 1px 5px #071211, 0 0 8px #040b0b; }
+.location > small { color: var(--lime); font: .72rem ui-monospace,monospace; }
+#app:is([data-mode="seat"],[data-mode="flight"]) #readouts {
+  bottom: auto; top: 70px; background: #0a1717c7;
+  padding: 5px 10px; border-radius: 5px; font-size: .74rem;
+}
+@media (max-width: 740px) {
+  #radar { width: 83px; height: 83px; }
+  #app:is([data-mode="seat"],[data-mode="flight"]) #readouts {
+    top: 172px; left: auto; right: 11px; transform: none;
+    max-width: calc(100% - 112px); gap: 6px; flex-wrap: wrap; justify-content: end;
+  }
+}
+@media (max-height: 510px) { #radar { display: block; width: 65px; height: 65px; } }
+
+#app:is([data-mode="seat"],[data-mode="flight"]) #prompt { bottom: 40%; }
+#app:is([data-mode="seat"],[data-mode="flight"]) #notice { bottom: 33%; }

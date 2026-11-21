@@ -1,6 +1,6 @@
-import * as T from '../moon/vendor/three.module.min.js';
-import { block, mesh, bevel, tube, canvasTexture, seeded } from '../moon/mesh.js';
-import { localSite, surfaceAt } from './terrain.js?v=2';
+import * as T from './vendor/three.module.min.js';
+import { block, mesh, bevel, tube, canvasTexture, seeded } from './mesh.js';
+import { localSite, surfaceAt } from './terrain.js?v=3';
 import { materials } from './catalog.js';
 
 export function paintSet() {
@@ -113,33 +113,8 @@ export function makeShip(m) {
   round(root,m.lit,0,2.03,3.59,.57,.04,.035,.014);
   for(let i=0;i<6;i++)round(root,m.alloy,0,.21+i*.17,3.99-i*.07,.78,.056,.18,.02);
   label(root,36,'#dce9bd','WM–04',0,2.47,3.148,.92,.345);
-  const engineLight = new T.PointLight(0xffb573,0,11,2);
-  engineLight.position.set(0,.6,2.5);root.add(engineLight);
-  return {root:shadows(root), engineLight};
+  return {root:shadows(root)};
 }
-export function makeCockpit(m) {
-  const scene=new T.Scene(),camera=new T.PerspectiveCamera(57,1,.05,25);
-  const dash=new T.Group();scene.add(dash,new T.HemisphereLight(0xd7e4e8,0x494942,1.47));
-  const key=new T.DirectionalLight(0xffd8a1,1.8);key.position.set(-3,4,2);scene.add(key);
-  round(dash,m.dark,0,-.82,-1.53,4.8,.42,.81,.10).rotation.x=-.12;
-  round(dash,m.rubber,0,-.655,-1.62,.8,.32,.42,.052).rotation.x=-.15;
-  round(dash,m.glass,0,-.608,-1.392,.65,.19,.05,.021).rotation.x=-.15;
-  for(let i=0;i<14;i++)block(dash,i<10?m.lit:m.orange,(i-6.5)*.038,-.588,-1.359,.021,.038,.007);
-  for(const side of [-1,1]){
-    round(dash,m.alloy,side*.77,-.67,-1.48,.49,.17,.44,.07).rotation.z=side*-.13;
-    for(let i=0;i<6;i++)block(dash,i%3===0?m.orange:m.dark,side*(.56+i*.076),-.60,-1.29,.036,.039,.035);
-    const yoke=round(dash,m.rubber,side*.51,-.72,-1.08,.13,.26,.19,.058);
-    yoke.rotation.x=-.55;
-  }
-  const ribs=new T.Group();scene.add(ribs);
-  for(const side of [-1,1]){
-    tube(ribs,m.dark,[[side*.70,-.86,-1.45],[side*.89,-.42,-1.7],[side*.91,.41,-1.75],[side*.68,.8,-1.69]],.097);
-    tube(ribs,m.alloy,[[side*.646,-.80,-1.43],[side*.845,-.41,-1.655],[side*.865,.394,-1.71],[side*.64,.77,-1.66]],.024);
-    tube(ribs,m.orange,[[side*.827,-.45,-1.63],[side*.849,-.33,-1.66]],.007);
-  }
-  return {scene,camera,resize(aspect){camera.aspect=aspect;camera.updateProjectionMatrix();ribs.scale.x=Math.max(.5,aspect);}};
-}
-
 function solar(root,m) {
   cylinder(root,m.dark,0,.28,0,.42,.69,.56);
   tube(root,m.alloy,[[0,.35,0],[0,1.5,0]],.17);

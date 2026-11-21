@@ -1,5 +1,5 @@
-import * as T from '../moon/vendor/three.module.min.js';
-import { canvasTexture, seeded } from '../moon/mesh.js';
+import * as T from './vendor/three.module.min.js';
+import { canvasTexture, seeded } from './mesh.js';
 import { worlds } from './catalog.js';
 
 const sphereDir = (face, u, v, out) => {
@@ -78,7 +78,7 @@ function groundMaterial(world, grain, scan) {
   mat.defines={ ROCK_SCALE: world.id==='veil' ? '0.154' : '0.28' };
   mat.onBeforeCompile = shader=>{
     Object.assign(shader.uniforms,{
-      grit:{value:grain}, surveyColor:{value:scan.color}, surveyRelief:{value:scan.relief}, rockTint:{value:new T.Color(world.rock)}, dustTint:{value:new T.Color(world.dust)},
+      grit:{value:grain}, surveyColor:scan.color, surveyRelief:scan.relief, rockTint:{value:new T.Color(world.rock)}, dustTint:{value:new T.Color(world.dust)},
       frostTint:{value:new T.Color(world.frost)}, horizonTint:{value:new T.Color(world.air)},
       groundCenter:{value:world.position},
     });
@@ -89,36 +89,40 @@ function groundMaterial(world, grain, scan) {
     shader.fragmentShader = `uniform sampler2D grit,surveyColor,surveyRelief;
       uniform vec3 rockTint,dustTint,frostTint,horizonTint,groundCenter;
       varying vec3 vSurface,vWorldN;
-      float triplanar(vec3 p, vec3 w){
-        return dot(vec3(texture2D(grit,p.yz).r,texture2D(grit,p.xz).r,texture2D(grit,p.xy).r),w);
-      }
     ` + shader.fragmentShader.replace('#include <color_fragment>',`#include <color_fragment>
       vec3 local=vSurface-groundCenter;
       vec3 n=normalize(vWorldN);
       vec3 w=pow(abs(n),vec3(6.0)); w/=max(.0001,w.x+w.y+w.z);
-      float macro=triplanar(local*.006,w);
-      vec3 texPos=local*ROCK_SCALE;
-      vec3 scanned = texture2D(surveyColor,texPos.yz).rgb*w.x+
-        texture2D(surveyColor,texPos.xz).rgb*w.y+texture2D(surveyColor,texPos.xy).rgb*w.z;
-      float scanHeight = dot(vec3(texture2D(surveyRelief,texPos.yz).r,
-        texture2D(surveyRelief,texPos.xz).r,texture2D(surveyRelief,texPos.xy).r),w);
-      float limestone=dot(scanned,vec3(.2126,.7152,.0722));
-      float strata=cos((length(local)+macro*12.0)*1.8+sin(local.z*.036)*1.2)*.5+.5;
-      float grit0=triplanar(local*.19,w);
-      float grit1=triplanar(local*.71,w);
-      float detail=1.-smoothstep(18.,90.,length(vViewPosition));
+      float viewRange=length(vViewPosition);
+      vec2 macroUV=mix(local.xz,local.xy,step(abs(n.y),abs(n.z)));
+      if(abs(n.x)>max(abs(n.y),abs(n.z)))macroUV=local.yz;
+      float macro=texture2D(grit,macroUV*.006).r;
       float steep=smoothstep(.91,.998,dot(n,normalize(local)));
       float dust=clamp(steep*.72+(macro-.46)*.9,0.,1.);
       vec3 stone=mix(rockTint,dustTint,dust);
       stone=mix(stone,frostTint,smoothstep(.62,.87,macro)*.28);
-      diffuseColor.rgb*=stone*(.88+(grit0-.47)*.18+(grit1-.48)*detail*.12+strata*(1.-steep)*.16)*mix(1.,clamp(.66+limestone*1.72+scanHeight*.26,.66,1.38),1.-smoothstep(90.,500.,length(vViewPosition)));
+      float scanHeight=.5;
+      float fine=1.;
+      if(viewRange<510.){
+        vec3 texPos=local*ROCK_SCALE;
+        vec3 scanned=texture2D(surveyColor,texPos.yz).rgb*w.x+
+          texture2D(surveyColor,texPos.xz).rgb*w.y+texture2D(surveyColor,texPos.xy).rgb*w.z;
+        float limestone=dot(scanned,vec3(.2126,.7152,.0722));
+        fine=mix(1.,clamp(.76+limestone*1.48,.66,1.38),1.-smoothstep(90.,500.,viewRange));
+        if(viewRange<65.)scanHeight=dot(vec3(texture2D(surveyRelief,texPos.yz).r,
+          texture2D(surveyRelief,texPos.xz).r,texture2D(surveyRelief,texPos.xy).r),w);
+      }
+      float strata=cos((length(local)+macro*12.0)*1.8+sin(local.z*.036)*1.2)*.5+.5;
+      diffuseColor.rgb*=stone*(.94+(macro-.47)*.16+strata*(1.-steep)*.17)*fine;
     `).replace('#include <normal_fragment_maps>',`
-      float roughRelief=((grit0+.32*grit1)*.009+scanHeight*.08)*(1.-smoothstep(10.,62.,length(vViewPosition)));
-      vec3 sigmaX=dFdx(-vViewPosition),sigmaY=dFdy(-vViewPosition);
-      vec3 r1=cross(sigmaY,normal),r2=cross(normal,sigmaX);
-      float determinant=dot(sigmaX,r1);
-      vec3 gradient=sign(determinant)*(dFdx(roughRelief)*r1+dFdy(roughRelief)*r2);
-      normal=normalize(abs(determinant)*normal-gradient);
+      float roughRelief=scanHeight*.055*(1.-smoothstep(10.,62.,viewRange));
+      vec2 slope=vec2(dFdx(roughRelief),dFdy(roughRelief));
+      if(viewRange<65.){
+        vec3 sigmaX=dFdx(-vViewPosition),sigmaY=dFdy(-vViewPosition);
+        vec3 r1=cross(sigmaY,normal),r2=cross(normal,sigmaX);
+        float determinant=dot(sigmaX,r1);
+        if(abs(determinant)>1e-10)normal=normalize(abs(determinant)*normal-sign(determinant)*(slope.x*r1+slope.y*r2));
+      }
     `).replace('#include <opaque_fragment>',`
       float air=1.-exp(-length(vViewPosition)*.00021);
       float nearGround=1.-smoothstep(60.,1250.,length(cameraPosition-groundCenter)-length(local));
@@ -128,8 +132,8 @@ function groundMaterial(world, grain, scan) {
   return mat;
 }
 const d=new T.Vector3(), dx=new T.Vector3(), dy=new T.Vector3(), n=new T.Vector3(), point=new T.Vector3();
-const div=18;
-function patchGeometry(world,face,u,v,size) {
+function patchGeometry(world,face,u,v,size,lod) {
+  const div=lod<4?12:16;
   const positions=[], normals=[], colors=[], indices=[];
   const step=size/div;
   for(let j=0;j<=div;j++) for(let i=0;i<=div;i++){
@@ -181,41 +185,76 @@ function terrain(world, scene, grain, scan) {
   parent.position.copy(world.position);
   scene.add(parent);
   const mat = groundMaterial(world,grain,scan);
-  const cache=new Map(), visible=new Set();
+  const cache=new Map(), visible=new Set(), pending=[];
   const target=new T.Vector3(), center=new T.Vector3();
-  let epoch=0;
-  function select(face,u,v,size,lod,focus,chosen,path) {
+  let epoch=0, maxDetail=0;
+  const roots=Array.from({length:6},(_,face)=>({face,u:-1,v:-1,size:2,lod:0,path:String(face)}));
+  function build(tile) {
+    const {face,u,v,size,lod,path}=tile;
+    const mesh=new T.Mesh(patchGeometry(world,face,u,v,size,lod),mat);
+    mesh.receiveShadow=true;
+    mesh.visible=false;
+    parent.add(mesh);
+    cache.set(path,{mesh,epoch});
+  }
+  for(const root of roots)build(root);
+  function select(tile,chosen) {
+    const {face,u,v,size,lod,path}=tile;
+    const ready=cache.get(path);
+    ready.epoch=epoch;
     sphereDir(face,u+size/2,v+size/2,center).multiplyScalar(world.radius);
     const distance=center.distanceTo(target);
-    if(lod < (focus?8:2) && distance < size*world.radius*1.95){
+    if(lod<maxDetail&&distance<size*world.radius*1.72){
       const half=size/2;
-      select(face,u,v,half,lod+1,focus,chosen,path+'0');
-      select(face,u+half,v,half,lod+1,focus,chosen,path+'1');
-      select(face,u,v+half,half,lod+1,focus,chosen,path+'2');
-      select(face,u+half,v+half,half,lod+1,focus,chosen,path+'3');
-      return;
+      const children=Array.from({length:4},(_,i)=>({
+        face,u:u+(i%2)*half,v:v+Math.floor(i/2)*half,size:half,lod:lod+1,path:path+i,
+      }));
+      if(children.every(child=>cache.has(child.path))){
+        for(const child of children)select(child,chosen);
+        return;
+      }
+      for(const child of children){
+        const cached=cache.get(child.path);
+        if(cached)cached.epoch=epoch;
+        else pending.push({tile:child,distance});
+      }
     }
-    let tile=cache.get(path);
-    if(!tile){
-      const mesh=new T.Mesh(patchGeometry(world,face,u,v,size),mat);
-      mesh.receiveShadow=true;
-      parent.add(mesh);tile={mesh,epoch};cache.set(path,tile);
-    }
-    tile.epoch=epoch;
-    tile.mesh.visible=true;
+    ready.mesh.visible=true;
     chosen.add(path);
   }
-  return (position,focus)=>{
-    target.copy(position).sub(world.position);
-    epoch++;
+  function reconcile(){
+    pending.length=0;
     const chosen=new Set();
-    for(let face=0;face<6;face++)select(face,-1,-1,2,0,focus,chosen,String(face));
-    for(const key of visible) if(!chosen.has(key))cache.get(key).mesh.visible=false;
+    for(const root of roots)select(root,chosen);
+    for(const key of visible)if(!chosen.has(key))cache.get(key).mesh.visible=false;
     visible.clear();
-    for(const key of chosen)visible.add(key);
-    if(cache.size>375)for(const [key,tile] of cache){
-      if(tile.epoch<epoch-4){parent.remove(tile.mesh);tile.mesh.geometry.dispose();cache.delete(key);}
+    for(const id of chosen)visible.add(id);
+    pending.sort((a,b)=>a.distance-b.distance);
+    if(cache.size>220)for(const [key,tile] of cache){
+      if(key.length>1&&tile.epoch<epoch-4){
+        parent.remove(tile.mesh);tile.mesh.geometry.dispose();cache.delete(key);
+      }
     }
+  }
+  return {
+    update(position,focus){
+      target.copy(position).sub(world.position);
+      maxDetail=focus ? 8 : 2;
+      epoch++;
+      reconcile();
+    },
+    stream(limit=2){
+      if(!pending.length)return false;
+      const deadline=performance.now()+2.2;
+      let built=0;
+      for(const {tile} of pending){
+        build(tile);
+        if(++built>=limit||performance.now()>=deadline)break;
+      }
+      reconcile();
+      return true;
+    },
+    hasPending(){return pending.length>0;},
   };
 }
 function atmosphere(world, scene, sun) {
@@ -246,14 +285,14 @@ function atmosphere(world, scene, sun) {
   mesh.position.copy(world.position);scene.add(mesh);
 }
 function sky(scene,sun) {
-  const map=canvasTexture(1024,512,ctx=>{
-    const image=ctx.createImageData(1024,512);
-    for(let y=0;y<512;y++)for(let x=0;x<1024;x++){
-      const u=x/1024, v=y/512;
+  const map=canvasTexture(512,256,ctx=>{
+    const image=ctx.createImageData(512,256);
+    for(let y=0;y<256;y++)for(let x=0;x<512;x++){
+      const u=x/512, v=y/256;
       const c=1-Math.min(1,Math.abs(v-.48-.16*Math.sin(u*6.283))/.28);
       const fog=noise(u*18,v*23,.5,17)*.7+noise(u*76,v*64,9,39)*.3;
       const radiance=c**2* Math.max(0,fog-.26);
-      image.data.set([6+radiance*45,9+radiance*36,14+radiance*56,255],(x+y*1024)*4);
+      image.data.set([6+radiance*45,9+radiance*36,14+radiance*56,255],(x+y*512)*4);
     }
     ctx.putImageData(image,0,0);
 
@@ -297,24 +336,34 @@ function rings(scene,world) {
   const ring=new T.Mesh(geometry,new T.MeshBasicMaterial({map:bands,transparent:true,side:T.DoubleSide,depthWrite:false,toneMapped:false}));
   ring.rotation.set(1.11,.44,-.16);ring.position.copy(world.position);scene.add(ring);
 }
-export async function createSystem(scene) {
+export function createSystem(scene, onSurfaceReady) {
   const loader=new T.TextureLoader();
-  const scans=await Promise.all(worlds.map(async world=>{
-    const [color,relief]=await Promise.all(['color','relief'].map(kind=>
-      loader.loadAsync(new URL(`textures/${world.id}-${kind}.webp`, import.meta.url).href)));
-    color.colorSpace=T.SRGBColorSpace;
-    for(const map of [color,relief]){
-      map.wrapS=map.wrapT=T.RepeatWrapping;
-      map.anisotropy=6;
-    }
-    return {color,relief};
-  }));
   const sun=new T.Vector3(-.63,.48,.44).normalize();
   sky(scene,sun);
   const grain=makeGrain();
-  const planets=worlds.map((entry,index)=>{
+  const planets=worlds.map(entry=>{
     const world={...entry,position:new T.Vector3(...entry.center),up:new T.Vector3(0,1,0)};
-    world.update=terrain(world,scene,grain,scans[index]);
+    const scan={color:{value:grain},relief:{value:grain}};
+    let requested=false;
+    world.loadSurface=()=>{
+      if(requested)return;
+      requested=true;
+      Promise.all(['color','relief'].map(kind=>
+        loader.loadAsync(new URL(`textures/${world.id}-${kind}.webp`, import.meta.url).href)
+          .then(texture=>({kind,texture})).catch(()=>null)))
+        .then(results=>{
+          for(const result of results){
+            if(!result)continue;
+            const {kind,texture}=result;
+            if(kind==='color')texture.colorSpace=T.SRGBColorSpace;
+            texture.wrapS=texture.wrapT=T.RepeatWrapping;
+            texture.anisotropy=6;
+            scan[kind].value=texture;
+          }
+          if(results.some(Boolean))onSurfaceReady(world);
+        });
+    };
+    Object.assign(world,terrain(world,scene,grain,scan));
     atmosphere(world,scene,sun);
     if(world.id==='veil')rings(scene,world);
     return world;
