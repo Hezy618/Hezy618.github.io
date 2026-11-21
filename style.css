@@ -1412,3 +1412,13 @@ html.day .companion-sport { --cat-band:#b96f5d; }
   .navbar .nav-links { width: auto; padding-left: 0; gap: clamp(4px, 1.3vw, 9px); }
   .navbar .moon-wrap, html.cosmic-ready .navbar .moon-wrap { width: 30px; height: 28px; }
 }
+
+.game-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.game-entry { border: 1px solid var(--line-soft); border-radius: 8px; padding: 12px 16px; }
+.game-entry:focus-within, .game-entry:hover { border-color: var(--gold-dim); }
+.game-link { color: var(--gold); font-weight: 700; }
+.game-desc { margin: 4px 0 0; color: var(--text); font-size: 14px; }
+.companion-game .cat-paw-left { animation: catTypeLeft 1.1s ease-in-out infinite paused; }
+.companion-game .cat-paw-right { animation: catTypeRight 1.1s ease-in-out -.3s infinite paused; }
+.companion-game.is-visible .cat-paw-left,
+.companion-game.is-visible .cat-paw-right { animation-play-state: running; }

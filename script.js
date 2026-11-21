@@ -245,6 +245,15 @@
        <p class="hobby-desc">${esc(h.desc)}</p>`));
   });
 
+  const gameList = $("#game-list");
+  (SITE.games || []).forEach((game) => {
+    const item = el("li", "game-entry");
+    const link = el("a", "game-link", esc(game.title));
+    link.href = game.href;
+    item.append(link, el("p", "game-desc", esc(game.desc)));
+    gameList.appendChild(item);
+  });
+
   /* Footer */
   $("#footer-text").textContent = SITE.footer || "";
 

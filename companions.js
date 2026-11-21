@@ -6,6 +6,7 @@
     catType: {symbol:'</>',label:'Say hello to the coding cat',mode:'code'},
     catPatrol: {symbol:'✦',label:'Greet the reading cat',mode:'curious'},
     catFirework: {symbol:'✧',label:'Celebrate with the cat',mode:'celebrate'},
+    catGame: {symbol:'✦',label:'Cheer on the gaming cat',mode:'game'},
     catSit: {symbol:'↗',label:'Cheer on the active cat',mode:'sport'},
   };
   // Eye height, gaze, brows and mouth are numbers, so every expression can morph.
@@ -29,6 +30,10 @@
       idle:[{left:.15,right:.92,brows:.28,smile:.56},{left:.9,right:.9,gx:1.1,brow:-1.1,smile:.35},{left:.8,right:.2,gx:-1,brows:.3,smile:.68}],
       react:[{left:1.4,right:1.4,brow:-2.5,smile:.65,blush:.25,spark:.45},{left:1.1,right:1.1,brow:-1.2,smile:1.15,blush:.65,spark:1}],
     },
+    game:{
+      idle:[{left:.69,right:.69,gx:1.4,gy:1,brow:1.2,brows:1,smile:-.15},{left:.62,right:.8,gx:1.7,gy:.9,brow:.7,smile:.07}],
+      react:[{left:1.25,right:1.25,brow:-1.6,oh:.65},{left:.8,right:.8,brow:.45,smile:.9}],
+    },
     sport:{
       idle:[{left:.86,right:.86,brow:1.2,tilt:1.5,brows:1,smile:.25},{left:1,right:.7,gx:1.6,brow:.3,tilt:.6,smile:.36},{left:.7,right:1,gx:-1.3,brow:.8,tilt:1,smile:.3}],
       react:[{left:1.25,right:1.25,brow:-1.5,smile:.68},{left:.42,right:.42,brows:.28,smile:1.2,blush:.3}],
@@ -39,6 +44,7 @@
     code: {rise:1, tilt:3, tail:-11, paw:-6},
     curious: {rise:-1, tilt:7, tail:14, paw:-1},
     celebrate: {rise:-6, tilt:-4, tail:-34, paw:-7},
+    game: {rise:-2, tilt:-4, tail:-16, paw:-3},
     sport: {rise:-4, tilt:5, tail:24, paw:-4},
   };
   const states=[];
@@ -145,6 +151,8 @@
     node.setAttribute('aria-label',p.label);node.title=p.label;
     const prop=p.mode==='code'
       ? '<g class="cat-prop"><path d="M23 60H63L59 74H27Z" fill="var(--cat-prop)" stroke="var(--cat-line)" stroke-width="1"/><path d="M19 75H66" stroke="var(--cat-line)" stroke-linecap="round"/><path d="M40 65L37 67L40 69M47 65L50 67L47 69" fill="none" stroke="var(--cat-accent)" stroke-width="1"/></g>'
+      : p.mode==='game'
+      ? '<g class="cat-prop"><path d="M34 63H53Q58 63 61 72L63 77Q64 81 60 81Q58 81 54 76H33Q29 81 27 81Q23 81 24 77L26 71Q29 63 34 63Z" fill="var(--cat-prop)" stroke="var(--cat-line)" stroke-width="1"/><path d="M32 70H39M35.5 66.5V73.5" stroke="var(--cat-face)" stroke-width="1.4"/><circle cx="51" cy="68" r="1.4" fill="var(--cat-accent)"/><circle cx="55" cy="72" r="1.4" fill="var(--cat-face)"/><path d="M80 48H91V64H79Z" fill="var(--cat-prop)" stroke="var(--cat-line)"/><path d="M82 51H89V60H81Z" fill="var(--cat-accent)"/><path d="M85 64V69M81 69H89" stroke="var(--cat-line)" stroke-width="1.25"/></g>'
       : p.mode==='curious'
       ? '<g class="cat-prop" fill="var(--cat-prop)" stroke="var(--cat-line)" stroke-width="1"><path d="M22 61Q33 58 43 63V76Q32 71 22 74ZM43 63Q54 58 65 61V74Q54 71 43 76Z"/><path d="M27 65L37 66M49 66L59 65M27 69L37 70M49 70L59 69" opacity=".5"/></g>'
       : p.mode==='sport'
@@ -171,7 +179,7 @@
             <g class="cat-blush" fill="var(--cat-accent)" opacity="0"><ellipse cx="27" cy="53" rx="3" ry="1.5"/><ellipse cx="59" cy="53" rx="3" ry="1.5"/></g>
           </g>
           ${prop}
-          <g class="companion-hands"><g class="cat-paw-left"><ellipse class="companion-paw" cx="29" cy="${p.mode==='code'?61:69}" rx="6" ry="4"/></g><g class="cat-paw-right"><ellipse class="companion-paw" cx="58" cy="${p.mode==='code'?61:69}" rx="6" ry="4"/></g></g>
+          <g class="companion-hands"><g class="cat-paw-left"><ellipse class="companion-paw" cx="29" cy="${p.mode==='code'?61:p.mode==='game'?64:69}" rx="6" ry="4"/></g><g class="cat-paw-right"><ellipse class="companion-paw" cx="58" cy="${p.mode==='code'?61:p.mode==='game'?64:69}" rx="6" ry="4"/></g></g>
         </g>
       </g>
     </svg><span class="companion-bubble" aria-hidden="true">${p.symbol}</span>`;

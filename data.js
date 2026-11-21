@@ -160,6 +160,10 @@ const SITE = {
     { icon: "🎸", title: "Guitar & Singing",   desc: "I enjoy playing guitar and singing songs by Jay Chou, Wang Leehom, and JJ Lin." },
   ],
 
+  games: [
+    { title: "Afterlight · 静海余光", desc: "Explore the Moon on foot, then pilot a lander and touch down on the same terrain.", href: "moon/" },
+  ],
+
   /* ---------- 页脚 ---------- */
   footer: "© 2026 Zhongyu He",
 };
