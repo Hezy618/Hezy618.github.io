@@ -1,8 +1,8 @@
-import { height } from './world.js?v=2';
+import { height } from './world.js?v=3';
 
 const size = 192;
 const center = size / 2;
-const extent = 220;
+const extent = 300;
 const pointsPerMeter = 1.15;
 
 export function createRadar(canvas) {
@@ -25,8 +25,8 @@ export function createRadar(canvas) {
   map.putImageData(image, 0, 0);
   ctx.scale(2, 2);
 
-  return (pos, yaw, points, orbit) => {
-    const scale = orbit ? .41 : pointsPerMeter;
+  return (pos, yaw, points, airborne) => {
+    const scale = airborne ? .32 : pointsPerMeter;
     ctx.clearRect(0, 0, size, size);
     ctx.save();
     ctx.beginPath();
@@ -34,7 +34,7 @@ export function createRadar(canvas) {
     ctx.clip();
     ctx.fillStyle = '#101b29';
     ctx.fillRect(0, 0, size, size);
-    if (!orbit) ctx.drawImage(terrain, center - (pos.x + extent) * scale,
+    ctx.drawImage(terrain, center - (pos.x + extent) * scale,
       center - (pos.z + extent + 35) * scale, terrain.width * scale, terrain.height * scale);
     ctx.strokeStyle = '#9cd5ef3a';
     ctx.lineWidth = .8;

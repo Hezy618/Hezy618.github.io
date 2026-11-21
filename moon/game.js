@@ -1,12 +1,12 @@
 import * as T from './vendor/three.module.min.js';
-import { createWorld, height, stations } from './world.js?v=2';
-import { createSuit } from './suit.js?v=2';
-import { createCockpit, createFlight, returnRange, scanSpeed } from './flight.js?v=2';
-import { createRadar } from './radar.js?v=2';
+import { createWorld, height, groundStations, home } from './world.js?v=3';
+import { createSuit } from './suit.js?v=3';
+import { areaRadius, areaCenterZ, createCockpit, createFlight, scanSpeed } from './flight.js?v=3';
+import { createRadar } from './radar.js?v=3';
 
 const $ = id => document.getElementById(id);
 const view = $('view');
-const camera = new T.PerspectiveCamera(58, 1, .065, 1600);
+const camera = new T.PerspectiveCamera(58, 1, .065, 7400);
 camera.rotation.order = 'YXZ';
 const spawn = new T.Vector3(2, 0, 3);
 const position = spawn.clone();
@@ -17,15 +17,19 @@ const coarse = matchMedia('(pointer: coarse)').matches;
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const projected = new T.Vector3();
 
-let scene, renderer, audio, canvas, drag, suit, cockpit, flight, drawRadar;
+let world, renderer, audio, canvas, drag, suit, cockpit, flight, drawRadar;
 let state = 'intro';
 let yaw = 0, pitch = 0, lift = 0, verticalSpeed = 0;
 let signalUntil = 0, time = 0, footDistance = 0, distance = 0;
 let muted = true;
-let mode = 'eva', phaseTime = 0, bank = 0, radarAt = -1;
-const lander = stations[3];
+let mode = 'eva', bank = 0, radarAt = -1;
+const lander = {
+  label: '登陆舱',
+  get x() { return flight.position.x; },
+  get z() { return flight.position.z; },
+};
+const stations = [...groundStations, lander];
 const boardRadius = 4.4;
-const door = new T.Vector3(lander.x, 0, lander.z + 3.05);
 const viewSpace = new T.Vector3();
 const surfaceColors = ['#a1e5ff', '#a1e5ff', '#a1e5ff', '#ffd5a5'];
 const keyDifference = (positive, negative) => Number(keys.has(positive)) - Number(keys.has(negative));
@@ -43,22 +47,30 @@ function hint(...actions) {
 
 function setMode(next) {
   mode = next;
-  phaseTime = 0;
   bank = 0;
   radarAt = -1;
   keys.clear();
+  const flying = next === 'flight';
   $('game').dataset.mode = next;
   $('flight-panel').hidden = next === 'eva';
-  $('hop').textContent = next === 'eva' ? '跳跃' : '制动';
-  $('hop').hidden = next !== 'eva' && next !== 'orbit';
-  $('use').hidden = next === 'ascent' || next === 'descent';
-  $('use').textContent = next === 'docked' ? '离舱' : next === 'orbit' ? '校准' : '采样';
-  $('board').textContent = next === 'docked' ? '起飞' : next === 'orbit' ? '返航' : '登船';
-  $('board').hidden = next === 'ascent' || next === 'descent';
-  setText('mode-label', { eva: '月面外勤', docked: '登陆舱待命', ascent: '起飞中', orbit: '月球轨道', descent: '返航中' }[next]);
+  $('hop').textContent = flying ? '制动' : '跳跃';
+  $('hop').hidden = next === 'docked';
+  $('vertical-controls').hidden = !flying;
+  $('use').textContent = next === 'docked' ? '离舱' : flying ? '校准' : '采样';
+  $('board').textContent = next === 'docked' ? '起飞' : '登船';
+  $('board').hidden = flying;
+  $('dpad').hidden = next === 'docked';
+  setText('mode-label', { eva: '月面外勤', docked: '舱内停泊', flight: '手动飞行' }[next]);
   setText('controls', next === 'eva' ? '鼠标或拖动观察 · Shift 加速 · 空格跳跃 · E 采样 · F 登船'
-    : '鼠标或拖动调整航向 · W / S 推进与反推 · A / D 侧推 · Shift 增推 · 空格制动');
+    : 'W/S 推进与反推 · A/D 侧移 · R 上升 · C 下降 · 空格制动 · Shift 增推 · E 校准或离舱');
   refreshObjectives();
+}
+
+function refreshShadows() {
+  const anchor = mode === 'eva' ? flight.position : home;
+  world.sun.target.position.set(anchor.x, 0, anchor.z - 32);
+  world.sun.position.set(anchor.x - 96, 38, anchor.z - 63);
+  renderer.shadowMap.needsUpdate = true;
 }
 
 const markers = stations.map(point => {
@@ -108,12 +120,13 @@ function announce(message) {
 
 function refreshObjectives() {
   const inSpace = mode !== 'eva';
-  setText('objective-title', inSpace ? '轨道校准' : '月面采样');
+  setText('objective-title', inSpace ? '空中校准' : '月面采样');
   setText('count', inSpace ? `${flight.scanned.size} / 2` : `${collected.size} / 3`);
   stations.slice(0, 3).forEach((point, index) => {
     const target = inSpace ? flight.points[index] : point;
+    markers[index].row.hidden = !target;
+    if (!target) return;
     const checked = inSpace ? flight.scanned.has(target) : collected.has(point);
-    markers[index].row.hidden = inSpace && !target.result;
     markers[index].row.textContent = `${checked ? '✓' : '◇'} ${target.label}`;
     markers[index].row.classList.toggle('done', checked);
   });
@@ -152,9 +165,10 @@ function start() {
   flight.reset();
   suit.reset();
   setMode('eva');
+  refreshShadows();
   setState('play');
   capture();
-  announce('前往采样点，或靠近登陆舱开启轨道任务。');
+  announce('前往采样点，或靠近登陆舱起飞。');
 }
 
 function targets() {
@@ -174,17 +188,17 @@ function nearby() {
 function interact() {
   if (state !== 'play') return;
   if (mode === 'docked') { disembark(); return; }
-  if (mode === 'orbit') {
+  if (mode === 'flight') {
     const target = flight.target();
     if (!target) return;
     if (flight.speed > scanSpeed) {
-      announce('减速至 1.3 km/s 以下，再开始校准。');
+      announce('减速至 7 m/s 以下，再开始校准。');
       return;
     }
     flight.scanned.add(target);
     sound('signal');
     refreshObjectives();
-    announce(target.result + (flight.scanned.size === 2 ? ' 可前往返航信标。' : ''));
+    announce(target.result + (flight.scanned.size === 2 ? ' 可以自行选点降落。' : ''));
     return;
   }
   if (mode !== 'eva') return;
@@ -199,43 +213,39 @@ function interact() {
     return;
   }
   const seconds = Math.floor(time);
-  $('summary').textContent = `外勤 ${Math.floor(seconds / 60)} 分 ${seconds % 60} 秒 · 徒步 ${Math.round(distance)} 米 · 轨道校准 ${flight.scanned.size} / 2`;
+  $('summary').textContent = `外勤 ${Math.floor(seconds / 60)} 分 ${seconds % 60} 秒 · 徒步 ${Math.round(distance)} 米 · 空中校准 ${flight.scanned.size} / 2`;
   setState('complete');
 }
 
 function disembark() {
-  position.copy(door);
-  yaw = Math.PI;
+  const sin = Math.sin(flight.heading), cos = Math.cos(flight.heading);
+  position.set(lander.x + sin * 3.05, 0, lander.z + cos * 3.05);
+  if (Math.hypot(position.x, position.z - areaCenterZ) > areaRadius + 3) {
+    position.set(lander.x - sin * 3.05, 0, lander.z - cos * 3.05);
+  }
+  yaw = flight.heading + Math.PI;
   pitch = lift = verticalSpeed = 0;
   suit.reset();
   setMode('eva');
   sound('signal');
-  announce(flight.scanned.size === 2 ? '轨道数据已入库。可继续月面外勤。' : '已离开登陆舱。');
+  announce(flight.scanned.size === 2 ? '两份空中记录已入库。' : '已离舱，可在这里继续外勤。');
 }
 
 function board() {
   if (state !== 'play') return;
   if (mode === 'eva' && range(lander) <= boardRadius) {
-    yaw = pitch = lift = verticalSpeed = 0;
+    yaw = flight.heading;
+    pitch = -.13;
+    lift = verticalSpeed = 0;
     setMode('docked');
     sound('signal');
     announce('舱门锁定。可点火起飞。');
   } else if (mode === 'docked') {
-    yaw = pitch = 0;
-    setMode('ascent');
+    yaw = flight.heading;
+    setMode('flight');
+    flight.launch();
     sound('signal');
-    announce('主引擎点火。正在升入月球轨道。');
-  } else if (mode === 'orbit') {
-    if (flight.position.length() > returnRange) {
-      announce('请飞到返航信标 35 km 以内。');
-    } else if (flight.speed > scanSpeed) {
-      announce('减速至 1.3 km/s 以下，再启动返航。');
-    } else {
-      yaw = pitch = 0;
-      setMode('descent');
-      sound('signal');
-      announce('返航程序已接管。');
-    }
+    announce(coarse ? '按住升降按钮控制高度。降落前请制动。' : 'R 上升 · C 下降 · 空格制动。');
   }
 }
 
@@ -244,7 +254,7 @@ function jump() {
 }
 
 function look(dx, dy) {
-  if (mode !== 'eva' && mode !== 'orbit') return;
+  if (mode !== 'eva' && mode !== 'flight') return;
   yaw = (yaw - dx * .0026) % (Math.PI * 2);
   pitch = T.MathUtils.clamp(pitch - dy * .0026, -1.34, 1.34);
 }
@@ -257,12 +267,12 @@ function updateEVA(dt) {
   const oldX = position.x, oldZ = position.z;
   const x = position.x + motion.x * Math.cos(yaw) + motion.y * Math.sin(yaw);
   const z = position.z - motion.x * Math.sin(yaw) + motion.y * Math.cos(yaw);
-  const radial = Math.hypot(x, z + 25);
-  if (radial <= 156 && Math.hypot(x - lander.x, z - lander.z) > 2.15) {
+  const radial = Math.hypot(x, z - areaCenterZ);
+  if (radial <= areaRadius + 4 && Math.hypot(x - lander.x, z - lander.z) > 2.15) {
     position.x = x;
     position.z = z;
   }
-  if (radial > 156 && time > signalUntil) announce('已到观测区边缘，请返回信标方向。');
+  if (radial > areaRadius + 4 && time > signalUntil) announce('已到观测区边缘，请返回信标方向。');
   const traveled = Math.hypot(position.x - oldX, position.z - oldZ);
   distance += traveled;
   if (lift === 0) {
@@ -298,59 +308,49 @@ function updateEVA(dt) {
 }
 
 function updateFlight(dt) {
-  const duration = 3.2;
-  phaseTime += dt;
-  const phase = T.MathUtils.smoothstep(phaseTime, 0, duration);
-  const altitude = mode === 'ascent' ? phase : mode === 'descent' ? 1 - phase : 0;
-
-  if (mode === 'orbit') {
-    bank = flight.step(dt, keys, yaw, pitch);
-    camera.position.copy(flight.position);
-    camera.rotation.set(pitch, yaw, reducedMotion ? 0 : bank);
-    setText('flight-phase', keys.has('Space') ? '制动' : '手动驾驶');
-    setText('speed', (flight.speed / 10).toFixed(1));
-    setText('altitude', Math.round(flight.altitude).toString());
-    setText('range-label', '距返航信标');
-    setText('range', `${Math.round(flight.position.length())} km`);
-    const target = flight.target();
-    const actions = [];
-    if (target) actions.push([coarse ? '校准' : 'E', flight.speed > scanSpeed ? '先减速再校准' : `校准${target.label}`]);
-    if (flight.position.length() <= returnRange) actions.push([coarse ? '返航' : 'F', '自动返航']);
-    hint(...actions);
-    updateMarkers(flight.points.map(point => ({
-      ...point, range: flight.position.distanceTo(point.position), active: !flight.scanned.has(point)
-        && (Boolean(point.result) || flight.position.length() > 28),
-    })), 'km');
-    return;
-  }
-
-  const ground = height(lander.x, lander.z);
-  camera.position.set(lander.x, ground + 2.9 + altitude * 186, lander.z + altitude * -76);
-  camera.rotation.set(-.09 - altitude * .48, 0, 0);
-  for (const { marker } of markers) marker.hidden = true;
-  const docked = mode === 'docked';
-  setText('flight-phase', docked ? '停泊' : mode === 'ascent' ? '爬升' : '自动降落');
-  setText('speed', docked ? '0.0' : (phase * 2.5 + .1).toFixed(1));
-  setText('altitude', Math.round(altitude * 148).toString());
-  setText('range-label', '登陆舱');
-  setText('range', 'AL-07');
-  if (docked) {
-    hint([coarse ? '起飞' : 'F', '点火起飞'], [coarse ? '离舱' : 'E', '返回月面']);
-  } else {
-    hint();
-    if (phaseTime >= duration) {
-      if (mode === 'ascent') {
-        flight.launch();
-        setMode('orbit');
-        camera.position.copy(flight.position);
-        camera.rotation.set(0, 0, 0);
-        announce('手动驾驶已接管。飞近卫星并减速校准。');
-      } else {
-        setMode('docked');
-        announce('已降落在静海。可离舱或再次起飞。');
-      }
+  if (mode === 'flight') {
+    const result = flight.step(dt, keys, yaw);
+    bank = result.bank;
+    if (result.contact) {
+      setMode('docked');
+      refreshShadows();
+      sound('signal');
+      announce('起落架已触地。可在这里离舱或再次起飞。');
+    } else if (result.blocked && time >= signalUntil) {
+      announce('请选择平坦空地，并先减掉横向速度。');
     }
   }
+
+  camera.position.copy(flight.position);
+  camera.position.y += 2.93;
+  camera.rotation.set(pitch, yaw, reducedMotion ? 0 : bank);
+  const docked = mode === 'docked';
+  setText('speed', flight.speed.toFixed(1));
+  setText('altitude', flight.altitude.toFixed(flight.altitude < 10 ? 1 : 0));
+  setText('vertical-speed', `${flight.verticalSpeed > .05 ? '+' : ''}${flight.verticalSpeed.toFixed(1)}`);
+  setText('flight-phase', docked ? '已着陆' : keys.has('Space') ? '制动'
+    : flight.rising ? '起飞' : flight.verticalSpeed < -.6 ? '下降' : flight.verticalSpeed > .6 ? '上升' : '手动飞行');
+  setText('range-label', '距起降点');
+  setText('range', `${Math.round(rangeFromHome())} m`);
+  if (docked) {
+    for (const { marker } of markers) marker.hidden = true;
+    hint([coarse ? '起飞' : 'F', '点火起飞'], [coarse ? '离舱' : 'E', '打开舱门']);
+    return;
+  }
+  const target = flight.target();
+  if (target) hint([coarse ? '校准' : 'E', flight.speed > scanSpeed ? '先减速再校准' : `校准${target.label}`]);
+  else if (flight.altitude < 12) hint([coarse ? '下降' : 'C', '减速后可着陆']);
+  else hint();
+  const homeMarker = new T.Vector3(home.x, height(home.x, home.z) + 1.1, home.z);
+  const points = flight.points.map(point => ({
+    ...point, range: flight.position.distanceTo(point.position), active: !flight.scanned.has(point),
+  }));
+  points.push({ label: home.label, position: homeMarker, color: '#f2deb6', range: rangeFromHome(), active: rangeFromHome() > 12 });
+  updateMarkers(points, 'm', true);
+}
+
+function rangeFromHome() {
+  return Math.hypot(flight.position.x - home.x, flight.position.z - home.z);
 }
 
 function update(dt) {
@@ -363,15 +363,16 @@ function update(dt) {
   if (time > signalUntil) setText('notice', '');
   if (time >= radarAt) {
     radarAt = time + .09;
-    const orbit = mode === 'orbit';
-    const points = orbit ? flight.points.filter(point => !flight.scanned.has(point)).map(point => ({
+    const airborne = mode === 'flight';
+    const points = airborne ? flight.points.filter(point => !flight.scanned.has(point)).map(point => ({
       x: point.position.x, z: point.position.z, color: point.color,
     })) : stations.map((point, i) => ({ ...point, color: collected.has(point) ? '#657b85' : surfaceColors[i] }));
-    drawRadar(orbit ? flight.position : mode === 'eva' ? position : lander, yaw, points, orbit);
+    if (airborne) points.push({ ...home, color: '#f2deb6' });
+    drawRadar(mode === 'eva' ? position : flight.position, yaw, points, airborne);
   }
 }
 
-function updateMarkers(points, unit) {
+function updateMarkers(points, unit, airborne = false) {
   const w = view.clientWidth, h = view.clientHeight;
   const edgeCounts = [0, 0];
   camera.updateMatrixWorld();
@@ -391,7 +392,7 @@ function updateMarkers(points, unit) {
       const panelBottom = left ? $('radar').closest('.navigation').getBoundingClientRect().bottom : 0;
       py = Math.max(h * .51, panelBottom + 18) + 36 * edgeCounts[Number(left)]++;
       hint = left ? '‹ ' : '› ';
-    } else if (unit === 'km' && (py < h * .25 || py > h * .73)) {
+    } else if (airborne && (py < h * .25 || py > h * .73)) {
       hint = py < h * .25 ? '↑ ' : '↓ ';
     }
     marker.style.left = `${px}px`;
@@ -402,7 +403,12 @@ function updateMarkers(points, unit) {
 }
 
 function render() {
-  renderer.render(mode === 'orbit' ? flight.scene : scene, camera);
+  const exterior = mode === 'eva';
+  if (world.ship.visible !== exterior) {
+    world.ship.visible = exterior;
+    refreshShadows();
+  }
+  renderer.render(world.scene, camera);
   if (state === 'intro') return;
   const overlay = mode === 'eva' ? suit : cockpit;
   if (mode !== 'eva') cockpit.animate(bank);
@@ -432,7 +438,7 @@ function introView() {
     camera.position.set(2.3, 2.45, 3);
     camera.lookAt(-1, 3.05, -26);
   }
-  renderer.render(scene, camera);
+  renderer.render(world.scene, camera);
 }
 
 function bindInput() {
@@ -442,7 +448,7 @@ function bindInput() {
   $('resume').addEventListener('click', () => { setState('play'); capture(); });
   $('hop').addEventListener('click', jump);
   $('hop').addEventListener('pointerdown', event => {
-    if (mode !== 'orbit') return;
+    if (mode !== 'flight') return;
     $('hop').setPointerCapture(event.pointerId);
     keys.add('Space');
   });
@@ -530,12 +536,9 @@ try {
   canvas.tabIndex = -1;
   canvas.setAttribute('aria-label', '月面第一人称视图');
   view.append(canvas);
-  const [world, lunarMap] = await Promise.all([
-    createWorld(),
-    new T.TextureLoader().loadAsync(new URL('lunar-albedo.jpg', import.meta.url).href),
-  ]);
-  scene = world.scene;
-  flight = createFlight(world.earthMap, lunarMap);
+  world = await createWorld();
+  flight = createFlight(world.scene, world.ship);
+  flight.reset();
   cockpit = createCockpit();
   suit = createSuit(reducedMotion);
   drawRadar = createRadar($('radar'));

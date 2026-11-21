@@ -95,6 +95,7 @@ h2 { font-size: clamp(2rem, 5vw, 4rem); }
 .dpad button:nth-child(2) { grid-column: 1; }
 .touch-actions { display: flex; gap: 5px; }
 .touch-actions button { padding: 0 9px; }
+#vertical-controls { display: flex; justify-content: end; flex-basis: 100%; gap: 5px; }
 @media (pointer: coarse) {
   #touch-controls { display: flex; }
   #notice { bottom: 128px; }

@@ -5,32 +5,49 @@ const standard = (color, metalness = .25, roughness = .65) => new T.MeshStandard
 
 export function createLander(group) {
   const rng = seeded(712);
-  const foilMap = canvasTexture(384, 384, ctx => {
-    ctx.fillStyle = '#a97935';
-    ctx.fillRect(0, 0, 384, 384);
-    for (let i = 0; i < 3500; i++) {
-      ctx.fillStyle = rng() > .55 ? '#ffdd7e25' : '#50280723';
-      const x = rng() * 384, y = rng() * 384, size = 1 + rng() * 20;
+  const finish = (base, light, dark, foil) => canvasTexture(512, 512, ctx => {
+    ctx.fillStyle = base;
+    ctx.fillRect(0, 0, 512, 512);
+    for (let i = 0; i < 13600; i++) {
+      const x = rng() * 512, y = rng() * 512;
+      const length = 1 + rng() ** 4 * (foil ? 42 : 14);
+      ctx.fillStyle = rng() > (foil ? .55 : .77) ? light : dark;
       ctx.beginPath();
       ctx.moveTo(x, y);
-      ctx.lineTo(x + size, y + rng() * 8);
-      ctx.lineTo(x + rng() * 6, y + size * .77);
+      ctx.lineTo(x + length, y + .4 + rng() * 7);
+      ctx.lineTo(x + rng() * 5, y + length * .58);
       ctx.fill();
     }
-    ctx.strokeStyle = '#452e202d';
-    for (let i = 0; i < 384; i += 48) {
-      ctx.strokeRect(i + .5, .5, 47, 382);
+    for (let i = 0; i < 260; i++) {
+      ctx.strokeStyle = i % 4 === 0 ? light : dark;
+      ctx.lineWidth = .4 + rng() * 1.2;
+      const x = rng() * 512, y = rng() * 512, extent = 1 + rng() ** 3 * 56;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + rng() * extent, y + extent);
+      ctx.stroke();
     }
+    const weather = ctx.createLinearGradient(0, 390, 0, 512);
+    weather.addColorStop(0, '#201d1800');
+    weather.addColorStop(1, foil ? '#2b2011a8' : '#322f28b2');
+    ctx.fillStyle = weather;
+    ctx.fillRect(0, 390, 512, 122);
   });
-  const bone = standard(0xbec4c3, .34);
-  const frame = standard(0x444b52, .68, .52);
-  const metal = standard(0x8696a2, .61, .38);
+  const foilMap = finish('#a78249', '#ffdb9a33', '#39271142', true);
+  const paintMap = finish('#c8c6ba', '#fff8ea45', '#403a302c', false);
+  const bone = new T.MeshStandardMaterial({
+    map: paintMap, roughnessMap: paintMap, bumpMap: paintMap, bumpScale: .027, metalness: .15, roughness: 1,
+  });
+  const frame = standard(0x43464a, .5, .76);
+  const metal = standard(0x929795, .50, .58);
   const black = standard(0x18212b, .27);
   const ceramics = standard(0x2d3341, .1, .83);
-  const gold = new T.MeshStandardMaterial({ map: foilMap, bumpMap: foilMap, bumpScale: .08, metalness: .48, roughness: .5 });
+  const gold = new T.MeshStandardMaterial({
+    map: foilMap, roughnessMap: foilMap, bumpMap: foilMap, bumpScale: .065, metalness: .33, roughness: .95,
+  });
   const orange = standard(0xab582f, .12);
   const glass = new T.MeshPhysicalMaterial({
-    color: 0x203f58, metalness: .57, roughness: .17, clearcoat: 1, emissive: 0x163247, emissiveIntensity: .35,
+    color: 0x15232d, metalness: .44, roughness: .28, clearcoat: .72, emissive: 0x101c25, emissiveIntensity: .28,
   });
   const light = new T.MeshBasicMaterial({ color: 0xa5e9ff });
   const white = new T.MeshBasicMaterial({ color: 0xf1e6d6 });

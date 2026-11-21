@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#080b10">
   <meta name="description" content="一段原创的第一人称月面探索任务。">
   <title>静海余光 · MARE TRANQUILLITATIS</title>
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
   <main id="game" aria-label="静海余光游戏">
@@ -21,7 +21,7 @@
       <div class="brief">
         <p class="eyebrow"><span></span> LUNAR SURFACE EXPEDITION</p>
         <h1>静海余光<span lang="en">AFTERLIGHT</span></h1>
-        <p class="description">徒步勘察静海边缘，或驾驶登陆舱进入月球轨道，校准两颗通信卫星。</p>
+        <p class="description">徒步勘察静海边缘，或驾驶登陆舱升空，巡查中继设备并自主选择着陆点。</p>
         <button class="primary" id="start" disabled>正在生成月面…</button>
         <p id="boot-error" role="alert" hidden></p>
       </div>
@@ -38,16 +38,16 @@
       <div id="waypoints" aria-hidden="true"></div>
       <div class="reticle" aria-hidden="true"></div>
       <div id="flight-panel" hidden>
-        <span>速度 <b id="speed">0.0</b> km/s</span><span>高度 <b id="altitude">0</b> km</span>
-        <span id="flight-phase">待命</span>
+        <span>速度 <b id="speed">0.0</b> m/s</span><span>离地 <b id="altitude">0</b> m</span>
+        <span>升降 <b id="vertical-speed">0.0</b> m/s</span><span id="flight-phase">待命</span>
       </div>
       <div id="notice" role="status"></div>
       <div id="prompt" hidden></div>
       <div class="hud-actions"><button id="help" aria-label="操作说明" aria-expanded="false">?</button><button id="pause" aria-label="暂停">Ⅱ</button></div>
       <div id="controls" hidden></div>
       <div id="touch-controls" aria-label="触屏操作">
-        <div class="dpad"><button data-key="KeyW" aria-label="前进">↑</button><button data-key="KeyA" aria-label="左移">←</button><button data-key="KeyS" aria-label="后退">↓</button><button data-key="KeyD" aria-label="右移">→</button></div>
-        <div class="touch-actions"><button id="hop">跳跃</button><button id="use">交互</button><button id="board">登船</button></div>
+        <div class="dpad" id="dpad"><button data-key="KeyW" aria-label="前进">↑</button><button data-key="KeyA" aria-label="左移">←</button><button data-key="KeyS" aria-label="后退">↓</button><button data-key="KeyD" aria-label="右移">→</button></div>
+        <div class="touch-actions"><div id="vertical-controls" hidden><button data-key="KeyR">上升</button><button data-key="KeyC">下降</button></div><button id="hop">跳跃</button><button id="use">交互</button><button id="board">登船</button></div>
       </div>
     </section>
     <section class="screen dialog" id="pause-screen" hidden>
@@ -57,6 +57,6 @@
       <div><p class="eyebrow">EVA COMPLETE</p><h2>外勤结束</h2><p class="description">三份观测记录已上传至登陆舱。</p><p id="summary"></p><button class="primary" id="restart">再次踏上月面</button></div>
     </section>
   </main>
-  <script type="module" src="game.js?v=2"></script>
+  <script type="module" src="game.js?v=3"></script>
 </body>
 </html>

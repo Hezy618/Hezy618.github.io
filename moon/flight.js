@@ -1,14 +1,24 @@
 import * as T from './vendor/three.module.min.js';
 import { block, mesh, bevel, tube } from './mesh.js?v=2';
-import { planet, stars } from './world.js?v=2';
+import { height, groundStations, home } from './world.js?v=3';
 
-const origin = new T.Vector3(0, 0, 0);
-const moonCenter = new T.Vector3(-130, -465, -370);
-const moonRadius = 465;
-const flightLimit = 520;
-export const scanRange = 24;
-export const scanSpeed = 13;
-export const returnRange = 35;
+export const areaRadius = 245;
+export const areaCenterZ = -25;
+export const scanSpeed = 7;
+const scanRange = 16;
+const ceiling = 360;
+const feet = [[-2.42, -2.27], [-2.42, 2.27], [2.42, -2.27], [2.42, 2.27]];
+
+function landingSurface(x, z, yaw) {
+  const sin = Math.sin(yaw), cos = Math.cos(yaw);
+  let floor = height(x, z), low = floor;
+  for (const [px, pz] of feet) {
+    const y = height(x + px * cos + pz * sin, z - px * sin + pz * cos);
+    floor = Math.max(y, floor);
+    low = Math.min(y, low);
+  }
+  return { floor, level: floor - low < .95 };
+}
 
 function navigationRing(parent, color, radius) {
   const material = new T.MeshBasicMaterial({ color, transparent: true, opacity: .67 });
@@ -53,98 +63,106 @@ function satellite(group, color, relay) {
   }
 }
 
-export function createFlight(earthMap, lunarMap) {
-  const scene = new T.Scene();
-  scene.background = new T.Color(0x03040b);
-  scene.add(new T.HemisphereLight(0xbcd7ff, 0x3a4254, .72));
-  const light = new T.DirectionalLight(0xffead1, 3.3);
-  light.position.set(-60, 50, 33);
-  scene.add(light);
-  stars(scene, true);
-  const [earth, halo] = planet(scene, earthMap);
-  earth.position.set(290, 205, -740);
-  earth.scale.setScalar(1.64);
-  halo.position.copy(earth.position);
-  halo.scale.copy(earth.scale);
-
-  lunarMap.colorSpace = T.SRGBColorSpace;
-  const moon = mesh(scene, new T.SphereGeometry(moonRadius, 112, 70), new T.MeshStandardMaterial({
-    map: lunarMap, bumpMap: lunarMap, bumpScale: 2.6, roughness: 1,
-  }));
-  moon.position.copy(moonCenter);
-  moon.rotation.set(.33, 1.24, .13);
-
+export function createFlight(scene, ship) {
   const points = [
-    { label: '静海一号', color: '#a1e5ff', position: new T.Vector3(-8, 2, -109), result: '静海一号轨道数据已同步。' },
-    { label: '远侧中继', color: '#ffd1a1', position: new T.Vector3(101, 33, -217), result: '远侧中继已校准。' },
-    { label: '返航信标', color: '#e9efde', position: origin },
+    { label: '静海一号', color: '#a1e5ff', position: new T.Vector3(-24, 68, -94), result: '静海一号数据已同步。' },
+    { label: '静海中继', color: '#ffd1a1', position: new T.Vector3(103, 146, -157), result: '静海中继已校准。' },
   ];
-  const orbiters = points.map((point, index) => {
+  const relays = points.map((point, index) => {
     const group = new T.Group();
     group.position.copy(point.position);
+    group.scale.setScalar(.54);
     scene.add(group);
-    const ring = navigationRing(group, point.color, index === 2 ? 5 : 15.5);
-    if (point.result) {
-      const body = new T.Group();
-      satellite(body, point.color, index === 1);
-      body.rotation.set(.12 + index * .35, -.2, .16);
-      group.add(body);
-      return { ring, body };
-    }
-    mesh(group, new T.OctahedronGeometry(.65), new T.MeshBasicMaterial({ color: point.color }));
-    return { ring, beacon: group };
+    const ring = navigationRing(group, point.color, 16);
+    const body = new T.Group();
+    satellite(body, point.color, index === 1);
+    body.rotation.set(.12 + index * .35, -.2, .16);
+    group.add(body);
+    return { ring, body };
   });
 
-  const position = new T.Vector3(0, 0, -16);
+  const position = ship.position;
   const velocity = new T.Vector3();
   const thrust = new T.Vector3();
-  const orientation = new T.Euler(0, 0, 0, 'YXZ');
-  let bank = 0;
+  const up = new T.Vector3(0, 1, 0);
+  let targetHeight = null, bank = 0, clearance = 0;
   const scanned = new Set();
 
   return {
-    scene, points, position, scanned,
+    points, position, scanned,
     get speed() { return velocity.length(); },
-    get altitude() { return Math.max(0, position.distanceTo(moonCenter) - moonRadius); },
-    reset() { this.launch(); scanned.clear(); },
-    launch() {
-      position.set(0, 0, -16);
+    get verticalSpeed() { return velocity.y; },
+    get altitude() { return clearance; },
+    get heading() { return ship.rotation.y; },
+    get rising() { return targetHeight !== null; },
+    reset() {
+      position.set(home.x, landingSurface(home.x, home.z, 0).floor, home.z);
+      ship.rotation.y = 0;
       velocity.set(0, 0, 0);
-      orbiters[2].beacon.visible = false;
-      bank = 0;
+      clearance = bank = 0;
+      targetHeight = null;
+      scanned.clear();
     },
-    step(dt, keys, yaw, pitch) {
+    launch() {
+      targetHeight = position.y + 10;
+      velocity.set(0, 0, 0);
+    },
+    step(dt, keys, yaw) {
       const strafe = Number(keys.has('KeyD')) - Number(keys.has('KeyA'));
       const forward = Number(keys.has('KeyS')) - Number(keys.has('KeyW'));
+      const vertical = Number(keys.has('KeyR')) - Number(keys.has('KeyC'));
       const brake = keys.has('Space');
       const boost = keys.has('ShiftLeft') || keys.has('ShiftRight');
-      orientation.set(pitch, yaw, 0);
-      thrust.set(strafe, 0, forward);
-      if (thrust.lengthSq() > 1) thrust.normalize();
-      thrust.applyEuler(orientation);
-      const speedLimit = boost ? 67 : 37;
-      velocity.addScaledVector(thrust, dt * (boost ? 47 : 29));
-      velocity.multiplyScalar(Math.exp(-dt * (brake ? 5.4 : thrust.lengthSq() < .01 ? .84 : .22)));
-      velocity.clampLength(0, speedLimit);
+      thrust.set(strafe, 0, forward).clampLength(0, 1).applyAxisAngle(up, yaw);
+      const horizontalSpeed = boost ? 44 : 25;
+      const response = 1 - Math.exp(-dt * (brake ? 6 : 1.75));
+      velocity.x = T.MathUtils.lerp(velocity.x, brake ? 0 : thrust.x * horizontalSpeed, response);
+      velocity.z = T.MathUtils.lerp(velocity.z, brake ? 0 : thrust.z * horizontalSpeed, response);
+
+      if (vertical !== 0 || brake) targetHeight = null;
+      if (targetHeight !== null && position.y >= targetHeight) targetHeight = null;
+      let climb = targetHeight !== null ? 7 : vertical * (vertical < 0 && clearance < 7 ? 3.2 : boost ? 25 : 17);
+      if (brake) climb = 0;
+      velocity.y = T.MathUtils.damp(velocity.y, climb, brake ? 6 : 3.6, dt);
       position.addScaledVector(velocity, dt);
-      if (position.length() > flightLimit) {
-        position.setLength(flightLimit);
-        velocity.multiplyScalar(.91);
+      const radial = Math.hypot(position.x, position.z - areaCenterZ);
+      if (radial > areaRadius) {
+        const scale = areaRadius / radial;
+        position.x *= scale;
+        position.z = areaCenterZ + (position.z - areaCenterZ) * scale;
+        velocity.x = velocity.z = 0;
       }
-      if (position.distanceTo(moonCenter) < moonRadius + 36) {
-        position.sub(moonCenter).setLength(moonRadius + 36).add(moonCenter);
-        velocity.multiplyScalar(.91);
+
+      const { floor, level } = landingSurface(position.x, position.z, yaw);
+      const horizontal = Math.hypot(velocity.x, velocity.z);
+      const nearInstrument = groundStations.some(point => Math.hypot(position.x - point.x, position.z - point.z) < 4);
+      const safe = level && !nearInstrument && horizontal < 4;
+      const contact = position.y <= floor && vertical < 0 && safe;
+      const minimum = safe ? floor : floor + .8;
+      if (position.y < minimum) {
+        position.y = minimum;
+        velocity.y = 0;
       }
-      bank = T.MathUtils.damp(bank, -.15 * strafe, 3.4, dt);
-      orbiters.forEach(({ ring, body, beacon }, index) => {
-        ring.rotation.z += dt * (index === 2 ? .42 : .15);
-        if (body) body.rotation.y += dt * .18;
-        if (beacon) beacon.visible = position.length() > 24;
-      });
-      return bank;
+      if (position.y > ceiling) {
+        position.y = ceiling;
+        velocity.y = Math.min(0, velocity.y);
+      }
+      ship.rotation.y = yaw;
+      clearance = Math.max(0, position.y - floor);
+      bank = T.MathUtils.damp(bank, -.12 * strafe, 3.4, dt);
+      for (const { ring, body } of relays) {
+        ring.rotation.z += dt * .15;
+        body.rotation.y += dt * .18;
+      }
+      if (contact) {
+        velocity.set(0, 0, 0);
+        bank = 0;
+        targetHeight = null;
+      }
+      return { bank, contact, blocked: vertical < 0 && !safe && clearance < 2 };
     },
     target() {
-      return points.find(point => point.result && !scanned.has(point) && point.position.distanceTo(position) <= scanRange);
+      return points.find(point => !scanned.has(point) && point.position.distanceTo(position) <= scanRange);
     },
   };
 }

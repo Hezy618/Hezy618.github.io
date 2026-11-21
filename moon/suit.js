@@ -16,11 +16,11 @@ function materials() {
   weave.wrapS = weave.wrapT = T.RepeatWrapping;
   weave.repeat.set(3, 3);
   return {
-    suit: new T.MeshStandardMaterial({ color: 0xc4cbd5, map: weave, bumpMap: weave, bumpScale: .013, roughness: .88 }),
+    suit: new T.MeshStandardMaterial({ color: 0xb9b8ae, map: weave, bumpMap: weave, bumpScale: .019, roughness: .99 }),
     inset: new T.MeshStandardMaterial({ color: 0x383e4b, map: weave, roughness: .87 }),
     joint: new T.MeshStandardMaterial({ color: 0x444b55, roughness: .67, metalness: .18 }),
     metal: new T.MeshStandardMaterial({ color: 0xb9c4d2, metalness: .53, roughness: .42 }),
-    stripe: new T.MeshStandardMaterial({ color: 0xd87b42, roughness: .72 }),
+    stripe: new T.MeshStandardMaterial({ color: 0xb07143, roughness: .88 }),
     lit: new T.MeshBasicMaterial({ color: 0x81e2ff }),
   };
 }
