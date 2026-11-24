@@ -1,5 +1,5 @@
 import * as T from './vendor/three.module.min.js';
-import { nearestPlanet, surfaceRadius, tangentBasis } from './terrain.js?v=4';
+import { nearestPlanet, surfaceRadius, tangentBasis } from './terrain.js?v=5';
 
 import { airDensity } from './catalog.js?v=2';
 

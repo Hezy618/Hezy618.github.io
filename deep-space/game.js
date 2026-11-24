@@ -2,7 +2,7 @@ import * as T from './vendor/three.module.min.js';
 import { createSuit } from './suit.js?v=2';
 import { seeded } from './mesh.js';
 import { blueprints, materials, recipes, costLabel, habitat, airDensity } from './catalog.js?v=2';
-import { createSystem, localSite, nearestPlanet, surfaceAt, surfaceRadius, tangentBasis } from './terrain.js?v=4';
+import { createSystem, localSite, nearestPlanet, surfaceAt, surfaceRadius, tangentBasis } from './terrain.js?v=5';
 import { alignSurface, boulders, makeDeposit, makeRuin, makeShip, makeStructure, paintSet } from './models.js?v=2';
 import { makeCockpit } from './cockpit.js';
 import { approachPoint, frame, key, makeFlight } from './flight.js?v=2';
@@ -234,13 +234,15 @@ function silenceCabin(){
 }
 function updateEcology(dt){
   const airborne=mode==='flight', altitude=airborne?flight.altitude:0;
+  const anchor=mode==='eva'?player:flight.position;
+  if(altitude<74&&ecology?.activeWorld!==world&&!world.readyAround(anchor))return;
   if(!ecologyRequested&&altitude<48){
     ecologyRequested=true;
-    import('./ecology.js').then(({createEcology})=>{
+    import('./ecology.js?v=2').then(({createEcology})=>{
       ecology=createEcology(scene,{mobile,reduced,blocked:bioBlocked});
     }).catch(error=>console.error(error));
   }
-  ecology?.update(world,mode==='eva'?player:flight.position,altitude,mode==='eva'?stride:0,dt,time);
+  ecology?.update(world,anchor,altitude,mode==='eva'?stride:0,dt,time);
 }
 function bioBlocked(p,body) {
   if(flight?.landingWorld===body&&p.distanceToSquared(flight.position)<34)return true;

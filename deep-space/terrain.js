@@ -11,6 +11,12 @@ const sphereDir = (face, u, v, out) => {
   else out.set(u,v,-1);
   return out.normalize();
 };
+function faceCoordinates(dir){
+  const {x,y,z}=dir, ax=Math.abs(x), ay=Math.abs(y), az=Math.abs(z);
+  if(ax>=ay&&ax>=az)return [x>=0?0:1,z/x,y/ax];
+  if(ay>=az)return [y>=0?2:3,x/ay,z/y];
+  return [z>=0?4:5,-x/z,y/az];
+}
 function hash(x,y,z,seed) {
   let n = Math.imul(x,374761393) + Math.imul(y,668265263) + Math.imul(z,1446648777) + Math.imul(seed,1274126177);
   n = Math.imul(n ^ (n >>> 13), 1274126177);
@@ -229,7 +235,7 @@ function terrain(world, scene, grain, scan) {
     for(const key of visible)if(!chosen.has(key))cache.get(key).mesh.visible=false;
     visible.clear();
     for(const id of chosen)visible.add(id);
-    pending.sort((a,b)=>a.distance-b.distance);
+    pending.sort((a,b)=>a.tile.lod-b.tile.lod||a.distance-b.distance);
     if(cache.size>220)for(const [key,tile] of cache){
       if(key.length>1&&tile.epoch<epoch-4){
         parent.remove(tile.mesh);tile.mesh.geometry.dispose();cache.delete(key);
@@ -255,6 +261,21 @@ function terrain(world, scene, grain, scan) {
       return true;
     },
     hasPending(){return pending.length>0;},
+    readyAround(position){
+      const direction=position.clone().sub(world.position).normalize();
+      const {right,forward}=tangentBasis(direction);
+      const offsets=[[0,0],[-35,-35],[35,-35],[-35,35],[35,35]];
+      return offsets.every(([x,z])=>{
+        const [face,u,v]=faceCoordinates(direction.clone().multiplyScalar(world.radius).addScaledVector(right,x).addScaledVector(forward,z));
+        let id=String(face), s=(u+1)/2, t=(v+1)/2;
+        for(let level=0;level<5;level++){
+          if(visible.has(id))return false;
+          const i=s>.5?1:0,j=t>.5?1:0;
+          id+=i+2*j;s=s*2-i;t=t*2-j;
+        }
+        return true;
+      });
+    },
   };
 }
 function atmosphere(world, scene, sun) {

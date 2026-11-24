@@ -1,6 +1,6 @@
 import * as T from './vendor/three.module.min.js';
 import { block, mesh, bevel, tube, canvasTexture, seeded } from './mesh.js';
-import { localSite, surfaceAt } from './terrain.js?v=4';
+import { localSite, surfaceAt } from './terrain.js?v=5';
 import { materials } from './catalog.js?v=2';
 
 export function paintSet() {

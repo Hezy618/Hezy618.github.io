@@ -1,6 +1,6 @@
 import * as T from './vendor/three.module.min.js';
 import { habitat } from './catalog.js?v=2';
-import { localSite, surfaceAt, tangentBasis } from './terrain.js?v=4';
+import { localSite, surfaceAt, tangentBasis } from './terrain.js?v=5';
 import { mesh, seeded, tube } from './mesh.js';
 import { frame } from './flight.js?v=2';
 
@@ -193,7 +193,7 @@ export function createEcology(scene,{mobile,reduced,blocked}) {
     return {rig,d,dir:forward,origin:d.clone(),phase:rand()*Math.PI*2,speed:0,scale,id,
       pos:rig.root.position,type:'fauna',kind:'wildlife',name:habitat[body.id].animal,world:body.id};
   }
-  function build(body,cell) {
+  function build(body,cell,observer) {
     const rand=seeded(cell.seed), group=new T.Group(), points=[[],[]], samples=[], animals=[];
     const shelf=cell.id==='shelf', total=shelf?(mobile?28:46):(mobile?13:24);
     for(let i=0;i<total;i++){
@@ -229,7 +229,7 @@ export function createEcology(scene,{mobile,reduced,blocked}) {
       const count=shelf?(mobile?1:2):1;
       for(let i=0;i<count;i++){
         const site=surfaceAt(body,shelf?localSite(body,axis,-12+i*27,28+i*19):cell.center.clone().normalize());
-        if(blocked(site,body))continue;
+        if(site.distanceToSquared(observer)<36||blocked(site,body))continue;
         animals.push(makeAnimal(group,body,`${body.id}:${cell.id}:fauna:${i}`,site,rand));
       }
     }
@@ -271,6 +271,7 @@ export function createEcology(scene,{mobile,reduced,blocked}) {
   }
   return {
     targets,reset,
+    get activeWorld(){return active;},
     invalidate(body,position){
       if(active!==body)return;
       for(const [id,patch] of cells){
@@ -295,7 +296,7 @@ export function createEcology(scene,{mobile,reduced,blocked}) {
         pending=selected.filter(cell=>!cells.has(cell.id));
         queryAt=now+.38;
       }
-      if(pending.length)build(body,pending.shift());
+      if(pending.length)build(body,pending.shift(),position);
       elapsed+=dt;
       if(now>=motionAt){
         targets.length=0;
