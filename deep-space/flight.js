@@ -1,5 +1,7 @@
 import * as T from './vendor/three.module.min.js';
-import { nearestPlanet, surfaceRadius, tangentBasis } from './terrain.js?v=3';
+import { nearestPlanet, surfaceRadius, tangentBasis } from './terrain.js?v=4';
+
+import { airDensity } from './catalog.js?v=2';
 
 const ease = (dt, rate) => 1 - Math.exp(-dt*rate);
 const v = new T.Vector3(), w = new T.Vector3(), target = new T.Vector3();
@@ -14,13 +16,14 @@ export function frame(forward,up) {
 export function makeFlight(planets,position,heading,fuel=100) {
   return {
     position, heading, fuel, velocity:new T.Vector3(), up:new T.Vector3(0,1,0),
-    landingWorld:null, world:null, altitude:0, vertical:0, speed:0, auto:false, hop:null, status:'停泊',
+    landingWorld:null, world:null, altitude:0, vertical:0, speed:0, density:0, auto:false, hop:null, status:'停泊',
     step(dt, keys, view, route, denied) {
       const world=nearestPlanet(planets,position);
       const radial=position.clone().sub(world.position).normalize();
       const clearance=position.distanceTo(world.position)-surfaceRadius(world,radial);
       this.world=world;
       this.up.copy(radial);
+      this.density=airDensity(world,clearance);
       const near=clearance<660;
       const thrust=key(keys,'KeyW','KeyS'),side=key(keys,'KeyD','KeyA'),lift=key(keys,'KeyR','KeyC');
       const braking=keys.has('Space');
@@ -43,7 +46,8 @@ export function makeFlight(planets,position,heading,fuel=100) {
         .addScaledVector(near?radial:cameraUp,signedLift*altitudeSpeed*fuelScale);
       if(this.hop!==null)target.set(0,0,0).addScaledVector(radial,14);
       if(braking)this.auto=false;
-      if(this.auto&&route) {
+      const guided=this.auto&&route;
+      if(guided) {
         const to=approachPoint(route).sub(position);
         const remaining=to.length();
         if(remaining<21&&this.velocity.length()<29) {
@@ -63,9 +67,20 @@ export function makeFlight(planets,position,heading,fuel=100) {
           }
         }
       }
-      if(braking)target.set(0,0,0);
-      this.velocity.lerp(target,ease(dt,braking?8:near?3.1:1.95));
-      this.fuel=Math.max(0,this.fuel-dt*(target.length()>1?(this.auto?.46:boosted?.36:.155):0));
+      const thrusting=target.lengthSq()>1;
+      if(braking){
+        this.velocity.multiplyScalar(Math.exp(-dt*8));
+      } else if(near||guided){
+        this.velocity.lerp(target,ease(dt,near?3.1:1.95));
+      } else {
+        // A manual burn changes velocity; releasing the thrusters leaves the craft coasting.
+        if(thrusting){
+          const limit=boosted?3440:Math.max(610,this.velocity.length());
+          this.velocity.addScaledVector(target,dt*(boosted?1.32:.94)).clampLength(0,limit);
+        }
+        this.velocity.multiplyScalar(Math.exp(-this.density*.32*dt));
+      }
+      this.fuel=Math.max(0,this.fuel-dt*((thrusting||braking&&this.speed>2)?(guided?.46:boosted?.36:.155):0));
       // Substeps avoid crossing the local surface during a fast approach.
       const move = this.velocity.length()*dt;
       const steps=Math.min(18,Math.max(1,Math.ceil(move/19)));
@@ -106,7 +121,7 @@ export function makeFlight(planets,position,heading,fuel=100) {
       this.landingWorld=null;
       this.altitude=Math.max(0,position.distanceTo(world.position)-surfaceRadius(world,radial));
       this.vertical=this.velocity.dot(radial);this.speed=this.velocity.length();
-      this.status=blocked?'寻找平地并减速':this.auto?'巡航中':braking?'惯性制动':this.hop!==null?'升空':'手动驾驶';
+      this.status=blocked?'寻找平地并减速':this.auto?'巡航中':braking?'惯性制动':this.hop!==null?'升空':!near&&!thrusting&&this.speed>2?'惯性滑行':'手动驾驶';
       return blocked?'blocked':'flying';
     },
   };

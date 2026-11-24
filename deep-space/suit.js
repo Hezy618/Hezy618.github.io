@@ -67,7 +67,7 @@ function glove(side, m) {
     finger.add(tip);
     capsule(tip, m.joint, .016, length * .24, 0, .014, 0);
     capsule(tip, m.suit, .014, length * .15, 0, .027, .006);
-    fingers.push(finger);
+    fingers.push({finger,tip});
   }
   const thumb = capsule(hand, m.inset, .022, .067, -side * .071, .041, -.013);
   thumb.rotation.set(-.45, 0, side * -.68);
@@ -79,7 +79,13 @@ function glove(side, m) {
     for (let i = 0; i < 4; i++) block(arm, m.inset, .014, -.111 + i * .016, .127, .068 - i * .009, .004, .002);
   }
   tube(arm, m.metal, [[side * .083, -.14, .07], [side * .105, -.06, .084], [side * .072, .042, .06]], .011, true);
-  return { arm, fingers, hand };
+  for(const x of [-.048,.048]){
+    const stitch=new T.Mesh(new T.TubeGeometry(new T.CatmullRomCurve3([
+      new T.Vector3(x,.01,.055),new T.Vector3(x,.046,.07),new T.Vector3(x,.101,.063),
+    ]),8,.003,5,false),m.inset);
+    hand.add(stitch);
+  }
+  return { arm, fingers, hand, thumb, thumbPad };
 }
 
 export function createSuit(reducedMotion) {
@@ -95,30 +101,57 @@ export function createSuit(reducedMotion) {
     scene.add(hand.arm);
     return hand;
   });
-  let phase = 0, effort = 0, reach = 0;
+  let phase=0, effort=0, airborne=0, impact=0, action='', age=0, breath=0, lateral=0, weight=0;
+  const duration={mine:.54,scan:.88,observe:.77,build:.50};
+  const light=new T.Vector3();
   return {
-    scene,
-    camera,
-    reset() { phase = effort = reach = 0; },
-    gesture() { reach = 1; },
-    update(dt, speed, airborne, lookPitch) {
-      effort = T.MathUtils.damp(effort, airborne ? .12 : Math.min(speed / 8.7, 1), 9, dt);
-      phase += speed * dt * 2.1;
-      reach = Math.max(0, reach - dt * 1.65);
-      const extend = Math.sin(Math.PI * reach);
-      for (const [index, { arm, fingers, hand }] of hands.entries()) {
-        const side = index === 0 ? -1 : 1;
-        const swing = Math.sin(phase + index * Math.PI) * effort * (reducedMotion ? .28 : 1);
-        const gesture = index === 1 ? extend : 0;
-        const horizontal = T.MathUtils.clamp(camera.aspect * .27, .23, .47);
-        const horizon = camera.aspect < 1 ? .05 : 0;
-        arm.position.set(side * (horizontal - gesture * .15),
-          -.49 + horizon + swing * .084 + gesture * .145 + (airborne ? .033 : 0),
-          -.94 + swing * .13 - gesture * .19);
-        arm.rotation.set(-.84 - swing * .40 - gesture * .52 + lookPitch * .08,
-          side * -.24 + gesture * .16, side * .14 + swing * .08);
-        hand.rotation.x = .11 + swing * .14 - gesture * .35;
-        for (const finger of fingers) finger.rotation.x = -.47 - .19 * effort + gesture * .48;
+    scene,camera,
+    reset(){phase=effort=airborne=impact=age=breath=lateral=weight=0;action='';},
+    gesture(name='mine'){action=name;age=0;},
+    light(sun,toView,incidence){
+      light.copy(sun).applyQuaternion(toView);
+      key.position.copy(light).multiplyScalar(4);
+      key.intensity=.15+2.15*incidence;
+    },
+    update(dt,speed,motion){
+      const scale=reducedMotion?.27:1;
+      const running=T.MathUtils.smoothstep(speed,4.5,8.8);
+      const moving=T.MathUtils.smoothstep(speed,.06,6.3);
+      effort=T.MathUtils.damp(effort,moving,moving>effort?8.2:10.8,dt);
+      airborne=T.MathUtils.damp(airborne,motion.air?1:0,7.5,dt);
+      if(motion.landed)impact=Math.min(1,.30+motion.landed*.14);
+      impact=T.MathUtils.damp(impact,0,10,dt);
+      weight=T.MathUtils.damp(weight,motion.vertical*.048,8,dt);
+      lateral=T.MathUtils.damp(lateral,motion.strafe*.38+motion.turn*.24,9,dt);
+      phase+=speed*dt*(1.76+running*.29);
+      breath+=dt*1.92;
+      age+=dt;
+      const time=action?Math.min(1,age/duration[action]):1;
+      const reach=time<1?T.MathUtils.smoothstep(time,0,.27)*(1-T.MathUtils.smoothstep(time,.57,1)):0;
+      if(time>=1)action='';
+      for(const [index,{arm,fingers,hand,thumb,thumbPad}] of hands.entries()){
+        const side=index===0?-1:1;
+        const angle=phase+index*Math.PI;
+        const gait=(Math.sin(angle)+.19*Math.sin(2*angle-.6))*effort*(1-airborne)*scale;
+        const prep=action==='scan'||action==='observe';
+        const express=reach*(prep?(index===0?1:.17):(index===1?1:.20));
+        const reachSide=express*(prep?.21:.18);
+        const aspect=T.MathUtils.clamp(camera.aspect*.265,.221,.465);
+        const portrait=camera.aspect<1?.045:0;
+        const oscillation=Math.sin(breath+index*.19)*.009*scale;
+        arm.position.set(side*(aspect-reachSide)+lateral*.039*scale,
+          -.497+portrait+gait*(.062+running*.026)+express*.159+airborne*.073-impact*.061*scale-weight*.061+oscillation,
+          -.95+gait*(.101+running*.038)-express*.18-airborne*.09);
+        arm.rotation.set(-.87-gait*.33-express*(prep?.38:.58)+motion.pitch*.078+airborne*.2-impact*.25*scale,
+          side*-.244+express*side*.30+lateral*.13*scale,side*.129+gait*.091+express*side*.20);
+        hand.rotation.set(.094+gait*.19-express*.42+impact*.15*scale,side*express*.11,-lateral*.14*scale);
+        thumb.rotation.x=-.45-.20*effort+express*.32;
+        thumbPad.rotation.x=-.59-.17*effort+express*.45;
+        for(const [n,{finger,tip}] of fingers.entries()){
+          const curl=.34+.30*effort+.035*n+(airborne*.14);
+          finger.rotation.x=-curl+express*(prep?.48:.37)*(1-n*.058);
+          tip.rotation.x=-.43-.27*effort+express*.42;
+        }
       }
     },
   };

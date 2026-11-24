@@ -1,11 +1,11 @@
 import * as T from './vendor/three.module.min.js';
-import { createSuit } from './suit.js';
+import { createSuit } from './suit.js?v=2';
 import { seeded } from './mesh.js';
-import { blueprints, materials, recipes, costLabel } from './catalog.js';
-import { createSystem, localSite, nearestPlanet, surfaceAt, surfaceRadius, tangentBasis } from './terrain.js?v=3';
-import { alignSurface, boulders, makeDeposit, makeRuin, makeShip, makeStructure, paintSet } from './models.js';
+import { blueprints, materials, recipes, costLabel, habitat, airDensity } from './catalog.js?v=2';
+import { createSystem, localSite, nearestPlanet, surfaceAt, surfaceRadius, tangentBasis } from './terrain.js?v=4';
+import { alignSurface, boulders, makeDeposit, makeRuin, makeShip, makeStructure, paintSet } from './models.js?v=2';
 import { makeCockpit } from './cockpit.js';
-import { approachPoint, frame, key, makeFlight } from './flight.js';
+import { approachPoint, frame, key, makeFlight } from './flight.js?v=2';
 
 const $ = id=>document.getElementById(id);
 const game=$('app'), viewport=$('viewport');
@@ -19,9 +19,13 @@ const player=new T.Vector3(), heading=new T.Vector3(0,0,-1);
 const relative=new T.Vector3(), projected=new T.Vector3(), sight=new T.Vector3();
 const shadowPosition=new T.Vector3();
 const scanRadius=145;
-let renderer, system, paint, suit, cockpit, vehicle, flight, world;
+let renderer, system, paint, suit, cockpit, vehicle, flight, world, ecology, engine, footBuffer;
+let ecologyRequested=false;
 let mode='intro', dialog=null, drag=null, started=false;
-let pitch=0, jump=0, jumpSpeed=0, stride=0, time=0, energy=100;
+let pitch=0, jump=0, jumpSpeed=0, stride=0, time=0, energy=100, footDistance=0, landedImpact=0, stepPhase=0, aimSway=0;
+const moveSpeed=new T.Vector3(), walk=new T.Vector3(), reverseView=new T.Quaternion();
+const startStep=new T.Vector3(), surfaceUp=new T.Vector3();
+const layerMotion={pitch:0,vertical:0,landed:0,strafe:0,air:false,turn:0};
 let chosen=null, placing=null, ghost=null, scanUntil=0, noticeUntil=0, hintKey='', hudAt=0, refreshAt=0, saveAt=0;
 let loadedSector='', visualsFrozen=false, sceneTimer=0, clock=0, context, soundOn=false, dirtyShadow=true;
 let data, previousPosition, renderHold=0, introFrame=0;
@@ -32,7 +36,7 @@ const objects=new Map(), scenic=[], markerNodes=[], effects=[], offscreen=[0,0];
 const storageKey='wild-meridian-save-1';
 
 function initialData() {
-  return {cargo:{iron:4,silica:3,crystal:0,alloy:0,fuel:2}, built:[], mined:[], discovered:[], landed:['ember'], visited:['ember'], made:0};
+  return {cargo:{iron:4,silica:3,crystal:0,alloy:0,fuel:2}, built:[], mined:[], discovered:[], specimens:[], landed:['ember'], visited:['ember'], made:0};
 }
 function readSave() {
   try {
@@ -136,9 +140,12 @@ function updateDeposits() {
 }
 function setMode(next) {
   mode=next;game.dataset.mode=next;cameraBank=0;
+  if(next!=='flight')silenceCabin();
   if(next==='eva'&&!suit)suit=createSuit(reduced);
   if(next!=='eva'&&next!=='intro'&&!cockpit)cockpit=makeCockpit(paint);
+  moveSpeed.set(0,0,0);footDistance=0;
   sizeOverlays();
+  $('attitude').hidden=next!=='flight';
   $('intro').hidden=next!=='intro';$('hud').hidden=next==='intro';
   for(const button of document.querySelectorAll('.lift'))button.hidden=next!=='flight';
   $('build').hidden=next!=='eva';
@@ -147,7 +154,7 @@ function setMode(next) {
 function begin() {
   if(!system||started)return;
   const snapshot=readSave();
-  data=snapshot?.data||initialData();
+  data={...initialData(),...snapshot?.data};
   world=system.planets.find(p=>p.id===snapshot?.world)||system.planets[0];
   const home=system.planets[0];
   const pos=snapshot?new T.Vector3(...snapshot.ship):surfaceAt(home,localSite(home,upVector,8,15),.06);
@@ -172,7 +179,11 @@ function viewOnSurface(localUp) {
   eye.quaternion.copy(frame(heading,localUp)).multiply(q.setFromAxisAngle(rightAxis,pitch));
 }
 function surfacePosition() {
-  if(mode==='eva') {eye.position.copy(player).addScaledVector(currentUp(),1.72+jump);viewOnSurface(currentUp());}
+  if(mode==='eva') {
+    const sway=reduced?0:Math.cos(stepPhase*2)*.031*T.MathUtils.smoothstep(stride,0,7)*(jump>0?0:1)-landedImpact*.012;
+    const up=currentUp();
+    eye.position.copy(player).addScaledVector(up,1.72+jump+sway);viewOnSurface(up);
+  }
   else if(mode==='seat') {
     const up=currentUp(flight.position);
     eye.position.copy(flight.position).addScaledVector(up,2.39).addScaledVector(flight.heading,1.5);
@@ -182,26 +193,95 @@ function surfacePosition() {
     eye.quaternion.copy(pilot).multiply(q.setFromAxisAngle(bankAxis,cameraBank));
   }
 }
+function surfaceAudio(strength){
+  if(!soundOn||context?.state!=='running')return;
+  if(!footBuffer){
+    footBuffer=context.createBuffer(1,Math.ceil(context.sampleRate*.13),context.sampleRate);
+    const noise=footBuffer.getChannelData(0);
+    const random=seeded(27);
+    for(let i=0;i<noise.length;i++)noise[i]=(random()*2-1)*(1-i/noise.length)**2;
+  }
+  const node=context.createBufferSource(), filter=context.createBiquadFilter(), level=context.createGain();
+  node.buffer=footBuffer;
+  node.playbackRate.value=1.15-strength*.30;
+  filter.type='lowpass';filter.frequency.value=395+170*world.pressure;
+  level.gain.value=.04+strength*.066;
+  node.connect(filter).connect(level).connect(context.destination);
+  node.start();
+  node.onended=()=>{node.disconnect();filter.disconnect();level.disconnect();};
+}
+function cabinAudio(){
+  if(!soundOn||context?.state!=='running'||mode!=='flight')return;
+  if(!engine){
+    const tone=context.createOscillator(), trim=context.createBiquadFilter(), gain=context.createGain();
+    tone.type='triangle';trim.type='lowpass';trim.frequency.value=160;gain.gain.value=0;
+    tone.connect(trim).connect(gain).connect(context.destination);tone.start();
+    engine={tone,gain,trim,updateAt:0};
+  }
+  const drive=flight.auto?1:Math.min(1,Math.abs(cockpitControls.forward)+Math.abs(cockpitControls.side)+Math.abs(cockpitControls.lift));
+  const t=context.currentTime;
+  if(t<engine.updateAt)return;
+  engine.updateAt=t+.071;
+  engine.tone.frequency.setTargetAtTime(37+drive*36+flight.density*14,t,.10);
+  engine.gain.gain.setTargetAtTime(.013+drive*.049,t,.14);
+}
+function silenceCabin(){
+  if(!engine)return;
+  const {tone,trim,gain}=engine;engine=null;
+  tone.onended=()=>{tone.disconnect();trim.disconnect();gain.disconnect();};
+  gain.gain.setTargetAtTime(0,context.currentTime,.075);
+  tone.stop(context.currentTime+.35);
+}
+function updateEcology(dt){
+  const airborne=mode==='flight', altitude=airborne?flight.altitude:0;
+  if(!ecologyRequested&&altitude<48){
+    ecologyRequested=true;
+    import('./ecology.js').then(({createEcology})=>{
+      ecology=createEcology(scene,{mobile,reduced,blocked:bioBlocked});
+    }).catch(error=>console.error(error));
+  }
+  ecology?.update(world,mode==='eva'?player:flight.position,altitude,mode==='eva'?stride:0,dt,time);
+}
+function bioBlocked(p,body) {
+  if(flight?.landingWorld===body&&p.distanceToSquared(flight.position)<34)return true;
+  for(const item of objects.values())
+    if(item.world===body.id&&p.distanceToSquared(item.pos)<(item.kind==='structure'?item.radius+1:2.4)**2)return true;
+  return false;
+}
 function updateEVA(dt) {
-  const up=currentUp();
+  const up=surfaceUp.copy(player).sub(world.position).normalize();
   viewOnSurface(up);
   const right=heading.clone().cross(up).normalize();
-  const speed=energy>0 ? keys.has('ShiftLeft')?8.8:5.15 : 2.55;
-  const travel=new T.Vector3().addScaledVector(heading,key(keys,'KeyW','KeyS')).addScaledVector(right,key(keys,'KeyD','KeyA'));
-  travel.clampLength(0,1).multiplyScalar(speed*dt);
-  if(travel.lengthSq()>.000001){
-    const radial=player.clone().add(travel).sub(world.position).normalize();
+  const strafe=key(keys,'KeyD','KeyA');
+  const speed=energy>0 ? keys.has('ShiftLeft')||keys.has('ShiftRight')?8.8:5.15 : 2.55;
+  walk.set(0,0,0).addScaledVector(heading,key(keys,'KeyW','KeyS')).addScaledVector(right,strafe).clampLength(0,1).multiplyScalar(speed);
+  moveSpeed.addScaledVector(up,-moveSpeed.dot(up)).lerp(walk,1-Math.exp(-dt*(jump>0?2.7:walk.lengthSq()>0?9.2:14.2)));
+  startStep.copy(player);
+  if(moveSpeed.lengthSq()>.001){
+    const radial=player.clone().addScaledVector(moveSpeed,dt).sub(world.position).normalize();
     const next=surfaceAt(world,radial);
-    const collision=[...objects.values()].some(o=>o.kind==='structure'&&o.type!=='pad'&&o.world===world.id&&o.pos.distanceTo(next)<o.radius*.69);
-    if(!collision&&next.distanceTo(flight.position)>2.1)player.copy(next);
-    energy=Math.max(0,energy-dt*.043);
+    let blocked=false;
+    for(const o of objects.values())if(o.kind==='structure'&&o.type!=='pad'&&o.world===world.id&&o.pos.distanceToSquared(next)<(o.radius*.69)**2){
+      blocked=true;break;
+    }
+    if(!blocked&&next.distanceTo(flight.position)>2.1)player.copy(next);
+    else moveSpeed.multiplyScalar(.35);
   }
+  const meters=startStep.distanceTo(player);
+  stride=meters/Math.max(.001,dt);stepPhase+=meters*1.73;
+  energy=Math.max(0,energy-meters*.0085);
+  let impact=0;
   if(jump>0||jumpSpeed>0){
-    jumpSpeed-=7.2*dt;jump+=jumpSpeed*dt;
-    if(jump<0)jump=jumpSpeed=0;
+    jumpSpeed-=world.gravity*dt;jump+=jumpSpeed*dt;
+    if(jump<0){impact=-jumpSpeed;jump=jumpSpeed=0;surfaceAudio(.66);}
+  } else if(meters>.001){
+    footDistance+=meters;
+    if(footDistance>(speed>7?2.24:1.75)){footDistance=0;surfaceAudio(speed>7?.46:.19);}
   }
-  stride=travel.length()/Math.max(.001,dt);
-  suit.update(dt,stride,jump>0,pitch);
+  aimSway=T.MathUtils.damp(aimSway,0,10,dt);landedImpact=T.MathUtils.damp(landedImpact,impact,10,dt);
+  Object.assign(layerMotion,{pitch,vertical:jumpSpeed,landed:impact,strafe,air:jump>0,turn:aimSway});
+  suit.update(dt,stride,layerMotion);
+  suit.light(system.sun,reverseView.copy(eye.quaternion).invert(),T.MathUtils.smoothstep(up.dot(system.sun),-.09,.39));
   if(player.distanceTo(flight.position)<8)energy=Math.min(100,energy+dt*9);
   updateDeposits();
 }
@@ -237,6 +317,7 @@ function updateFlight(dt) {
 function look(dx,dy) {
   if(dialog||mode==='intro'||mode==='seat')return;
   if(mode==='eva'){
+    aimSway=T.MathUtils.clamp(aimSway+dx*.012,-1,1);
     heading.applyAxisAngle(currentUp(),-dx*.0025);
     pitch=T.MathUtils.clamp(pitch-dy*.0025,-1.31,1.31);
   } else {
@@ -297,22 +378,23 @@ function scan() {
   if(mode==='intro')return;
   scanUntil=time+17;
   blip('scan');
-  if(mode==='eva'){scanEffect();announce('扫描完成。矿藏与记录站已标注。',2.5);}
+  if(mode==='eva'){suit.gesture('scan');scanEffect();announce('扫描完成。矿藏、记录站与附近生物已标注。',2.5);}
   else announce('航线数据已标注。可在星图选择目的地。',2.5);
 }
 function foundTarget() {
   if(mode!=='eva')return null;
   eye.getWorldDirection(sight);
   let best=null,score=-Infinity;
-  for(const item of objects.values()){
-    if(item.world!==world.id)continue;
-    relative.copy(item.pos).addScaledVector(currentUp(item.pos),item.kind==='archive'?1.8:1).sub(eye.position);
+  const candidates=[...objects.values(),...(time<scanUntil?(ecology?.targets||[]):[])];
+  for(const item of candidates){
+    if(item.world!==world.id || item.kind==='wildlife'&&data.specimens.includes(`${item.world}:${item.type}`))continue;
+    relative.copy(item.pos).addScaledVector(currentUp(item.pos),item.kind==='archive'?1.8:item.kind==='wildlife'?.7:1).sub(eye.position);
     const d=relative.length();
-    const threshold=item.kind==='structure'?item.radius+3.6:item.kind==='archive'?8:7;
+    const threshold=item.kind==='wildlife'?15:item.kind==='structure'?item.radius+3.6:item.kind==='archive'?8:7;
     if(d>threshold)continue;
     const alignment=relative.dot(sight)/Math.max(1,d);
     if(alignment<.43&&d>3)continue;
-    const weight=alignment*2.2-d*.13;
+    const weight=alignment*2.2-d*.13-(item.kind==='wildlife'?.48:0);
     if(weight>score){best=item;score=weight;}
   }
   return best;
@@ -324,7 +406,13 @@ function use() {
   if(placing){construct();return;}
   const selected=foundTarget();
   if(!selected)return;
-  if(selected.kind==='deposit'){
+  if(selected.kind==='wildlife'){
+    const id=`${selected.world}:${selected.type}`;
+    if(!data.specimens.includes(id)){
+      data.specimens.push(id);suit.gesture('observe');blip('scan');
+      announce(`已录入图鉴 · ${selected.name}`);save();
+    }
+  } else if(selected.kind==='deposit'){
     data.cargo[selected.type]=count(selected.type)+selected.amount;
     data.mined.push(selected.id);
     announce(`已采集 ${selected.name} ×${selected.amount}`);
@@ -427,11 +515,16 @@ function construct() {
   if(!exchange(placing.cost))return;
   const entry={id,type:placing.id,world:world.id,dir:destination.toArray(),angle:structureAngle(destination,root)};
   data.built.push(entry);registerStructure(entry);
+  ecology?.invalidate(world,root);suit.gesture('build');
   announce(`已建成 ${placing.name}。`);cancelBuild();dirtyShadow=true;blip('scan');save();
 }
 function setPrompt(message){
   if(message===hintKey)return;
-  hintKey=message;$('prompt').hidden=!message;set('prompt',message);
+  hintKey=message;$('prompt').hidden=!message;
+  const key=message.match(/^([BCEFJQRV]|空格)(?= )/);
+  if(!key){set('prompt',message);return;}
+  const cap=document.createElement('kbd');cap.textContent=key[0];
+  $('prompt').replaceChildren(cap,message.slice(key[0].length));
 }
 function objective() {
   const built=id=>data.built.some(b=>b.type===id);
@@ -470,10 +563,12 @@ function updateHUD() {
   set('world-name',world.name);set('mode',mode==='eva'?world.biome:mode==='seat'?'座舱待命':flight.status);
   const [task,detail]=objective();set('objective',task);set('objective-detail',detail);
   set('navigation',mode==='eva'?`飞船 ${Math.round(distShip())} m`:chosen?`航向 ${chosen.name}`:'M 打开星图');
-  const panels=mode==='eva'?`<span>宇航服 <b>${Math.round(energy)}%</b></span><span>货舱 <b>${Object.values(data.cargo).reduce((a,b)=>a+b,0)}</b></span>`
-    :`<span>燃料 <b>${Math.round(flight.fuel)}%</b></span><span>速度 <b>${Math.round(mode==='flight'?flight.speed:0)} m/s</b></span><span>离地 <b>${Math.round(mode==='flight'?flight.altitude:0)} m</b></span>`;
+  const density=mode==='flight'?flight.density:airDensity(world,0);
+  const panels=mode==='eva'?`<span>宇航服 <b>${Math.round(energy)}%</b></span><span>货舱 <b>${Object.values(data.cargo).reduce((a,b)=>a+b,0)}</b></span><span>地表 <b>${world.temperature} °C</b></span>`
+    :`<span>燃料 <b>${Math.round(flight.fuel)}%</b></span><span>速度 <b>${Math.round(mode==='flight'?flight.speed:0)} m/s</b></span><span>离地 <b>${Math.round(mode==='flight'?flight.altitude:0)} m</b></span><span class="air-state">${density<.011?'真空':'近地'}</span>`;
   if($('readouts').innerHTML!==panels)$('readouts').innerHTML=panels;
   const items=[];
+  delete game.dataset.target;
   if(mode==='eva'){
     items.push({name:'远征船',position:flight.position.clone().addScaledVector(currentUp(flight.position),4.3),color:'#f4b783'});
     const target=foundTarget();
@@ -484,14 +579,19 @@ function updateHUD() {
       ghostMaterial.color.set(preview.error?'#e48b77':'#b8ea98');
       setPrompt(preview.error||`E 放置${placing.name} · Esc 取消`);
     } else if(target){
-      setPrompt(target.kind==='deposit'?`E 采集 ${target.name}`: `E 交互 · ${target.name}`);
+      game.dataset.target=target.kind;
+      const action=target.kind==='deposit'?`E 采集 ${target.name}`:target.kind==='wildlife'?`E 记录 ${target.name}`:`E 交互 · ${target.name}`;
+      setPrompt(distShip()<7.1?`${action} · F 登船`:action);
     } else setPrompt(distShip()<7.1?'F 登船':'');
-    if(time<scanUntil)for(const item of [...objects.values()].filter(o=>o.world===world.id&&o.pos.distanceTo(player)<scanRadius)
+    if(time<scanUntil)for(const item of [...objects.values(),...(ecology?.targets||[])].filter(o=>
+      o.world===world.id&&o.pos.distanceTo(player)<scanRadius&&
+      (o.kind!=='wildlife'||!data.specimens.includes(`${o.world}:${o.type}`)))
       .sort((a,b)=>a.pos.distanceToSquared(player)-b.pos.distanceToSquared(player)).slice(0,7)){
-      items.push({name:item.name,position:item.pos.clone().addScaledVector(currentUp(item.pos),item.kind==='archive'?5:2.5),color:materials[item.type]?.color||'#d7edb3'});
+      items.push({name:item.name,position:item.pos.clone().addScaledVector(currentUp(item.pos),item.kind==='archive'?5:2.5),color:item.kind==='wildlife'?'#b2f4dc':materials[item.type]?.color||'#d7edb3'});
     }
   } else if(mode==='seat')setPrompt('F 起飞 · E 离舱');
   else {
+    updateAttitude();
     setPrompt(flight.altitude<35?'C 下降 · 空格减速 · 选择平坦着陆点': flight.auto?'V 或空格退出巡航':'');
     if(flight.altitude>200||time<scanUntil)for(const body of system.planets){
       if(body===world&&flight.altitude<650)continue;
@@ -513,12 +613,23 @@ function updateHUD() {
   }
   drawRadar(items);
 }
+function updateAttitude(){
+  const forward=eye.getWorldDirection(sight);
+  const {right,forward:north}=tangentBasis(flight.up);
+  const bearing=(Math.round(-Math.atan2(forward.dot(right),forward.dot(north))*180/Math.PI)+360)%360;
+  const pitchDeg=Math.round(Math.asin(T.MathUtils.clamp(forward.dot(flight.up),-1,1))*180/Math.PI);
+  const sign=pitchDeg>0?'+':'';
+  set('bearing',`${String(bearing).padStart(3,'0')}°  ·  ${sign}${pitchDeg}°`);
+  $('flight-ladder-ticks').style.transform=`translateY(${T.MathUtils.clamp(pitchDeg*2.4,-57,57)}px) rotate(${-cameraBank*180/Math.PI}deg)`;
+}
 function drawRadar(items) {
   const canvas=$('radar'),ctx=canvas.getContext('2d'),center=canvas.width/2;
   const span = mode==='flight' ? Math.max(280,flight.altitude*3) : 95;
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle='#233332';ctx.beginPath();ctx.arc(center,center,center-3,0,Math.PI*2);ctx.fill();
-  ctx.strokeStyle='#c2d9ab42';ctx.lineWidth=1;
+  const radarFill=ctx.createRadialGradient(center,center,0,center,center,center);
+  radarFill.addColorStop(0,'#173f3fe8');radarFill.addColorStop(1,'#071b20f3');
+  ctx.fillStyle=radarFill;ctx.beginPath();ctx.arc(center,center,center-1,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#a2dacf55';ctx.lineWidth=1;
   for(const r of [.32,.61,.94]){ctx.beginPath();ctx.arc(center,center,center*r,0,Math.PI*2);ctx.stroke();}
   ctx.beginPath();ctx.moveTo(center,8);ctx.lineTo(center,canvas.height-8);ctx.moveTo(8,center);ctx.lineTo(canvas.width-8,center);ctx.stroke();
   const up=mode==='eva'?currentUp():flight.up, facing=new T.Vector3(0,0,-1).applyQuaternion(eye.quaternion);
@@ -566,8 +677,8 @@ function mapDrawing(node) {
   }
 }
 function drawPanel() {
-  set('dialog-kind',{build:'CONSTRUCTION',cargo:'CARGO & FABRICATION',map:'SYSTEM CHART',help:'FLIGHT MANUAL',pause:'EXPEDITION PAUSED'}[dialog]);
-  set('dialog-title',{build:'基地蓝图',cargo:'远征货舱',map:'子午线星系',help:'操控与任务',pause:'远征暂停'}[dialog]);
+  set('dialog-kind',{build:'CONSTRUCTION',cargo:'CARGO & FABRICATION',map:'SYSTEM CHART',help:'FLIGHT MANUAL',survey:'BIOSPHERE LOG',pause:'EXPEDITION PAUSED'}[dialog]);
+  set('dialog-title',{build:'基地蓝图',cargo:'远征货舱',map:'子午线星系',help:'操控与任务',survey:'生物图鉴',pause:'远征暂停'}[dialog]);
   const content=$('dialog-content');content.replaceChildren();
   if(dialog==='build'){
     const grid=dialogGrid(content);
@@ -599,9 +710,17 @@ function drawPanel() {
       engage.addEventListener('click',()=>{flight.auto=false;toggleCruise();close();});
       engage.style.marginTop='14px';content.append(engage);
     }
+  } else if(dialog==='survey'){
+    const grid=dialogGrid(content);
+    for(const body of system.planets){
+      const entries=['flora','fauna'].map(type=>data.specimens.includes(`${body.id}:${type}`)
+        ?habitat[body.id][type==='flora'?'plant':'animal']
+        :type==='flora'?'植物待记录':'动物待记录');
+      grid.append(option(body.name,entries.join(' · '),body.biome));
+    }
   } else if(dialog==='help') {
     const grid=dialogGrid(content);
-    grid.append(option('月面外勤','WASD 移动，鼠标锁定或按住画面拖动观察，Shift 奔跑，空格跳跃。Q 扫描，E 采矿和互动，靠近飞船后 F 登船。'));
+    grid.append(option('星球外勤','WASD 移动，鼠标锁定或按住画面拖动观察，Shift 奔跑，空格跳跃。Q 扫描，E 采矿、互动或记录物种，J 打开图鉴。靠近飞船后 F 登船。'));
     grid.append(option('驾驶飞船','F 起飞，W/S 推进和反推，A/D 横移，R 上升，C 下降，空格制动，Shift 增推。低速按住 C 在平地着陆，停稳后 E 离舱。'));
     grid.append(option('航线与基地','M 选星球，V 或星图按钮开启巡航，到达后手动下降。B 选择蓝图，E 放置，Esc 取消。I 查看货舱。'));
     grid.append(option('触屏','拖动画面改变视角，长按方向键或升降按钮，点击交互、扫描及飞船按钮。进度保存在当前浏览器。'));
@@ -631,12 +750,13 @@ function bindInput() {
   $('build').onclick=()=>open('build');
   $('cargo').onclick=()=>open('cargo');
   $('map').onclick=()=>open('map');
+  $('survey').onclick=()=>open('survey');
   $('close').onclick=close;
   $('touch-use').onclick=use;$('touch-place').onclick=construct;$('touch-board').onclick=board;$('touch-scan').onclick=scan;
   $('audio').onclick=async()=>{
     try{
       if(!soundOn){context??=new AudioContext();await context.resume();}
-      soundOn=!soundOn;$('audio').setAttribute('aria-pressed',soundOn);
+      soundOn=!soundOn;if(!soundOn)silenceCabin();$('audio').setAttribute('aria-pressed',soundOn);
       set('audio',soundOn?'音效开':'音效关');blip('scan');
     }catch{set('audio','音效不可用');}
   };
@@ -649,13 +769,14 @@ function bindInput() {
     if(event.code==='Space'||event.code.startsWith('Arrow'))event.preventDefault();
     keys.add(event.code);
     if(event.repeat)return;
-    if(event.code==='Space'&&mode==='eva'&&!jump)jumpSpeed=4.6;
+    if(event.code==='Space'&&mode==='eva'&&!jump)jumpSpeed=3.65;
     if(event.code==='KeyE')use();
     if(event.code==='KeyF')board();
     if(event.code==='KeyQ')scan();
     if(event.code==='KeyB'&&mode==='eva')open('build');
     if(event.code==='KeyI')open('cargo');
     if(event.code==='KeyM')open('map');
+    if(event.code==='KeyJ')open('survey');
     if(event.code==='KeyV'&&mode==='flight')board();
   });
   document.addEventListener('keyup',event=>keys.delete(event.code));
@@ -680,7 +801,7 @@ function bindInput() {
   for(const button of document.querySelectorAll('[data-key]')){
     button.addEventListener('pointerdown',event=>{
       button.setPointerCapture(event.pointerId);keys.add(button.dataset.key);
-      if(button.dataset.key==='Space'&&mode==='eva'&&!jump)jumpSpeed=4.6;
+      if(button.dataset.key==='Space'&&mode==='eva'&&!jump)jumpSpeed=3.65;
     });
     button.addEventListener('lostpointercapture',()=>keys.delete(button.dataset.key));
   }
@@ -736,6 +857,7 @@ function stepCockpit(dt) {
   cockpitTelemetry.fuel=flight.fuel;cockpitTelemetry.landed=!flying;
   cockpitTelemetry.cruise=flying&&flight.auto;cockpitTelemetry.braking=flying&&keys.has('Space');
   cockpit.update(dt,time,cockpitControls,cockpitTelemetry);
+  cabinAudio();
 }
 function tuneResolution(ms) {
   if(ms<4||ms>200)return;
@@ -777,6 +899,7 @@ function frameTick(now) {
   }
   streamTerrain(world);
   if(mode!=='flight')addScenery(world);
+  updateEcology(dt);
   if(time>saveAt){save();saveAt=time+5;}
   if(time>noticeUntil)set('notice','');
   updateEffects();
@@ -786,6 +909,7 @@ function frameTick(now) {
 }
 function pauseLoop(){
   renderer?.setAnimationLoop(null);
+  silenceCabin();
   cancelAnimationFrame(introFrame);introFrame=0;
   if(context?.state==='running'&&document.hidden)context.suspend().catch(()=>{});
 }

@@ -1,7 +1,7 @@
 import * as T from './vendor/three.module.min.js';
 import { block, mesh, bevel, tube, canvasTexture, seeded } from './mesh.js';
-import { localSite, surfaceAt } from './terrain.js?v=3';
-import { materials } from './catalog.js';
+import { localSite, surfaceAt } from './terrain.js?v=4';
+import { materials } from './catalog.js?v=2';
 
 export function paintSet() {
   const rnd=seeded(783);
@@ -72,6 +72,22 @@ function chassis(root,m,side) {
   }
   round(root,m.lit,side*3.33,1.53,-.72,.12,.048,.19,.018);
 }
+function exhaust(root,m,x){
+  const metal=new T.LatheGeometry([
+    [.47,-.36],[.53,-.30],[.59,-.08],[.59,.21],[.53,.33],
+    [.47,.35],[.42,.31],[.35,.18],[.28,-.06],[.28,-.24],
+  ].map(([r,y])=>new T.Vector2(r,y)),36);
+  mesh(root,metal,m.alloy,x,1.46,3.65).rotation.x=Math.PI/2;
+  cylinder(root,m.rubber,x,1.46,3.39,.295,.295,.035,28).rotation.x=Math.PI/2;
+  for(const [radius,z] of [[.496,3.92],[.437,3.98],[.33,3.65]]){
+    mesh(root,new T.TorusGeometry(radius,.022,6,32),radius>.4?m.dark:m.gold,x,1.46,z);
+  }
+  for(let i=0;i<12;i++){
+    const a=i*Math.PI/6;
+    const strake=round(root,m.dark,x+Math.cos(a)*.546,1.46+Math.sin(a)*.546,3.59,.092,.063,.41,.021);
+    strake.rotation.z=a;
+  }
+}
 export function makeShip(m) {
   const root=new T.Group();
   round(root,m.dark,0,1.25,.25,4.6,1.28,6.2,.32);
@@ -90,14 +106,14 @@ export function makeShip(m) {
     for(let i=0;i<8;i++)block(root,m.alloy,x,2.236,-.63+i*.29,.76,.045,.035);
     const window=round(root,m.glass,side*1.53,2.44,-1.54,.13,.44,1.55,.061);
     window.rotation.z=side*.11;
-    const engine = cylinder(root,m.alloy,x,1.46,3.43,.59,.53,.85,24);
-    engine.rotation.x=Math.PI/2;
-    cylinder(root,m.dark,x,1.46,3.89,.46,.39,.19,24).rotation.x=Math.PI/2;
-    cylinder(root,m.orange,x,1.46,3.995,.30,.30,.04,24).rotation.x=Math.PI/2;
-    for(let i=0;i<10;i++){
-      const a=i*Math.PI/5;
-      round(root,m.rubber,x+Math.cos(a)*.47,1.46+Math.sin(a)*.47,3.83,.095,.095,.29,.037);
+    exhaust(root,m,x);
+    const cover=round(root,m.dark,x+side*.620,1.53,1.10,.11,.51,1.79,.041);
+    cover.rotation.y=side*.075;
+    for(let n=0;n<4;n++){
+      round(root,m.alloy,x+side*.684,1.53,.44+n*.38,.017,.38,.061,.008);
     }
+    tube(root,m.gold,[[x+side*.49,1.99,1.66],[x+side*.70,1.90,1.96],
+      [x+side*.69,1.75,2.52],[x+side*.47,1.64,2.86]],.034,true);
     tube(root,m.alloy,[[x,1.92,1.9],[x+side*.54,1.73,2.42],[x+side*.48,1.23,2.99]],.081,true);
     for(const dz of [-1.95,2.38]){
       tube(root,m.dark,[[side*1.73,1.1,dz],[side*2.24,.65,dz],[side*2.65,.14,dz+.25]],.13);
@@ -111,6 +127,10 @@ export function makeShip(m) {
   round(root,m.armor,0,1.73,3.33,1.36,.94,.3,.12);
   round(root,m.dark,0,1.78,3.5,1.07,.72,.14,.089);
   round(root,m.lit,0,2.03,3.59,.57,.04,.035,.014);
+  for(const side of [-1,1]){
+    tube(root,m.alloy,[[side*.59,.20,3.97],[side*.53,1.30,3.65],[side*.55,1.90,3.67]],.028);
+    round(root,m.stripe,side*.69,1.29,3.52,.055,.43,.04,.016);
+  }
   for(let i=0;i<6;i++)round(root,m.alloy,0,.21+i*.17,3.99-i*.07,.78,.056,.18,.02);
   label(root,36,'#dce9bd','WM–04',0,2.47,3.148,.92,.345);
   return {root:shadows(root)};

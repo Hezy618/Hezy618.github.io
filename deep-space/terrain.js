@@ -1,6 +1,6 @@
 import * as T from './vendor/three.module.min.js';
 import { canvasTexture, seeded } from './mesh.js';
-import { worlds } from './catalog.js';
+import { worlds } from './catalog.js?v=2';
 
 const sphereDir = (face, u, v, out) => {
   if (face===0) out.set(1,v,u);
@@ -260,25 +260,36 @@ function terrain(world, scene, grain, scan) {
 function atmosphere(world, scene, sun) {
   const material=new T.ShaderMaterial({
     transparent:true,depthWrite:false,side:T.BackSide,blending:T.AdditiveBlending,
-    uniforms:{origin:{value:world.position},tint:{value:new T.Color(world.air)},sun:{value:sun},radius:{value:world.radius}},
+    uniforms:{origin:{value:world.position},tint:{value:new T.Color(world.air)},sun:{value:sun},radius:{value:world.radius},pressure:{value:world.pressure}},
     vertexShader:`varying vec3 p;
       #include <common>
       #include <logdepthbuf_pars_vertex>
       void main(){p=(modelMatrix*vec4(position,1.)).xyz; gl_Position=projectionMatrix*viewMatrix*vec4(p,1.);
       #include <logdepthbuf_vertex>
       }`,
-    fragmentShader:`varying vec3 p; uniform vec3 origin,tint,sun; uniform float radius;
+    fragmentShader:`varying vec3 p; uniform vec3 origin,tint,sun; uniform float radius,pressure;
       #include <common>
       #include <logdepthbuf_pars_fragment>
       void main(){
       #include <logdepthbuf_fragment>
       vec3 v=normalize(p-cameraPosition);
       vec3 n=normalize(p-origin);
-      float up=distance(cameraPosition,origin)/radius;
-      float limb=pow(1.-abs(dot(n,v)),2.9);
-      float light=.20+.80*max(0.,dot(n,sun));
-      float halo=pow(max(0.,dot(v,sun)),20.);
-      gl_FragColor=vec4(tint*(.69+halo*.45), limb*light*(up<1.035?.42:.84));
+      vec3 local=cameraPosition-origin;
+      float h=length(local)/radius;
+      float limb=pow(1.-abs(dot(n,v)),3.);
+      float light=.07+.93*smoothstep(-.20,.72,dot(n,sun));
+      float halo=pow(max(0.,dot(v,sun)),14.);
+      float visibility=pressure*(.32+halo*.37);
+      if(h<1.036){
+        vec3 zenith=normalize(local);
+        float daylight=smoothstep(-.20,.20,dot(zenith,sun));
+        float altitude=1.-smoothstep(1.004,1.036,h);
+        float horizon=pow(1.-clamp(dot(zenith,v),0.,1.),3.);
+        float opacity=(.03+.16*halo+.39*horizon)*altitude*visibility*daylight;
+        gl_FragColor=vec4(tint, opacity);
+      } else {
+        gl_FragColor=vec4(tint*(.74+halo*.45),limb*light*visibility);
+      }
       }`,
   });
   const mesh=new T.Mesh(new T.SphereGeometry(world.radius*1.036,64,34),material);

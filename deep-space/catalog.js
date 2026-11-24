@@ -1,11 +1,17 @@
 export const worlds = [
-  { id:'ember', name:'赤脊星', biome:'赤铁峡谷', radius:2420, center:[0,-2420,0], seed:11,
+  { id:'ember', name:'赤脊星', biome:'赤铁峡谷', radius:2420, center:[0,-2420,0], seed:11, gravity:4.2, pressure:.38, scaleHeight:105, temperature:-12,
     rock:'#703f2d', dust:'#a37748', frost:'#d4ba82', air:'#ff934e', accent:'#ffb27a' },
-  { id:'rime', name:'霜镜', biome:'冰原与玄武岩', radius:1960, center:[12760,7420,-12800], seed:43,
+  { id:'rime', name:'霜镜', biome:'冰原与玄武岩', radius:1960, center:[12760,7420,-12800], seed:43, gravity:3.1, pressure:.16, scaleHeight:82, temperature:-63,
     rock:'#304454', dust:'#718b97', frost:'#b9d8dd', air:'#66aed9', accent:'#9ae9ff' },
-  { id:'veil', name:'翡翠幕', biome:'层状矿脊', radius:3260, center:[-15800,8890,-17200], seed:91,
+  { id:'veil', name:'翡翠幕', biome:'层状矿脊', radius:3260, center:[-15800,8890,-17200], seed:91, gravity:6.8, pressure:.81, scaleHeight:162, temperature:17,
     rock:'#344239', dust:'#687a50', frost:'#b1ac73', air:'#88d189', accent:'#bae888' },
 ];
+export const habitat = {
+  ember:{ plant:'铜羽蓟', animal:'赤脊跖兽', leaf:0x8f9c58, shoot:0xe4ae75, skin:0x9d674b, trim:0xf4c18d },
+  rime:{ plant:'霜杯藓', animal:'玻纹潜行兽', leaf:0x8ccecb, shoot:0xd3f4eb, skin:0x6d929f, trim:0xbdebeb },
+  veil:{ plant:'幕菌', animal:'翡翠冠兽', leaf:0x487761, shoot:0xadf1a3, skin:0x6a9377, trim:0xe1da8a },
+};
+export const airDensity = (world, altitude) => world.pressure * Math.exp(-Math.max(0, altitude) / world.scaleHeight);
 export const materials = {
   iron:{ name:'铁矿', color:'#e99b70' },
   silica:{ name:'硅砂', color:'#94d6e5' },

@@ -104,3 +104,87 @@ button.primary:hover:not(:disabled){color:#142016;background:#f0ffd4}
 
 #app:is([data-mode="seat"],[data-mode="flight"]) #prompt { bottom: 40%; }
 #app:is([data-mode="seat"],[data-mode="flight"]) #notice { bottom: 33%; }
+
+:root {
+  --ink:#eff5f2; --muted:#b8cac8; --lime:#b4efe0;
+  --panel:#091d20eb; --line:#90c7c557; --warm:#ffc895;
+  --readable-shadow:0 1px 3px #061014,0 0 12px #061014;
+}
+.top { background:#071618e8; }
+.top>span { letter-spacing:.24em; }
+.top button { border-color:#84bbb344; margin-left:4px; }
+.primary { color:#092120; background:#aee8d8; border-color:#aee8d8; }
+button.primary:hover:not(:disabled){color:#092120;background:#d5fff0}
+.eyebrow { letter-spacing:.23em; }
+#radar { box-shadow:0 0 0 1px #a1d6d37a,0 7px 25px #040b1280; }
+.location > span { font-size:.72rem; }
+.mission {
+  border:0; border-top:1px solid #abd7d389; border-right:2px solid #a7d1cdb3;
+  background:linear-gradient(115deg,#071c1eea,#10272adb);
+  max-width:232px; padding:11px 13px; border-radius:0 0 0 8px;
+}
+.mission>span { color:#a9c5c4; letter-spacing:.14em; }
+.mission>b { color:#e8fbf4; }
+#reticle {
+  width:18px;height:18px;border:0;box-shadow:none;border-radius:0;
+  background:linear-gradient(var(--lime),var(--lime)) center top/1px 5px no-repeat,
+    linear-gradient(var(--lime),var(--lime)) center bottom/1px 5px no-repeat,
+    linear-gradient(90deg,var(--lime),var(--lime)) left center/5px 1px no-repeat,
+    linear-gradient(90deg,var(--lime),var(--lime)) right center/5px 1px no-repeat;
+  filter:drop-shadow(0 1px 1px #071517);
+}
+#reticle::after { content:""; width:2px;height:2px;background:#effff7;position:absolute;left:8px;top:8px; }
+#app[data-target] #reticle { border:1px solid #d6f8e4a8; }
+#prompt {
+  border:0; border-left:2px solid #9fd6c8; border-radius:3px;
+  background:#092124e8; color:#e9fff4; box-shadow:0 5px 20px #0614156e;
+  padding:8px 12px; font-weight:650; letter-spacing:.02em;
+}
+#notice { text-shadow:var(--readable-shadow); color:#f1f7e9; font-size:.875rem; }
+kbd {
+  display:inline-block;padding:1px 4px;margin-right:6px;min-width:18px;
+  border:1px solid #9cccca59;border-radius:3px;
+  font:.72rem/1.35 ui-monospace,monospace;text-align:center;color:#bce8e4;
+}
+#hud-actions { gap:5px; }
+#hud-actions button {
+  border-color:#8dc3be5e; border-radius:4px; padding:7px 9px;
+  background:#081d21e8; box-shadow:0 3px 12px #04131157;
+}
+#hud-actions button:hover { border-color:#b9e9df; }
+#readouts { background:#091b20e4; border-radius:4px; border-top-color:#a1d8d17c; }
+#readouts span+span { border-left:1px solid #86b7b14a; padding-left:10px; }
+#attitude { pointer-events:none;position:absolute;inset:0; }
+#bearing {
+  position:absolute;top:111px;left:50%;transform:translateX(-50%);
+  min-width:128px;text-align:center;color:#c7eee5;letter-spacing:.17em;
+  font:700 .77rem ui-monospace,monospace;text-shadow:var(--readable-shadow);
+}
+.flight-ladder {
+  position:absolute;left:50%;top:50%;width:128px;height:145px;transform:translate(-50%,-50%);
+  overflow:hidden;mask-image:linear-gradient(transparent,#000 21%,#000 79%,transparent);
+}
+#flight-ladder-ticks { position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;align-items:center; }
+#flight-ladder-ticks i { width:80%;height:1px;background:linear-gradient(90deg,#c0ebe38c 29%,transparent 29% 71%,#c0ebe38c 71%);position:relative; }
+#flight-ladder-ticks i.datum { width:100%;background:linear-gradient(90deg,#c2efeccc 25%,transparent 25% 75%,#c2efeccc 75%); }
+#flight-ladder-ticks span { position:absolute;right:0;top:-11px;font:9px ui-monospace,monospace;color:#c3efe2; }
+.option { border-radius:4px;background:linear-gradient(150deg,#112f30,#102426); }
+.dialog-frame { border-top:2px solid #9ed7cc; }
+@media (max-width:740px){
+  .mission { max-width:155px;padding:7px 9px; }
+  #hud-actions button { padding:6px 8px; }
+  #hud-actions kbd { display:none; }
+  #bearing { top:28%; font-size:.64rem; }
+  .flight-ladder { width:90px;height:115px; }
+  #readouts span+span { padding-left:6px; }
+}
+
+#app[data-mode="eva"] #readouts {
+  left:clamp(11px,3vw,40px);transform:none;
+}
+@media (max-width:740px) {
+  #app[data-mode="eva"] #readouts { left:50%;transform:translateX(-50%); }
+}
+@media (min-width:741px) and (max-width:930px) {
+  #app[data-mode="flight"] .mission,#app[data-mode="seat"] .mission { top:112px; }
+}
